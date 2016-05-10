@@ -12,9 +12,11 @@
   </head>
   <body>
     <script>
-      $("#clickme").click(function(){
-        $("#appoint").text("约会地点江阴，时间：2016.5.14");
-      })
+     $(document).ready(function(){  
+        $("#clickme").click(function(){  
+          $("#appoint").html("约会地点：江阴，约会时间，本周六");
+        }); 
+      }); 
     </script>
     <section class="page-header">
       <h1 class="project-name">阿梅我想你</h1>
