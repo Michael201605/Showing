@@ -9,7 +9,7 @@
 <!--<br>-->
 <!--<span id="twocats">{{{__n "%d cat" "%d cats" 2}}}</span>-->
 
-<div class="container main">
+<div class="container main" ng-app="mainApp" ng-controller="MainCtrl">
     <div class="row">
         <div class="col-lg-12">
             <!--Navigation-->
@@ -149,6 +149,6 @@
     </div>
 </div>
 {{#section 'jquery'}}
-
+    <script src="/js/mainApp.js"></script>
 
 {{/section}}

@@ -1,4 +1,4 @@
-<div class="col-lg-3">
+<div class="col-lg-1">
     <!--navigation buttons-->
     <ul class="nav nav-pills nav-stacked">
         <li class="active"><a data-toggle="pill" href="#home">{{{__ "Start"}}}</a></li>
@@ -8,15 +8,17 @@
 
     </ul>
 </div>
-<div class="col-lg-9">
+<div class="col-lg-11">
     <!--visualization-->
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-            <img src="/SvgImage/Start.svg" class="img-fluid" alt="Responsive image">
+            <!--<img src="/SvgImage/Start.svg" class="img-fluid" alt="Responsive image">-->
+            <input id="navigations" type="text" class="hidden" value="{{partials.naviStr}}"/>
         </div>
         {{#each partials.navigations}}
             <div id="{{index}}" class="tab-pane fade">
-                <img src="/SvgImage/{{index}}.svg" class="img-fluid" alt="Responsive image">
+                <!--<svg id="canvas" width="100%" height="100%"></svg>-->
+                <!--<div ng-include="/SvgImage/{{index}}.svg" class="img-fluid" alt="Responsive image"></div>-->
             </div>
         {{/each}}
     </div>

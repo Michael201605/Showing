@@ -28,6 +28,7 @@ var handlebars = require('express3-handlebars')
             __n: function() { return i18n.__n.apply(this, arguments); }
         }
     });
+
 var menus = require('./lib/tools/Menu');
 var navs = require('./lib/tools/Navigation');
 // configuration ===============================================================
@@ -137,6 +138,7 @@ app.use(function (req,res,next) {
     i18n.setLocale(i18n, req.locale);
     res.locals.partials.menus = menus(i18n);
     res.locals.partials.navigations = navs(res.locals.partials.menus);
+    res.locals.partials.naviStr = JSON.stringify(res.locals.partials.navigations );
     //console.log("Navigation's length: " +res.locals.partials.navigations.length );
 
     //console.log("showTest: " +res.locals.showTests);

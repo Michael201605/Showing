@@ -157,11 +157,6 @@ var ConfigureMenus = [
         url: '#'
     },
     {
-        name: 'Users',
-        SubMenus: [],
-        url: '#'
-    },
-    {
         name: 'Language',
         SubMenus: [
             {
