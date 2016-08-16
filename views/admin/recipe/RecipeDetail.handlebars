@@ -1,0 +1,147 @@
+<div class="container" ng-app="recipeApp" ng-controller="RecipeDetailCtrl">
+    <div class="row">
+        <div class="col-lg-3">
+            <label>{[{result}]}</label>
+        </div>
+        <div class="col-lg-8">
+            <h2>{{{__ "Recipe Detail"}}}</h2>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <input id="recipe" type="text" class="hidden" value="{{recipe}}"/>
+            <!--<input id="id" type="text" class="hidden" value="{{recipe.id}}"/>-->
+            <!--<input id="Ident" type="text" class="hidden" value="{{recipe.Ident}}"/>-->
+            <!--<input id="Name" type="text" class="hidden" value="{{recipe.Name}}"/>-->
+            <!--<input id="LineIdent" type="text" class="hidden" value="{{recipe.LineIdent}}"/>-->
+            <!--<input id="JobIdent" type="text" class="hidden" value="{{recipe.JobIdent}}"/>-->
+            <form class="form-horizontal" role="form" ng-submit="update()">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{{__ "Ident"}}}</label>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="Ident"
+                               ng-model="recipe.Ident"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{{__ "Name"}}}</label>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="Name"
+                               ng-model="recipe.Name"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{{__ "LineIdent"}}}</label>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="LineIdent"
+                               ng-model="recipe.LineIdent"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="padding-left:300px">
+                        <input type="submit" value="Submit" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <!--navigation buttons-->
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a data-toggle="pill" href="#Senders">{{{__ "Senders"}}}</a></li>
+                <li><a data-toggle="pill" href="#Receivers">{{{__ "Receivers"}}}</a></li>
+            </ul>
+        </div>
+        <div class="col-lg-7">
+            <!--visualization-->
+            <div class="tab-content">
+                <div id="Senders" class="tab-pane fade in active">
+                    <div class="col-lg-9">
+                        <table class="table table-bordered table-hover">
+                            <caption> {{{__ "Senders"}}}</caption>
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" ng-model="sendersSelectedAll" ng-click="senderCheckAll()"/>
+                                </th>
+                                <th>{{{__ "ProductIdent"}}}</th>
+                                <th>{{{__ "TargetPercentage"}}}</th>
+                                <th>{{{__ "TargetWeight"}}}</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="sender in senders">
+                                <td>
+                                    <input type="checkbox" ng-model="sender.selected"/>
+                                </td>
+                                <th>{[{sender.ProductIdent}]}</th>
+                                <th>{[{sender.TargetPercentage}]}</th>
+                                <th>{[{sender.TargetWeight}]}</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-3">
+                        <!--navigation buttons-->
+                        <button type="submit" class="btn btn-primary" ng-click="createSender()">{{{__ "New"}}}</button>
+                        <button id='deleteJob' class="btn btn-danger"
+                                ng-click="removeSender()">{{{__ "Delete"}}}</button>
+                    </div>
+                </div>
+                <div id="Receivers" class="tab-pane fade">
+                    <div class="col-lg-9">
+                        <table class="table table-bordered table-hover">
+                            <caption> {{{__ "Receivers"}}}</caption>
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" ng-model="receiversSelectedAll"
+                                           ng-click="receiversCheckAll()"/></th>
+                                <th><select ng-model="senderProductIdent"
+                                            class="optional overall classes"
+                                            data-btn-class="option toggle classes">
+                                    <!-- ... -->
+                                </select></th>
+                                <th>{{{__ "TargetPercentage"}}}</th>
+                                <th>{{{__ "TargetWeight"}}}</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="receiver in receivers">
+                                <td>
+                                    <input type="checkbox" ng-model="receiver.selected"/>
+                                </td>
+                                <th>{[{receiver.ProductIdent}]}</th>
+                                <th>{[{receiver.TargetPercentage}]}</th>
+                                <th>{[{receiver.TargetWeight}]}</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-3">
+                        <!--navigation buttons-->
+                        <button type="submit" class="btn btn-primary"
+                                ng-click="createReceiver()">{{{__ "New"}}}</button>
+                        <button id='deleteJob' class="btn btn-danger"
+                                ng-click="removeReceiver()">{{{__ "Delete"}}}</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <!--navigation buttons-->
+        </div>
+        <div class="col-lg-9">
+            <!--visualization-->
+        </div>
+    </div>
+</div>
+{{#section 'jquery'}}
+
+    <script src="/js/recipes/recipeApp.js"></script>
+
+{{/section}}

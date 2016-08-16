@@ -1,0 +1,23 @@
+<div class="col-lg-3">
+    <!--navigation buttons-->
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a data-toggle="pill" href="#home">{{{__ "Start"}}}</a></li>
+        {{#each partials.navigations}}
+            <li><a data-toggle="pill" href="#{{index}}">{{name}}</a></li>
+        {{/each}}
+
+    </ul>
+</div>
+<div class="col-lg-9">
+    <!--visualization-->
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <img src="/SvgImage/Start.svg" class="img-fluid" alt="Responsive image">
+        </div>
+        {{#each partials.navigations}}
+            <div id="{{index}}" class="tab-pane fade">
+                <img src="/SvgImage/{{index}}.svg" class="img-fluid" alt="Responsive image">
+            </div>
+        {{/each}}
+    </div>
+</div>

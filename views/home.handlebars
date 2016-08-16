@@ -1,0 +1,154 @@
+{{#section 'head'}}
+
+
+
+{{/section}}
+<!--<span id="text">{{{__ "text to test"}}}</span>-->
+<!--<br>-->
+<!--<span id="onecat">{{{__n "%d cat" "%d cats" 1}}}</span>-->
+<!--<br>-->
+<!--<span id="twocats">{{{__n "%d cat" "%d cats" 2}}}</span>-->
+
+<div class="container main">
+    <div class="row">
+        <div class="col-lg-12">
+            <!--Navigation-->
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">FLCos</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="myNavbar">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="#">{{{__ "Home"}}}</a></li>
+                            {{> menus}}
+                            <!--<li class="dropdown">-->
+                                <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Warehouse <span-->
+                                        <!--class="caret"></span></a>-->
+                                <!--<ul class="dropdown-menu">-->
+                                    <!--<li><a target="_blank" href="/warehouse/rawwarehouse">Raw Warehouse</a></li>-->
+                                    <!--<li><a href="/warehouse/dispensary:dis1">Disp1 Warehouse</a></li>-->
+                                    <!--<li><a href="#">Disp2 Warehouse</a></li>-->
+                                    <!--<li><a href="#">FinishedProduct</a></li>-->
+                                    <!--<li><a href="#">LotManagement</a></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li class="dropdown">-->
+                                <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Intake <span-->
+                                        <!--class="caret"></span></a>-->
+                                <!--<ul class="dropdown-menu">-->
+                                    <!--<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">INT1-->
+                                        <!--<span-->
+                                                <!--class="caret"></span></a>-->
+                                        <!--<ul class="dropdown-menu-right">-->
+                                            <!--<li><a target="_blank" href="/job/jobList/:INT1">Jobs</a></li>-->
+                                            <!--<li><a target="_blank" href="/job/jobLogList/:INT1">Job Log</a></li>-->
+                                            <!--<li><a target="_blank" href="/Line/LineDetail/:INT1">Line</a></li>-->
+                                        <!--</ul>-->
+                                    <!--</li>-->
+                                    <!--<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">INT2-->
+                                        <!--<span-->
+                                                <!--class="caret"></span></a>-->
+                                        <!--<ul class="dropdown-menu">-->
+                                            <!--<li><a target="_blank" href="/jobs/jobList:INT2">Jobs</a></li>-->
+                                            <!--<li><a target="_blank" href="/jobs/jobLogList:INT2">Job Log</a></li>-->
+                                            <!--<li><a target="_blank" href="/Line/LineDetail:INT2">Line</a></li>-->
+                                        <!--</ul>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li class="dropdown">-->
+                                <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Production <span-->
+                                        <!--class="caret"></span></a>-->
+                                <!--<ul class="dropdown-menu">-->
+                                    <!--<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">MIX1-->
+                                        <!--<span-->
+                                                <!--class="caret"></span></a>-->
+                                        <!--<ul class="dropdown-menu">-->
+                                            <!--<li><a target="_blank" href="/jobs/jobList:MIX1">Jobs</a></li>-->
+                                            <!--<li><a target="_blank" href="/jobs/jobLogList:MIX1">Job Log</a></li>-->
+                                            <!--<li><a target="_blank" href="/Line/LineDetail:MIX1">Line</a></li>-->
+                                        <!--</ul>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li><a href="#">Process</a></li>-->
+                            <!--<li><a href="#">DatabaseManage</a></li>-->
+                            <!--<li><a href="#">Users</a></li>-->
+                            <!--<li class="dropdown">-->
+                                <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Language<span-->
+                                        <!--class="caret"></span></a>-->
+                                <!--<ul class="dropdown-menu">-->
+                                    <!--<li><a href="#">Chinese</a></li>-->
+                                    <!--<li><a href="#">English</a></li>-->
+                                    <!--<li><a href="#">German</a></li>-->
+                                    <!--<li><a href="#">French</a></li>-->
+                                    <!--<li><a href="#">Italian</a></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                            <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <!--showing message-->
+        </div>
+        <div class="col-lg-4">
+            <!--tools buttons-->
+        </div>
+    </div>
+    <div class="row">
+        {{> navigations}}
+        <!--<div class="col-lg-3">-->
+            <!--&lt;!&ndash;navigation buttons&ndash;&gt;-->
+            <!--<ul class="nav nav-pills nav-stacked">-->
+                <!--<li class="active"><a data-toggle="pill" href="#home">Home</a></li>-->
+                <!--<li><a data-toggle="pill" href="#menu1">Menu 1</a></li>-->
+                <!--<li><a data-toggle="pill" href="#menu2">Menu 2</a></li>-->
+                <!--<li><a data-toggle="pill" href="#menu3">Menu 3</a></li>-->
+            <!--</ul>-->
+        <!--</div>-->
+        <!--<div class="col-lg-9">-->
+            <!--&lt;!&ndash;visualization&ndash;&gt;-->
+            <!--<div class="tab-content">-->
+                <!--<div id="home" class="tab-pane fade in active">-->
+                    <!--<h3>HOME</h3>-->
+                    <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut-->
+                        <!--labore et dolore magna aliqua.</p>-->
+                <!--</div>-->
+                <!--<div id="menu1" class="tab-pane fade">-->
+                    <!--<h3>Menu 1</h3>-->
+                    <!--<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo-->
+                        <!--consequat.</p>-->
+                <!--</div>-->
+                <!--<div id="menu2" class="tab-pane fade">-->
+                    <!--<h3>Menu 2</h3>-->
+                    <!--<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,-->
+                        <!--totam rem aperiam.</p>-->
+                <!--</div>-->
+                <!--<div id="menu3" class="tab-pane fade">-->
+                    <!--<h3>Menu 3</h3>-->
+                    <!--<p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt-->
+                        <!--explicabo.</p>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+{{#section 'jquery'}}
+
+
+{{/section}}

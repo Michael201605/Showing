@@ -1,0 +1,39 @@
+<div class="container" ng-app="recipeApp" ng-controller="RecipeListCtrl">
+    <div class="row">
+        <div class="col-lg-8">
+            <input id="recipes" type="text" class="hidden" value="{{recipes}}"/>
+            <table class="table table-bordered table-hover">
+                <caption>{{{__ "Recipe Management"}}}</caption>
+                <thead>
+                <tr>
+                    <th><input type="checkbox" ng-model="selectedAll" ng-click="checkAll()"/></th>
+                    <th>{{{__ "Ident"}}}</th>
+                    <th>{{{__ "LineIdent"}}}</th>
+                    <th>{{{__ "Category"}}}</th>
+                </tr>
+                </thead>
+                <tr ng-repeat="recipe in recipes">
+                    <td>
+                        <input type="checkbox" ng-model="recipe.selected"/>
+                    </td>
+                    <td><a href="/admin/recipe/RecipeDetail/:{[{recipe.id}]}">{[{recipe.Ident}]}</a></td>
+                    <td>{[{recipe.Name}]}</td>
+                    <td>{[{recipe.LineIdent}]}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-lg-3">
+            <form class="form-horizontal" role="form" ng-submit="createRecipe()">
+
+                <button type="submit" class="btn btn-primary">{{{__ "New"}}}</button>
+                <!--<button type="submit" class="btn btn-primary addnew pull-right" ng-click="copyRecipe">{{{__ "Copy"}}}</button>-->
+
+            </form>
+                <button id='deleteJob' class="btn btn-danger" ng-click="remove()">{{{__ "Delete"}}}</button>
+        </div>
+    </div>
+</div>
+{{#section 'jquery'}}
+    <script src="/js/recipes/recipeApp.js"></script>
+
+{{/section}}

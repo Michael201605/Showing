@@ -1,0 +1,31 @@
+{{#each partials.menus}}
+    <!-- First level-->
+    <li class="dropdown">
+
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{name}} <span
+                class="caret"></span></a>
+        {{#if SubMenus}}
+            <!-- Second level-->
+            <ul class="dropdown-menu">
+                {{#each SubMenus}}
+                    <li>
+                        {{#if SubMenus}}
+                            <a class="dropdown-toggle" data-toggle="dropdown"
+                               href="#">{{name}} <span
+                                    class="caret"></span></a>
+                            <ul>
+                                {{#each SubMenus}}
+                                    <!-- Third level-->
+                                    <li><a target="_blank" href="{{url}}">{{name}}</a></li>
+                                {{/each}}
+                            </ul>
+                        {{else}}
+                            <a href="{{url}}">{{name}}</a>
+                        {{/if}}
+                    </li>
+                {{/each}}
+            </ul>
+        {{/if}}
+
+    </li>
+{{/each}}

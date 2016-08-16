@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="public/vendor/jquery/jquery-1.9.1.js"></script>
+    <script src="public/vendor/require-2.2.0.js"></script>
+    <script src="browser-serialport.js"></script>
+</head>
+<body>
+    <script>
+        $(function () {
+            var serialport = require('browser-serialport').SerialPort;
+            console.dir(serialport);
+        });
+
+    </script>
+</body>
+</html>

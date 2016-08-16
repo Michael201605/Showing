@@ -1,0 +1,83 @@
+<div class="container" ng-app="jobApp" ng-controller="JobDetailCtrl">
+    <input id="job" type="text" class="hidden" value="{{job}}"/>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Ident"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Ident" disabled
+                           ng-model="job.Ident"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Name"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Name" disabled
+                           ng-model="job.Name"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "State"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="State" disabled
+                           ng-model="job.State"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Locked"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Locked" disabled
+                           ng-model="job.Locked"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Product"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Product" disabled
+                           ng-model="Product"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "TargetWeight"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="TargetWeight" disabled
+                           ng-model="TargetWeight"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Sender"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Sender" disabled
+                           ng-model="Sender"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Receiver"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Receiver" disabled
+                           ng-model="Receiver"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
