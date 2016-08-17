@@ -28,7 +28,8 @@ var handlebars = require('express3-handlebars')
             __n: function() { return i18n.__n.apply(this, arguments); }
         }
     });
-
+var server = require('http').createServer(app),
+    io = require('socket.io')(server);
 var menus = require('./lib/tools/Menu');
 var navs = require('./lib/tools/Navigation');
 // configuration ===============================================================
@@ -157,6 +158,26 @@ require('./routes/line')(app, i18n);
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
+
+io.on('connection', function (socket) {
+    var GCObjects= [
+        {
+            id: 'A_1001_MXZ01',
+            State: 30
+        },
+        {
+            id: 'A_1003_QXV01',
+            State: 40
+        }
+    ];
+    var GCObjectsStr = JSON.stringify(GCObjects);
+    socket.emit('GCObjectUpdate', GCObjects);
+    console.log('Have send event to client');
+    // socket.on('my other event', function (data) {
+    //     console.log(data);
+    // });
+});
+
 // launch ======================================================================
-app.listen(port);
+server.listen(port);
 console.log('The magic happens on port ' + port);

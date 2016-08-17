@@ -76,5 +76,11 @@
 	"Lot": "Lot",
 	"Login": "Login",
 	"Signup": "Signup",
-	"home": "home"
+	"home": "home",
+	"Sign Up": "Sign Up",
+	"Logout": "Logout",
+	"ErrorList": "ErrorList",
+	"Reset": "Reset",
+	"Continue": "Continue",
+	"Stop": "Stop"
 }
