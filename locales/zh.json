@@ -82,5 +82,12 @@
 	"ErrorList": "ErrorList",
 	"Reset": "Reset",
 	"Continue": "Continue",
-	"Stop": "Stop"
+	"Stop": "Stop",
+	"Mannual": "Mannual",
+	"Automatic": "Automatic",
+	"Close": "Close",
+	"Open": "Open",
+	"Mode": "Mode",
+	"Operation": "Operation",
+	"storage not found": "storage not found"
 }

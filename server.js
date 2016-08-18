@@ -155,10 +155,11 @@ app.use(function (req,res,next) {
 require('./routes/index')(app, passport); // load our routes and pass in our app and fully configured passport
 require('./routes/job')(app, i18n);
 require('./routes/line')(app, i18n);
+require('./routes/storage')(app, i18n);
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
-
+require('./routes/gcobject')(app, i18n);
 io.on('connection', function (socket) {
     var GCObjects= [
         {

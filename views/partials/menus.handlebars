@@ -16,11 +16,11 @@
                             <ul>
                                 {{#each SubMenus}}
                                     <!-- Third level-->
-                                    <li><a target="_blank" href="{{url}}">{{name}}</a></li>
+                                    <li><div><a target="_blank" href="{{url}}">{{name}}</a></div></li>
                                 {{/each}}
                             </ul>
                         {{else}}
-                            <a href="{{url}}">{{name}}</a>
+                            <a target="_blank" href="{{url}}">{{name}}</a>
                         {{/if}}
                     </li>
                 {{/each}}

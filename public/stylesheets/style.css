@@ -87,3 +87,18 @@ svg {
 #inner-petals .segment:hover > .segment-edge {
     stroke: green;
 }
+.dialog{
+    margin: 0%;
+    padding: 0%;
+}
+.lamp{
+    padding-left: 0%;
+    padding-right: 0%;
+    background-color: black;
+}
+.lamp-div{
+    padding-left: 0%;
+}
+.title{
+    color : #9acfea;
+}

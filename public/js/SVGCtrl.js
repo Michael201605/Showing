@@ -1,7 +1,43 @@
 /**
  * Created by pi on 8/17/16.
  */
+var GcObjectDialog, StorageDialog, ScaleDialog;
 $(function () {
+    //modal dialog------
+
+        // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
+        // emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+        // name = $( "#name" ),
+        // email = $( "#email" ),
+        // password = $( "#password" ),
+        // allFields = $( [] ).add( name ).add( email ).add( password ),
+        // tips = $( ".validateTips" );
+
+    GcObjectDialog = $( "#GCObject-form" ).dialog({
+        title: 'GcObject',
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            Cancel: function() {
+                GcObjectDialog.dialog( "close" );
+            }
+        },
+        close: function() {
+
+        }
+    });
+    
+
+    // form = dialog.find( "form" ).on( "submit", function( event ) {
+    //     event.preventDefault();
+    //     addUser();
+    // });
+
+    //-------------------------------
+
+    //load svg file
     $('#home').load('SvgImage/Start.svg');
     var navigations = JSON.parse($("#navigations").val());
     navigations.forEach(function (nav) {
@@ -9,6 +45,8 @@ $(function () {
         $('#' + nav.index).load(url);
     });
 
+
+    //socket communication with server to update GCObject's state
     try
     {
         var socket = io('http://172.26.203.71:3000');
@@ -21,18 +59,108 @@ $(function () {
             });
 
         });
+        socket.on('connect_timeout',function (data) {
+            console.log('connect_timeout',data);
+        });
+        socket.on('error',function (data) {
+            console.log('error',data);
+        });
+        socket.on('disconnect', function(){
+            console.log('disconnected......');
+        });
+
     }catch (ex){
-        console.log('error happened:',ex);
+        console.log('exception happened:',ex);
     }
 
-});
-function pp()
-{
-    var width = screen.width;
-    var height = screen.height;
-    var someValue = window.showModalDialog("new.html","","dialogWidth="+width+"px;dialogHeight="+height+"px;status=no;help=no;scrollbars=no")
-}
 
+});
+function Storage(BinIdent) {
+    if(BinIdent){
+        var url = '/storage/StorageDetail/:' + BinIdent;
+        var win = window.open(url, '_blank');
+        win.focus();
+    }else {
+        alert('BIN Ident is empty');
+    }
+
+}
+function Scale(Ident) {
+    if(Ident){
+        var url = '/scale/ScaleDetail/:' + Ident;
+        var win = window.open(url, '_blank');
+        win.focus();
+    }else {
+        alert('Scale Ident is empty');
+    }
+
+}
+function GcObject(gcIdent) {
+    console.log('gcIdent: ' + gcIdent);
+
+    $.get('/gcobject/:' + gcIdent,function (gcObject) {
+        console.log('gcObejct:');
+        console.dir(gcObject);
+        GcObjectDialog.dialog('option', 'title','GcObject: ' +gcIdent);
+
+        GcObjectDialog.data('gcObject', gcObject).dialog('open');
+
+        setGcObjectButtons(gcObject);
+
+        $('#Mannual').click(function () {
+            gcObject.mode = 0;
+            sendGcObjectToServer(gcObject);
+        });
+        $('#Aumatic').click(function () {
+            gcObject.mode = 1;
+            sendGcObjectToServer(gcObject);
+        });
+        $('#close').click(function () {
+            gcObject.status = 0;
+            sendGcObjectToServer(gcObject);
+        });
+        $('#Open').click(function () {
+            gcObject.status = 1;
+            sendGcObjectToServer(gcObject);
+        });
+    });
+
+}
+function sendGcObjectToServer(gcObject) {
+
+    $.post('/gcobject',{gcObjectStr:JSON.stringify(gcObject)}, function (gcObject) {
+        console.log('refresh gcObject: ');
+        console.dir(gcObject);
+        setGcObjectButtons(gcObject);
+    });
+}
+function setGcObjectButtons(gcObject) {
+    if(gcObject.mode){
+        $('#Mannual').attr("disabled", false);
+        $('#Aumatic').attr("disabled", true);
+        $('#close').attr("disabled", true);
+        $('#Open').attr("disabled", true);
+        $('#mode').attr('fill', 'green');
+    }else {
+        $('#mode').attr('fill', 'grey');
+        $('#Mannual').attr("disabled", true);
+        $('#Aumatic').attr("disabled", false);
+        if(gcObject.status){
+            $('#close').attr("disabled", false);
+            $('#Open').attr("disabled", true);
+        }else {
+            $('#close').attr("disabled", true);
+            $('#Open').attr("disabled", false);
+        }
+    }
+    if(gcObject.status){
+        $('#status').attr('fill', 'green');
+    }
+    else {
+        $('#status').attr('fill', 'grey');
+    }
+
+}
 function updateStatus(GCObject) {
     var color = getColorByState(GCObject.State);
     setBKColor($('#' + GCObject.id), color);
@@ -84,13 +212,6 @@ function getColorByState(state) {
     }
     return color;
 }
-// $scope.A_1001_MXZ01 ={
-//     Style: {
-//
-//         'background-color':'red'
-//     }
-// }
-// $scope.Style = {'background-color':'blue'};
 function setBKColor($node, color) {
     $node.children().attr('fill', color);
     $node.find('rect').attr('fill', color);
