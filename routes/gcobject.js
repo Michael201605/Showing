@@ -1,9 +1,9 @@
 /**
  * Created by pi on 7/21/16.
  */
-//var Job = require('../../Models/Pr/Job');
-var Line = require('../Models/Eq/Line');
-var GcsState = require('../lib/StateAndCategory/GcsState');
+//var Job = require('../../Models/pr/Job');
+var Line = require('../models/eq/Line');
+var GcsState = require('../lib/stateAndCategory/gcsState');
 module.exports = function (app, i18n) {
     app.get('/gcobject/:id', function (req, res) {
         var id = req.params.id.substring(1);

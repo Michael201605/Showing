@@ -1,16 +1,16 @@
 /**
  * Created by pi on 7/21/16.
  */
-var Receipt = require('../Models/Pr/Receipt');
-var Product = require('../Models/Pr/Product');
-var Company = require('../Models/Eq/Company');
+var Receipt = require('../models/pr/Receipt');
+var Product = require('../models/pr/Product');
+var Company = require('../models/eq/Company');
 
-var WarehousePackingType = require('../lib/StateAndCategory/WarehousePackingType');
+var WarehousePackingType = require('../lib/stateAndCategory/warehousePackingType');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 
 
 module.exports = function (app, i18n) {
-    app.get('/warehouse/ReceiptList/:state', function (req, res) {
+    app.get('/warehouse/receiptList/:state', function (req, res) {
         var state = req.params.state.substring(1);
 
         Receipt.findAll({
@@ -18,7 +18,7 @@ module.exports = function (app, i18n) {
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
             var receiptsStr = JSON.stringify(receipts);
-            res.render('warehouse/ReceiptList', {
+            res.render('warehouse/receiptList', {
                 receipts: receiptsStr,
                 state: state
             });
@@ -38,7 +38,7 @@ module.exports = function (app, i18n) {
             res.json(newReceipt);
         });
     });
-    app.get('/warehouse/ReceiptDetail/:id', function (req, res) {
+    app.get('/warehouse/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -54,7 +54,7 @@ module.exports = function (app, i18n) {
                 Company.findAll().then(function (companys) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
-                    res.render('warehouse/ReceiptDetail', {
+                    res.render('warehouse/receiptDetail', {
                         receipt: receiptStr,
                         packingCategory: packingCategoryStr,
                         products: productsStr,
@@ -68,7 +68,7 @@ module.exports = function (app, i18n) {
 
     });
 
-    app.post('/warehouse/ReceiptDetail', function (req, res) {
+    app.post('/warehouse/receiptDetail', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
@@ -86,21 +86,21 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/station/ReceiptList', function (req, res) {
+    app.get('/warehouse/station/receiptList', function (req, res) {
 
         Receipt.findAll({
             where: {State: 10}
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
             var receiptsStr = JSON.stringify(receipts);
-            res.render('warehouse/station/ReceiptList', {
+            res.render('warehouse/station/receiptList', {
                 receipts: receiptsStr,
                 state: 10
             });
         });
 
     });
-    app.get('/warehouse/station/ReceiptDetail/:id', function (req, res) {
+    app.get('/warehouse/station/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -116,7 +116,7 @@ module.exports = function (app, i18n) {
                 Company.findAll().then(function (companys) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
-                    res.render('warehouse/station/ReceiptDetail', {
+                    res.render('warehouse/station/receiptDetail', {
                         receipt: receiptStr,
                         packingCategory: packingCategoryStr,
                         products: productsStr,
@@ -129,7 +129,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/ConfirmReceipt/:id', function (req, res) {
+    app.get('/warehouse/confirmReceipt/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -141,7 +141,7 @@ module.exports = function (app, i18n) {
                     errors: JSON.stringify(errors)
                 });
             }else {
-                res.render('warehouse/ReceiptLabel', {
+                res.render('warehouse/receiptLabel', {
                     receipt: receiptStr,
                     packingCategory: packingCategoryStr
                 });
@@ -151,7 +151,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/ReceiptLabel/:id', function (req, res) {
+    app.get('/warehouse/receiptLabel/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -168,7 +168,7 @@ module.exports = function (app, i18n) {
                 theReceipt.getSupplier().then(function (supplier) {
                     data.SupplierName =supplier.Name;
                     console.log('data: '+ JSON.stringify(data));
-                    res.render('warehouse/ReceiptLabel', {
+                    res.render('warehouse/receiptLabel', {
                         data: data
                     });
                 });

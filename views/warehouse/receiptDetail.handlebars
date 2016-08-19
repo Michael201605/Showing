@@ -1,0 +1,135 @@
+<div class="container" ng-app="receiptApp" ng-controller="ReceiptDetailCtrl">
+
+
+    <input id="receipt" type="text" class="hidden" value="{{receipt}}"/>
+    <input id="packingCategory" type="text" class="hidden" value="{{packingCategory}}"/>
+    <input id="products" type="text" class="hidden" value="{{products}}"/>
+    <input id="companys" type="text" class="hidden" value="{{companys}}"/>
+    <div class="row">
+        <div class="col-lg-8">
+            <h2>{{{__ "Receipt Detail"}}}</h2>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Ident"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Ident" disabled
+                           ng-model="receipt.Ident"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "Name"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="Name"
+                           ng-model="receipt.Name"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-4 control-label">{{{__ "Supplier"}}}</label>
+                <select class="col-md-8" name="Supplier" id="Supplier" ng-model="receipt.SupplierId">
+                    <option ng-repeat="company in companys" value="{[{company.id}]}">{[{company.Name}]}</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-6">
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">{{{__ "Product"}}}</label>
+                <select class="col-md-8" name="Product" id="Product" ng-model="receipt.ProductId">
+                    <option ng-repeat="product in products" value="{[{product.id}]}">{[{product.Name}]}</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-4 control-label">{{{__ "TargetWeight"}}}</label>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="TargetWeight" disabled
+                           ng-model="receipt.TargetWeight"/>
+                </div>
+                <label class="col-md-3 control-label">{{{__ "KG"}}}</label>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "TargetUnitSize"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="TargetUnitSize" disabled
+                           ng-model="receipt.TargetUnitSize"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-4 control-label">{{{__ "PackagingType"}}}</label>
+                <select class="col-md-8" name="PackagingType" id="repeatSelect" ng-model="receipt.PackagingType">
+                    <option ng-repeat="option in packingCategoryOptions" value="{[{option.value}]}">{[{option.name}]}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <!--<h3>model = {[{receipt.PackagingType}]}</h3><br/>-->
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="col-md-4 control-label">{{{__ "Supplier"}}}</label>
+                <select class="col-md-8" name="Supplier" id="Supplier" ng-model="receipt.SupplierId">
+                    <option ng-repeat="company in companys" value="{[{company.id}]}">{[{company.Name}]}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{{__ "LOT"}}}</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="LOT"
+                           ng-model="receipt.LOT"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-6 control-label">{{{__ "ActualUnitSize"}}}</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="ActualUnitSize"
+                           ng-model="receipt.ActualUnitSize" ng-change="change()"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-md-6 control-label">{{{__ "ActualNbOfUnits"}}}</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="ActualNbOfUnits"
+                           ng-model="receipt.ActualNbOfUnits" ng-change="change()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-group">
+
+        <div style="padding-left:300px">
+
+            <input type="submit" value="Submit" class="btn btn-primary" ng-click="update()"/>
+        </div>
+    </div>
+</div>
+{{#section 'jquery'}}
+    <script src="/js/StateAndCategory/WarehousePackingType.js"></script>
+    <script src="/js/app/receiptApp.js"></script>
+    <script src="/vendor/r.js"></script>
+{{/section}}

@@ -30,8 +30,8 @@ var handlebars = require('express3-handlebars')
     });
 var server = require('http').createServer(app),
     io = require('socket.io')(server);
-var menus = require('./lib/tools/Menu');
-var navs = require('./lib/tools/Navigation');
+var menus = require('./lib/tools/menu');
+var navs = require('./lib/tools/navigation');
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 

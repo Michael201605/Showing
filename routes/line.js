@@ -1,23 +1,23 @@
 /**
  * Created by pi on 7/21/16.
  */
-//var Job = require('../../Models/Pr/Job');
-var Line = require('../Models/Eq/Line');
-var GcsState = require('../lib/StateAndCategory/GcsState');
+//var Job = require('../../Models/pr/Job');
+var Line = require('../models/eq/Line');
+var GcsState = require('../lib/stateAndCategory/gcsState');
 module.exports = function (app, i18n) {
-    app.get('/line/LineList', function (req, res) {
+    app.get('/line/lineList', function (req, res) {
         Line.findAll({
 
         }).then(function (lines) {
             console.log('lines: '+ lines);
-            res.render('line/LineList',
+            res.render('line/lineList',
                 {
                     lines: JSON.stringify(lines)
                 });
         });
 
     });
-    app.get('/line/LineList/createLine', function (req, res) {
+    app.get('/line/lineList/createLine', function (req, res) {
         var lineInfo = {
             Ident: 'newLine',
             State: GcsState.Passive
@@ -28,7 +28,7 @@ module.exports = function (app, i18n) {
             res.json(newLine);
         });
     });
-    app.post('/line/LineList/deleteLine', function (req, res) {
+    app.post('/line/lineList/deleteLine', function (req, res) {
         var toDeleteLineIdsStr = req.body.toDeleteLineIdsStr;
         console.log('toDeleteLineIdsStr:  ' + toDeleteLineIdsStr);
         var toDeleteLineIds = JSON.parse(toDeleteLineIdsStr);
@@ -43,7 +43,7 @@ module.exports = function (app, i18n) {
         });
     });
 
-    app.get('/line/LineDetail/:id', function (req, res) {
+    app.get('/line/lineDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
         console.log('Line id: ' + id);
         Line.findOne({
@@ -51,14 +51,14 @@ module.exports = function (app, i18n) {
         }).then(function (theLine) {
             var lineStr = JSON.stringify(theLine);
             console.log('line string: ' + lineStr);
-            res.render('line/LineDetail',
+            res.render('line/lineDetail',
                 {
                     line: lineStr
 
                 });
         });
     });
-    app.post('/line/LineDetail', function (req, res) {
+    app.post('/line/lineDetail', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }

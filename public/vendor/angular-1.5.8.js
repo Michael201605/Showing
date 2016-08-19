@@ -1672,7 +1672,7 @@ function angularInit(element, bootstrap) {
  * @description
  * Use this function to manually start up angular application.
  *
- * For more information, see the {@link guide/bootstrap Bootstrap guide}.
+ * For more information, see the {@link guide/bootstrap bootstrap guide}.
  *
  * Angular will detect if it has been loaded into the browser more than once and only allow the
  * first loaded script to be bootstrapped and will report a warning to the browser console for

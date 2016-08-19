@@ -8,7 +8,7 @@ var LocalStrategy   = require('passport-local').Strategy;
 
 // load up the user model
 var bcrypt = require('bcrypt-nodejs');
-var User = require('../Models/Um/User');
+var User = require('../models/um/User');
 
 
 // expose this function to our app using module.exports
@@ -62,7 +62,7 @@ module.exports = function(passport) {
                 console.log('local-signup...');
                 User.findOne({
                     where:{
-                        UserName: username
+                        userName: username
                     }
                 }).then(function(user) {
                     console.log('try to check user is existed...');
@@ -70,10 +70,10 @@ module.exports = function(passport) {
                         return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
                     }
                     var newUserMysql = {
-                        UserName: username,
-                        Password: bcrypt.hashSync(password, null, null),  // use the generateHash function in our user model
-                        IsAdministrator: false, //default
-                        IsEngineer:false // always false
+                        userName: username,
+                        password: bcrypt.hashSync(password, null, null),  // use the generateHash function in our user model
+                        isAdministrator: false, //default
+                        isEngineer:false // always false
                     };
                     User.create(newUserMysql).then(function (newUser) {
                         if(!newUser){
@@ -104,7 +104,7 @@ module.exports = function(passport) {
 
                 User.findOne({
                     where:{
-                        UserName: username
+                        userName: username
                     }
                 }).then(function(user) {
 
@@ -112,10 +112,10 @@ module.exports = function(passport) {
                         return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
                     }
                     console.log('User: ' + user);
-                    console.log('User: ' + user.UserName);
+                    console.log('User: ' + user.userName);
 
                     // if the user is found but the password is wrong
-                    if (!bcrypt.compareSync(password, user.Password))
+                    if (!bcrypt.compareSync(password, user.password))
                         return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
                     // all is well, return successful user

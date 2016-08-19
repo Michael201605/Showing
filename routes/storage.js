@@ -1,9 +1,9 @@
 /**
  * Created by pi on 7/21/16.
  */
-//var Job = require('../../Models/Pr/Job');
-var Storage = require('../Models/Eq/Storage');
-var GcsState = require('../lib/StateAndCategory/GcsState');
+//var Job = require('../../Models/pr/Job');
+var Storage = require('../models/eq/Storage');
+var GcsState = require('../lib/stateAndCategory/gcsState');
 module.exports = function (app, i18n) {
     app.get('/storage/StorageList', function (req, res) {
         Storage.findAll({}).then(function (storages) {
