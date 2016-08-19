@@ -32,6 +32,12 @@ var server = require('http').createServer(app),
     io = require('socket.io')(server);
 var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
+var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
+var nodeId = 'ns=1;s=PLC1.A_1006_MXZ01.Information.StCode';
+gcObjectAdapter = new GcObjectAdapter();
+gcObjectAdapter.getItemValue(nodeId, function (err, value) {
+    console.log('read nodeId: ' + nodeId + 'value: ' + value);
+})
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 
