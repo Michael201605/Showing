@@ -16,7 +16,7 @@ var Mixer = require('./eq/Mixer');
 var Packer = require('./eq/Packer');
 var Section = require('./eq/Section');
 var Line = require('./eq/Line');
-
+var GcObject = require('./eq/GcObject');
 
 var Product = require('./pr/Product');
 var IngredientComponent = require('./pr/IngredientComponent');
@@ -82,3 +82,4 @@ Line.sync().then(function () {
 });
 
 JobLog.sync();
+GcObject.sync();

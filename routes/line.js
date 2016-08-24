@@ -17,7 +17,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/line/lineList/createLine', function (req, res) {
+    app.get('/line/lineList/createLine',isLoggedIn, function (req, res) {
         var lineInfo = {
             Ident: 'newLine',
             State: GcsState.Passive
@@ -28,7 +28,7 @@ module.exports = function (app, i18n) {
             res.json(newLine);
         });
     });
-    app.post('/line/lineList/deleteLine', function (req, res) {
+    app.post('/line/lineList/deleteLine',isLoggedIn, function (req, res) {
         var toDeleteLineIdsStr = req.body.toDeleteLineIdsStr;
         console.log('toDeleteLineIdsStr:  ' + toDeleteLineIdsStr);
         var toDeleteLineIds = JSON.parse(toDeleteLineIdsStr);
@@ -43,7 +43,7 @@ module.exports = function (app, i18n) {
         });
     });
 
-    app.get('/line/lineDetail/:id', function (req, res) {
+    app.get('/line/lineDetail/:id',isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
         console.log('Line id: ' + id);
         Line.findOne({
@@ -58,7 +58,7 @@ module.exports = function (app, i18n) {
                 });
         });
     });
-    app.post('/line/lineDetail', function (req, res) {
+    app.post('/line/lineDetail',isLoggedIn, function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
@@ -78,52 +78,18 @@ module.exports = function (app, i18n) {
     });
 
 
-    // app.get('/job/JobDetail/Startjob/:Ident', function (req, res) {
-    //     var lineIdent = '';
-    //     var theLine,
-    //         lineController;
-    //     var Ident = req.params.Ident.substring(1);
-    //     var message = '';
-    //     var originMessage = '';
-    //     var error = '';
-    //     var originError = '';
-    //     Job.findOne({
-    //         where: {Ident: Ident}
-    //     }).then(function (theJob) {
-    //         if (theJob) {
-    //             lineIdent = theJob.LineIdent;
-    //             if (lineIdent) {
-    //                 Line.fineone({
-    //                     where: {Ident: lineIdent}
-    //                 }).then(function (theLine) {
-    //                     lineController = ControllerAdapter.getController(theLine.ControllerName);
-    //                     lineController.startJob(theJob);
-    //                     message = i18n.__('Job {0} is starting', Ident);
-    //                     res.send({
-    //                         messsage: message,
-    //                     });
-    //                 });
-    //
-    //             }
-    //             else {
-    //                 originError = 'the line: {0} is not found';
-    //                 error = i18n.__(originError, lineIdent);
-    //                 res.send({
-    //                     error: error
-    //                 });
-    //             }
-    //         }
-    //         else {
-    //             originError = 'the job: {0} is not found';
-    //             error = i18n.__(originError, Ident);
-    //             res.send({
-    //                 error: error
-    //             });
-    //         }
-    //     });
-    //
-    //
-    //
-    //
-    // });
+};
+
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated()){
+
+        console.log('is Authenticated!!!');
+        return next();
+    }
+
+
+    // if they aren't redirect them to the home page
+    res.redirect('/');
 }

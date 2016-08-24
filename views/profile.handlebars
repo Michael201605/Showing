@@ -14,12 +14,13 @@
 
                 <p>
                     <strong>id</strong>: {{ user.id }}<br>
-                    <strong>username</strong>: {{  user.UserName }}<br>
-                    <strong>DisplayName</strong>: {{  user.DisplayName }}<br/>
+                    <strong>username</strong>: {{  user.userName }}<br>
+                    <strong>DisplayName</strong>: {{  user.displayName }}<br/>
 
                 </p>
                 <input type="checkbox" class="checkbox" name="IsAdministrator" value="{{user.IsAdministrator}}">
             </div>
+            <p>Or go <a href="/">{{{__ "home"}}}</a>.</p>
         </div>
 
     </div>

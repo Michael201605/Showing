@@ -96,7 +96,7 @@ function Scale(Ident) {
 
 }
 function GcObject(gcIdent) {
-    console.log('gcIdent: ' + gcIdent);
+    console.log('ident: ' + gcIdent);
 
     $.get('/gcobject/:' + gcIdent,function (gcObject) {
         console.log('gcObejct:');

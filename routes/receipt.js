@@ -10,7 +10,7 @@ var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 
 
 module.exports = function (app, i18n) {
-    app.get('/warehouse/receiptList/:state', function (req, res) {
+    app.get('/warehouse/receiptList/:state',isLoggedIn, function (req, res) {
         var state = req.params.state.substring(1);
 
         Receipt.findAll({
@@ -25,7 +25,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/createReceipt', function (req, res) {
+    app.get('/warehouse/createReceipt', isLoggedIn, function (req, res) {
         var info = {
             Ident: 'newReceipt',
             Name: 'Raw',
@@ -38,7 +38,7 @@ module.exports = function (app, i18n) {
             res.json(newReceipt);
         });
     });
-    app.get('/warehouse/receiptDetail/:id', function (req, res) {
+    app.get('/warehouse/receiptDetail/:id',isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -68,7 +68,7 @@ module.exports = function (app, i18n) {
 
     });
 
-    app.post('/warehouse/receiptDetail', function (req, res) {
+    app.post('/warehouse/receiptDetail',isLoggedIn, function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
@@ -86,7 +86,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/station/receiptList', function (req, res) {
+    app.get('/warehouse/station/receiptList',isLoggedIn, function (req, res) {
 
         Receipt.findAll({
             where: {State: 10}
@@ -100,7 +100,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/station/receiptDetail/:id', function (req, res) {
+    app.get('/warehouse/station/receiptDetail/:id',isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -129,7 +129,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/confirmReceipt/:id', function (req, res) {
+    app.get('/warehouse/confirmReceipt/:id',isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -151,7 +151,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/receiptLabel/:id', function (req, res) {
+    app.get('/warehouse/receiptLabel/:id',isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -180,3 +180,17 @@ module.exports = function (app, i18n) {
 
     });
 };
+
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated()){
+
+        console.log('is Authenticated!!!');
+        return next();
+    }
+
+
+    // if they aren't redirect them to the home page
+    res.redirect('/');
+}

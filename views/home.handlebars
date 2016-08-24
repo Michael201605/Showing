@@ -34,10 +34,10 @@
                                         class="glyphicon glyphicon-log-out"></span> {{{__ "Logout"}}}</a></li>
                                 <li><a href="/profile"><span
                                         class="glyphicon glyphicon-user"></span>
-                                    {{#if user.DisplayName}}
-                                        {{user.DisplayName}}
+                                    {{#if user.displayName}}
+                                        {{user.displayName}}
                                     {{else}}
-                                        {{user.UserName}}
+                                        {{user.userName}}
                                     {{/if}}
                                 </a></li>
                             </ul>

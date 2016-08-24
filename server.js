@@ -5,27 +5,31 @@
 
 // set up ======================================================================
 // get all the tools we need
-var express  = require('express');
-var session  = require('express-session');
+var express = require('express');
+var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-var app      = express();
-var port     = process.env.PORT || 3000;
+var app = express();
+var port = process.env.PORT || 3000;
 var i18n = require('i18n');
 var passport = require('passport');
-var flash    = require('connect-flash');
+var flash = require('connect-flash');
 var handlebars = require('express3-handlebars')
     .create({
-        defaultLayout:'main',
+        defaultLayout: 'main',
         helpers: {
             section: function (name, options) {
-                if(!this._sections) this._sections = {};
+                if (!this._sections) this._sections = {};
                 this._sections[name] = options.fn(this);
                 return null;
             },
-            __: function() { return i18n.__.apply(this, arguments); },
-            __n: function() { return i18n.__n.apply(this, arguments); }
+            __: function () {
+                return i18n.__.apply(this, arguments);
+            },
+            __n: function () {
+                return i18n.__n.apply(this, arguments);
+            }
         }
     });
 var server = require('http').createServer(app),
@@ -33,20 +37,39 @@ var server = require('http').createServer(app),
 var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
-var nodeId = 'ns=1;s=PLC1.A_1006_MXZ01.Information.StCode';
-gcObjectAdapter = new GcObjectAdapter();
-gcObjectAdapter.getItemValue(nodeId, function (err, value) {
-    console.log('read nodeId: ' + nodeId + 'value: ' + value);
-})
+
+var nodeId = 'ns=1;s=PLC1.Element.SimpleMotor.=A-0002-MXZ01.Commands.CmdEnable';
+var opcua = require("node-opcua");
+var DataType = opcua.DataType;
+var gcObjectAdapter = new GcObjectAdapter().then(function (gcObject) {
+    gcObject.getItemValue(nodeId, function (err, data) {
+        console.log('read nodeId: ' + nodeId + '. value: ' + data.value.value);
+        console.log('read nodeId: ' + nodeId + '. type: ' + data.value.dataType);
+    });
+    var data = {
+        type: opcua.DataType.Boolean,
+        value: true
+    };
+    console.log('data to write:');
+    console.dir(data);
+    gcObject.setItemValue(nodeId, data, function (error) {
+        if(!error){
+            console.log('write successfully');
+        }else {
+            console.log('error: ' +  error);
+        }
+
+    });
+});
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 
 i18n.configure({
     // setup some locales - other locales default to en silently
-    locales:['en', 'zh'],
+    locales: ['en', 'zh'],
 
     // fall back from Dutch to German
-    fallbacks:{'nl': 'de'},
+    fallbacks: {'nl': 'de'},
 
     // you may alter a site wide default locale
     defaultLocale: 'de',
@@ -126,17 +149,17 @@ app.use(session({
     secret: 'vidyapathaisalwaysrunning',
     resave: true,
     saveUninitialized: true
-} )); // session secret
+})); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(i18n.init);
 app.use(express.static(__dirname + '/public'));
 
-app.use(function (req,res,next) {
+app.use(function (req, res, next) {
     res.locals.showTests = app.get('env') !== 'production' &&
         req.query.test === '1';
-    if(!res.locals.partials) res.locals.partials = {};
+    if (!res.locals.partials) res.locals.partials = {};
     // for(var o in i18n)
     // {
     //     console.log("i18n property: " +o);
@@ -145,7 +168,7 @@ app.use(function (req,res,next) {
     i18n.setLocale(i18n, req.locale);
     res.locals.partials.menus = menus(i18n);
     res.locals.partials.navigations = navs(res.locals.partials.menus);
-    res.locals.partials.naviStr = JSON.stringify(res.locals.partials.navigations );
+    res.locals.partials.naviStr = JSON.stringify(res.locals.partials.navigations);
     //console.log("Navigation's length: " +res.locals.partials.navigations.length );
 
     //console.log("showTest: " +res.locals.showTests);
@@ -165,9 +188,9 @@ require('./routes/storage')(app, i18n);
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
-require('./routes/gcobject')(app, i18n);
+require('./routes/gcObject')(app, i18n);
 io.on('connection', function (socket) {
-    var GCObjects= [
+    var GCObjects = [
         {
             id: 'A_1001_MXZ01',
             State: 30

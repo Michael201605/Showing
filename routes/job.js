@@ -10,7 +10,7 @@ var Line = require('../models/eq/Line');
 var JobState = require('../lib/stateAndCategory/jobState');
 // var Recipe = require('../../Models/pr/Recipe');
 module.exports = function (app, i18n) {
-    app.get('/job/jobList/:lineIdent', function (req, res) {
+    app.get('/job/jobList/:lineIdent',isLoggedIn, function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log('lineIdent: ' + lineIdent);
 
@@ -31,7 +31,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/job/jobList/createJob/:lineIdent', function (req, res) {
+    app.get('/job/jobList/createJob/:lineIdent',isLoggedIn,  function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log(lineIdent);
         Line.findOne({
@@ -74,7 +74,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.post('/job/jobList/deleteJob', function (req, res) {
+    app.post('/job/jobList/deleteJob', isLoggedIn, function (req, res) {
         var toDeleteJobIdsStr = req.body.toDeleteJobIdsStr;
         console.log('toDeleteJobIdsStr:  ' + toDeleteJobIdsStr);
         var toDeleteJobIds = JSON.parse(toDeleteJobIdsStr);
@@ -88,7 +88,7 @@ module.exports = function (app, i18n) {
             res.json(message);
         });
     });
-    app.get('/job/jobList/:lineIdent', function (req, res) {
+    app.get('/job/jobList/:lineIdent', isLoggedIn, function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log(lineIdent);
 
@@ -109,7 +109,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/job/jobDetail/:id', function (req, res) {
+    app.get('/job/jobDetail/:id',isLoggedIn,  function (req, res) {
         var id = req.params.id.substring(1);
         Job.findOne({
             where: {id: id}
@@ -122,7 +122,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/job/jobDetail/startJob/:ident', function (req, res) {
+    app.get('/job/jobDetail/startJob/:ident',isLoggedIn,  function (req, res) {
         var lineIdent = '';
         var theLine,
             lineController;
@@ -169,3 +169,17 @@ module.exports = function (app, i18n) {
 
     });
 };
+
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated()){
+
+        console.log('is Authenticated!!!');
+        return next();
+    }
+
+
+    // if they aren't redirect them to the home page
+    res.redirect('/');
+}

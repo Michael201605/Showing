@@ -4,17 +4,27 @@
 //var Job = require('../../Models/pr/Job');
 var Line = require('../models/eq/Line');
 var GcsState = require('../lib/stateAndCategory/gcsState');
+var GcObject = require('../models/eq/GcObject');
+var util = require('util');
+
 module.exports = function (app, i18n) {
-    app.get('/gcobject/:id', function (req, res) {
-        var id = req.params.id.substring(1);
+    app.get('/gcobject/:ident', function (req, res) {
+        var ident = req.params.ident.substring(1);
         //for mode,0:manual,1;automatic
         //for status,0: close, 1: open
-        var gcObject ={
-            id: id,
-            mode: 0,
-            status: 1
-        };
-        res.json(gcObject);
+        GcObject.findOne({
+            where: {ident:ident}
+        }).then(function (theGcObject) {
+            console.log('theGcObject');
+            console.dir(theGcObject);
+            if(theGcObject){
+                res.json(theGcObject.getClientEndObject());
+
+            }
+
+        });
+
+
 
 
     });
