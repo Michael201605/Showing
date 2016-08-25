@@ -25,7 +25,7 @@ var BeltMonitor = function () {
 BeltMonitor.prototype.Commands = {
     CmdFaultReset: false,
     CmdMonitoringEnable: false,
-    CmdUsebyUnitIdent:'',
+    CmdUsebyUnitIdent: '',
     CmdUsebyUnitType: ''
 };
 BeltMonitor.prototype.HardwareIO = {
@@ -45,16 +45,15 @@ BeltMonitor.prototype.States = {
 };
 
 
-
 var FilterControl = function () {
 
 };
 FilterControl.prototype.Commands = {
     CmdEnable: false,
     CmdEnableIdling: false,
-    CmdFaultReset:false,
+    CmdFaultReset: false,
     CmdInterlock: false,
-    CmdManual:false,
+    CmdManual: false,
     CmdService: false,
     CmdUseByUnitIdent: '',
     CmdUseByUnitType: ''
@@ -89,13 +88,13 @@ FilterControl.prototype.States = {
     StaStopping: false
 };
 
-var HighLevel  = function () {
+var HighLevel = function () {
 
 };
 HighLevel.prototype.Commands = {
     CmdFaultReset: false,
     CmdUsebyUnitIdent: false,
-    CmdUsebyUnitType:false
+    CmdUsebyUnitType: false
 };
 
 HighLevel.prototype.HardwareIO = {
@@ -122,68 +121,58 @@ HighLevel.prototype.States = {
 };
 
 
-
-
-
 //=====================================
 
-var SimpleMotor  = function () {
-
+var SimpleMotor = function () {
+    this.Commands = {
+        CmdEnable: false,
+        CmdEnableIdling: false,
+        CmdFaultReset: false,
+        CmdInterlock: false,
+        CmdManual: false,
+        CmdService: false,
+        CmdUseByUnitIdent: '',
+        CmdUseByUnitType: ''
+    };
+    this.HardwareIO = {
+        ValInput1: false,
+        ValOutput1: false
+    };
+    this.Information = {
+        InfListIdent: '',
+        InfType: ''
+    };
+    this.Parameter = {
+        ParAdrInput1: '',
+        ParAdrOutput1: '',
+        ParRelatedToUnitIdent1: '',
+        ParRelatedToUnitIdent2: '',
+        ParRelatedToUnitIdent3: '',
+        ParRelatedToUnitIdent4: '',
+        ParRelatedToUnitType1: '',
+        ParRelatedToUnitType2: '',
+        ParRelatedToUnitType3: '',
+        ParRelatedToUnitType4: '',
+        ParTimeOut: ''
+    };
+    this.States = {
+        StaFault: false,
+        StaStarted: false,
+        StaStarting: false,
+        StaStopped: false,
+        StaStopping: false
+    };
 };
+SimpleMotor.prototype = {};
 
-SimpleMotor.prototype.Commands = {
-    CmdEnable: false,
-    CmdEnableIdling: false,
-    CmdFaultReset:false,
-    CmdInterlock: false,
-    CmdManual: false,
-    CmdService:false,
-    CmdUseByUnitIdent: '',
-    CmdUseByUnitType: ''
-};
-
-SimpleMotor.prototype.HardwareIO = {
-    ValInput1: false,
-    ValOutput1: false
-};
-SimpleMotor.prototype.Information = {
-    InfListIdent: '',
-    InfType: ''
-};
-
-
-SimpleMotor.prototype.Parameter = {
-    ParAdrInput1: '',
-    ParAdrOutput1: '',
-    ParRelatedToUnitIdent1: '',
-    ParRelatedToUnitIdent2: '',
-    ParRelatedToUnitIdent3: '',
-    ParRelatedToUnitIdent4: '',
-    ParRelatedToUnitType1: '',
-    ParRelatedToUnitType2: '',
-    ParRelatedToUnitType3: '',
-    ParRelatedToUnitType4: '',
-    ParTimeOut: ''
-};
-
-SimpleMotor.prototype.States = {
-    StaFault: false,
-    StaStarted: false,
-    StaStarting: false,
-    StaStopped: false,
-    StaStopping: false
-};
-
-
-
-var SpeedMonitor  = function () {
+var SpeedMonitor = function () {
 
 };
 
 SpeedMonitor.prototype.Commands = {
     CmdFaultReset: false,
     CmdMonitoringEnable: false,
-    CmdUsebyUnitIdent:'',
+    CmdUsebyUnitIdent: '',
     CmdUsebyUnitType: ''
 };
 
@@ -207,19 +196,18 @@ SpeedMonitor.prototype.States = {
 };
 
 
-
-var ValveOpenClose  = function () {
+var ValveOpenClose = function () {
 
 };
 
 ValveOpenClose.prototype.Commands = {
     CmdEnable: false,
     CmdEnableIdling: false,
-    CmdFaultReset:false,
+    CmdFaultReset: false,
     CmdInterlock: false,
     CmdManual: false,
     CmdService: false,
-    CmdUseByUnitIdent:'',
+    CmdUseByUnitIdent: '',
     CmdUseByUnitType: ''
 };
 
@@ -239,16 +227,16 @@ ValveOpenClose.prototype.Parameter = {
     ParAdrInput1: '',
     ParAdrInput2: '',
     ParAdrOutput1: '',
-    ParAdrOutput2:'',
+    ParAdrOutput2: '',
     ParRelatedToUnitIdent1: '',
-    ParRelatedToUnitIdent2:'',
-    ParRelatedToUnitIdent3:'',
-    ParRelatedToUnitIdent4:'',
-    ParRelatedToUnitType1:'',
-    ParRelatedToUnitType2:'',
-    ParRelatedToUnitType3:'',
-    ParRelatedToUnitType4:'',
-    ParTimeOut:''
+    ParRelatedToUnitIdent2: '',
+    ParRelatedToUnitIdent3: '',
+    ParRelatedToUnitIdent4: '',
+    ParRelatedToUnitType1: '',
+    ParRelatedToUnitType2: '',
+    ParRelatedToUnitType3: '',
+    ParRelatedToUnitType4: '',
+    ParTimeOut: ''
 };
 
 ValveOpenClose.prototype.States = {
@@ -256,20 +244,20 @@ ValveOpenClose.prototype.States = {
     StaClosing: false,
     StaFault: false,
     StaOpened: false,
-    StaOpening:false
+    StaOpening: false
 };
 
 
-var LBCA  = function () {
+var LBCA = function () {
 
 };
 
 LBCA.prototype.Commands = {
     CmdEnable: false,
     CmdEnableIdling: false,
-    CmdFaultReset:false,
+    CmdFaultReset: false,
     CmdInterlock: false,
-    CmdUseByUnitIdent:'',
+    CmdUseByUnitIdent: '',
     CmdUseByUnitType: ''
 
 };
@@ -283,18 +271,18 @@ LBCA.prototype.Information = {
 LBCA.prototype.Parameter = {
     ParIdelingTime: '',
     ParRelatedToUnitIdent1: '',
-    ParRelatedToUnitIdent2:'',
-    ParRelatedToUnitIdent3:'',
-    ParRelatedToUnitIdent4:'',
-    ParRelatedToUnitType1:'',
-    ParRelatedToUnitType2:'',
-    ParRelatedToUnitType3:'',
-    ParRelatedToUnitType4:'',
+    ParRelatedToUnitIdent2: '',
+    ParRelatedToUnitIdent3: '',
+    ParRelatedToUnitIdent4: '',
+    ParRelatedToUnitType1: '',
+    ParRelatedToUnitType2: '',
+    ParRelatedToUnitType3: '',
+    ParRelatedToUnitType4: '',
     ParStartDelay: '',
-    ParStartingTime:'',
-    ParStopDelay:'',
-    ParStoppingTime:'',
-    ParWithOverflowFlap:false,
+    ParStartingTime: '',
+    ParStopDelay: '',
+    ParStoppingTime: '',
+    ParWithOverflowFlap: false,
     ParWithSpeedMonitor: false
 
 };
@@ -304,20 +292,20 @@ LBCA.prototype.States = {
     StaIdeling: false,
     StaStarted: false,
     StaStarting: false,
-    StaStopped:false,
-    StaStopping:false
+    StaStopped: false,
+    StaStopping: false
 };
 
-var LBEA  = function () {
+var LBEA = function () {
 
 };
 
 LBEA.prototype.Commands = {
     CmdEnable: false,
     CmdEnableIdling: false,
-    CmdFaultReset:false,
+    CmdFaultReset: false,
     CmdInterlock: false,
-    CmdUseByUnitIdent:'',
+    CmdUseByUnitIdent: '',
     CmdUseByUnitType: ''
 
 };
@@ -331,22 +319,22 @@ LBEA.prototype.Information = {
 LBEA.prototype.Parameter = {
     ParIdelingTime: '',
     ParRelatedToUnitIdent1: '',
-    ParRelatedToUnitIdent2:'',
-    ParRelatedToUnitIdent3:'',
-    ParRelatedToUnitIdent4:'',
-    ParRelatedToUnitType1:'',
-    ParRelatedToUnitType2:'',
-    ParRelatedToUnitType3:'',
-    ParRelatedToUnitType4:'',
+    ParRelatedToUnitIdent2: '',
+    ParRelatedToUnitIdent3: '',
+    ParRelatedToUnitIdent4: '',
+    ParRelatedToUnitType1: '',
+    ParRelatedToUnitType2: '',
+    ParRelatedToUnitType3: '',
+    ParRelatedToUnitType4: '',
     ParStartDelay: '',
-    ParStartingTime:'',
-    ParStopDelay:'',
-    ParStoppingTime:'',
-    ParWithBeltMonitor1:false,
+    ParStartingTime: '',
+    ParStopDelay: '',
+    ParStoppingTime: '',
+    ParWithBeltMonitor1: false,
     ParWithBeltMonitor2: false,
-    ParWithBeltMonitor3:false,
+    ParWithBeltMonitor3: false,
     ParWithBeltMonitor4: false,
-    ParWithSpeedMonitor:false
+    ParWithSpeedMonitor: false
 
 };
 
@@ -355,20 +343,20 @@ LBEA.prototype.States = {
     StaIdeling: false,
     StaStarted: false,
     StaStarting: false,
-    StaStopped:false,
-    StaStopping:false
+    StaStopped: false,
+    StaStopping: false
 };
 
-var MVRW  = function () {
+var MVRW = function () {
 
 };
 
 MVRW.prototype.Commands = {
     CmdEnable: false,
     CmdEnableIdling: false,
-    CmdFaultReset:false,
+    CmdFaultReset: false,
     CmdInterlock: false,
-    CmdUseByUnitIdent:'',
+    CmdUseByUnitIdent: '',
     CmdUseByUnitType: ''
 
 };
@@ -382,18 +370,18 @@ MVRW.prototype.Information = {
 MVRW.prototype.Parameter = {
     ParIdelingTime: '',
     ParRelatedToUnitIdent1: '',
-    ParRelatedToUnitIdent2:'',
-    ParRelatedToUnitIdent3:'',
-    ParRelatedToUnitIdent4:'',
-    ParRelatedToUnitType1:'',
-    ParRelatedToUnitType2:'',
-    ParRelatedToUnitType3:'',
-    ParRelatedToUnitType4:'',
+    ParRelatedToUnitIdent2: '',
+    ParRelatedToUnitIdent3: '',
+    ParRelatedToUnitIdent4: '',
+    ParRelatedToUnitType1: '',
+    ParRelatedToUnitType2: '',
+    ParRelatedToUnitType3: '',
+    ParRelatedToUnitType4: '',
     ParStartDelay: '',
-    ParStartingTime:'',
-    ParStopDelay:'',
-    ParStoppingTime:'',
-    ParWithFilterControl:false
+    ParStartingTime: '',
+    ParStopDelay: '',
+    ParStoppingTime: '',
+    ParWithFilterControl: false
 
 };
 
@@ -402,8 +390,8 @@ MVRW.prototype.States = {
     StaIdeling: false,
     StaStarted: false,
     StaStarting: false,
-    StaStopped:false,
-    StaStopping:false
+    StaStopped: false,
+    StaStopping: false
 };
 
 module.exports.Element = Element;

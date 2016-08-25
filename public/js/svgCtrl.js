@@ -5,26 +5,26 @@ var GcObjectDialog, StorageDialog, ScaleDialog;
 $(function () {
     //modal dialog------
 
-        // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-        // emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
-        // name = $( "#name" ),
-        // email = $( "#email" ),
-        // password = $( "#password" ),
-        // allFields = $( [] ).add( name ).add( email ).add( password ),
-        // tips = $( ".validateTips" );
+    // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
+    // emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+    // name = $( "#name" ),
+    // email = $( "#email" ),
+    // password = $( "#password" ),
+    // allFields = $( [] ).add( name ).add( email ).add( password ),
+    // tips = $( ".validateTips" );
 
-    GcObjectDialog = $( "#GCObject-form" ).dialog({
+    GcObjectDialog = $("#GCObject-form").dialog({
         title: 'GcObject',
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
         buttons: {
-            Cancel: function() {
-                GcObjectDialog.dialog( "close" );
+            Cancel: function () {
+                GcObjectDialog.dialog("close");
             }
         },
-        close: function() {
+        close: function () {
 
         }
     });
@@ -47,118 +47,164 @@ $(function () {
 
 
     //socket communication with server to update GCObject's state
-    try
-    {
-        var socket = io('http://172.26.203.71:3000');
-        socket.on('GCObjectUpdate', function (GCObjects) {
-            // var GCObjects = JSON.parse(GCObjectsStr);
-            console.log('has received event');
-            console.dir(GCObjects);
-            GCObjects.forEach(function (GCObject) {
-                updateStatus(GCObject)
-            });
-
-        });
-        socket.on('connect_timeout',function (data) {
-            console.log('connect_timeout',data);
-        });
-        socket.on('error',function (data) {
-            console.log('error',data);
-        });
-        socket.on('disconnect', function(){
-            console.log('disconnected......');
-        });
-
-    }catch (ex){
-        console.log('exception happened:',ex);
-    }
 
 
 });
 function Storage(BinIdent) {
-    if(BinIdent){
+    if (BinIdent) {
         var url = '/storage/StorageDetail/:' + BinIdent;
         var win = window.open(url, '_blank');
         win.focus();
-    }else {
+    } else {
         alert('BIN Ident is empty');
     }
 
 }
 function Scale(Ident) {
-    if(Ident){
+    if (Ident) {
         var url = '/scale/ScaleDetail/:' + Ident;
         var win = window.open(url, '_blank');
         win.focus();
-    }else {
+    } else {
         alert('Scale Ident is empty');
     }
 
 }
 function GcObject(gcIdent) {
     console.log('ident: ' + gcIdent);
+    var socket = io('http://172.26.203.71:3000');
 
-    $.get('/gcobject/:' + gcIdent,function (gcObject) {
+    $.get('/gcobject/:' + gcIdent, function (gcObject) {
         console.log('gcObejct:');
         console.dir(gcObject);
-        GcObjectDialog.dialog('option', 'title','GcObject: ' +gcIdent);
+        GcObjectDialog.dialog('option', 'title', 'GcObject: ' + gcIdent);
 
         GcObjectDialog.data('gcObject', gcObject).dialog('open');
-
+        $('#Category').html(gcObject.category);
         setGcObjectButtons(gcObject);
 
         $('#Mannual').click(function () {
-            gcObject.mode = 0;
-            sendGcObjectToServer(gcObject);
+            var command = {
+                nodeId: gcObject.nodeId + '.Commands.CmdManual',
+                value: true,
+                gcObject: gcObject
+            };
+            sendCommandToServer(command);
         });
         $('#Aumatic').click(function () {
-            gcObject.mode = 1;
-            sendGcObjectToServer(gcObject);
+            var command = {
+                nodeId: gcObject.nodeId + '.Commands.CmdManual',
+                value: false,
+                gcObject: gcObject
+            };
+            sendCommandToServer(command);
         });
         $('#close').click(function () {
-            gcObject.status = 0;
-            sendGcObjectToServer(gcObject);
+            var command = {
+                nodeId: gcObject.nodeId + '.HardwareIO.ValInput1',
+                value: false,
+                gcObject: gcObject
+            };
+            sendCommandToServer(command);
         });
         $('#Open').click(function () {
-            gcObject.status = 1;
-            sendGcObjectToServer(gcObject);
+            var command = {
+                nodeId: gcObject.nodeId + '.HardwareIO.ValInput1',
+                value: true,
+                gcObject: gcObject
+            };
+            sendCommandToServer(command);
         });
+        try {
+
+            socket.on('GCObjectUpdate', function (nodeData) {
+                // var GCObjects = JSON.parse(GCObjectsStr);
+                console.log('has received event');
+                console.dir(nodeData);
+
+                var nodeId = nodeData.monitored_nodeId;
+                var segments = nodeId.split('.');
+                var ident = segments[3];
+                var category = segments[4];
+                var paraName = segments[5];
+                var value = nodeData.dataValue.value.value;
+                console.log('category: ' + ident);
+                console.log('category: ' + category);
+                console.log('paraName: ' + paraName);
+                if(ident === gcObject.ident){
+                    gcObject[category][paraName] = value;
+                    setGcObjectButtons(gcObject);
+                }
+
+            });
+            socket.on('connect_timeout', function (data) {
+                console.log('connect_timeout', data);
+            });
+            socket.on('error', function (data) {
+                console.log('error', data);
+            });
+            socket.on('disconnect', function () {
+                console.log('disconnected......');
+            });
+
+        } catch (ex) {
+            console.log('exception happened:', ex);
+        }
     });
 
 }
-function sendGcObjectToServer(gcObject) {
+function sendCommandToServer(command) {
 
-    $.post('/gcobject',{gcObjectStr:JSON.stringify(gcObject)}, function (gcObject) {
-        console.log('refresh gcObject: ');
-        console.dir(gcObject);
-        setGcObjectButtons(gcObject);
+    $.post('/gcobject', {commandStr: JSON.stringify(command)}, function (err) {
+
+        if(err){
+            console.log(err);
+        }
     });
 }
+//status lamp
+//light green : starting
+//green: started
+//blue: stopping
+//grey: stopped
 function setGcObjectButtons(gcObject) {
-    if(gcObject.mode){
+
+    if (!gcObject.gcObjectParameter.Commands.CmdManual) {
         $('#Mannual').attr("disabled", false);
         $('#Aumatic').attr("disabled", true);
         $('#close').attr("disabled", true);
         $('#Open').attr("disabled", true);
         $('#mode').attr('fill', 'green');
-    }else {
+    } else {
         $('#mode').attr('fill', 'grey');
         $('#Mannual').attr("disabled", true);
         $('#Aumatic').attr("disabled", false);
-        if(gcObject.status){
+        if (gcObject.gcObjectParameter.States.StaStarted) {
             $('#close').attr("disabled", false);
             $('#Open').attr("disabled", true);
-        }else {
+        } else if (gcObject.gcObjectParameter.States.StaStopped) {
             $('#close').attr("disabled", true);
+            $('#Open').attr("disabled", false);
+        } else {
+            $('#close').attr("disabled", false);
             $('#Open').attr("disabled", false);
         }
     }
-    if(gcObject.status){
-        $('#status').attr('fill', 'green');
+    if (gcObject.gcObjectParameter.States.StaStarting) {
+        $('#status').attr('fill', 'LightGreen');
     }
-    else {
-        $('#status').attr('fill', 'grey');
+    else if (gcObject.gcObjectParameter.States.StaStarted) {
+        $('#status').attr('fill', 'Green');
+    } else if (gcObject.gcObjectParameter.States.StaStopping) {
+        $('#status').attr('fill', 'Blue');
+    } else if (gcObject.gcObjectParameter.States.StaStopped) {
+        $('#status').attr('fill', 'Grey');
+    } else if (gcObject.gcObjectParameter.States.StaFault) {
+        $('#status').attr('fill', 'Red');
+    } else {
+        $('#status').attr('fill', 'DimGrey ');
     }
+
 
 }
 function updateStatus(GCObject) {
