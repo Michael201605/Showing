@@ -393,7 +393,42 @@ MVRW.prototype.States = {
     StaStopped: false,
     StaStopping: false
 };
-
+var Line = function () {
+    this.Commands = {
+        CmdEnable: false,
+        CmdEnableIdling: false,
+        CmdFaultReset: false,
+        CmdInterlock: false,
+        CmdManual: false,
+        CmdService: false,
+        CmdUseByUnitIdent: '',
+        CmdUseByUnitType: ''
+    };
+    this.HardwareIO = {
+        ValInput1: false,
+        ValOutput1: false
+    };
+    this.Information = {
+        InfListIdent: '',
+        InfType: ''
+    };
+    this.Parameter = {
+        ParIdelingTime: '',
+        ParStartDelay: '',
+        ParStartingTime: '',
+        ParStopDelay: '',
+        ParStoppingTime: '',
+        ParWithFilterControl: false
+    };
+    this.States = {
+        StaFault: false,
+        StaStarted: false,
+        StaStarting: false,
+        StaStopped: false,
+        StaStopping: false
+    };
+};
+Line.prototype = {};
 module.exports.Element = Element;
 module.exports.Unit = Unit;
 module.exports.BeltMonitor = BeltMonitor;
@@ -405,3 +440,4 @@ module.exports.ValveOpenClose = ValveOpenClose;
 module.exports.LBCA = LBCA;
 module.exports.LBEA = LBEA;
 module.exports.MVRW = MVRW;
+module.exports.Line = Line;

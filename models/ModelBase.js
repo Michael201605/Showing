@@ -3,6 +3,7 @@
  */
 var Sequelize = require('sequelize');
 var database = require('../database');
+
 // var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password);
 var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password, {
     host: 'localhost',
@@ -32,7 +33,7 @@ sequelize.expendGcsProperty = function (subProperties) {
 };
 sequelize.expendProperty = function (ParentProperties, subProperties) {
     for (var p in ParentProperties) {
-        if(subProperties.hasOwnProperty[p]) continue;
+        if (subProperties.hasOwnProperty[p]) continue;
         subProperties[p] = ParentProperties[p];
     }
     return subProperties;

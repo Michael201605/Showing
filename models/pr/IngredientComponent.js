@@ -6,13 +6,14 @@
  */
 var modelBase = require('../ModelBase');
 var Product = require('./Product');
+var Storage = require('../eq/Storage');
 var IngredientComponent = modelBase.define('IngredientComponent',{
     ident : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
-    productIdent : modelBase.Sequelize.INTEGER,
     targetPercentage: modelBase.Sequelize.DECIMAL,
     targetWeight: modelBase.Sequelize.DECIMAL,
-    jobIdent : modelBase.Sequelize.STRING
+    storageIdent : modelBase.Sequelize.STRING
 });
 IngredientComponent.belongsTo(Product);
+IngredientComponent.belongsTo(Storage);
 module.exports = IngredientComponent;

@@ -37,11 +37,11 @@ var server = require('http').createServer(app),
 var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
-
+var ControllerManager= require('./lib/controllers/controllerManager');
 var nodeId = 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01.Commands.CmdEnable';
 var opcua = require("node-opcua");
 var DataType = opcua.DataType;
-
+require('enum').register();
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -166,53 +166,59 @@ require('./routes/index')(app, passport); // load our routes and pass in our app
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
+io.on('connection', function (socket) {
+    console.log('io socket connection success!');
+    new GcObjectAdapter(socket).then(function (gcObjectAd) {
+        console.log('gcobjectAdapter created success!');
+        gcObjectAd.DataType = opcua.DataType;
 
-new GcObjectAdapter().then(function (gcObjectAd) {
-    gcObjectAd.DataType = opcua.DataType;
-    io.on('connection', function (socket) {
-        require('./routes/job')(app,gcObjectAd, i18n,socket);
+        new ControllerManager().then(function (controllerManager) {
+            require('./routes/job')(app,controllerManager, i18n,socket);
+        });
         require('./routes/line')(app,gcObjectAd, i18n,socket);
         require('./routes/storage')(app,gcObjectAd, i18n,socket);
         require('./routes/gcObject')(app,gcObjectAd, i18n,socket);
-        // var GCObjects = [
-        //     {
-        //         id: 'A_1001_MXZ01',
-        //         State: 30
-        //     },
-        //     {
-        //         id: 'A_1003_QXV01',
-        //         State: 40
+
+        // gcObjectAd.getItemsValue(nodeId, function (err,theNodeId, data) {
+        //     console.log('data: ');
+        //     console.dir(data);
+        //     console.log('read nodeId: ' + nodeId + '. value: ' + data.value.value);
+        //     console.log('read nodeId: ' + nodeId + '. type: ' + data.value.dataType);
+        // });
+        // var data = {
+        //     type: opcua.DataType.Boolean,
+        //     value: true
+        // };
+        // console.log('data to write:');
+        // console.dir(data);
+        // gcObjectAd.setItemValue(nodeId, data, function (error) {
+        //     if(!error){
+        //         console.log('write successfully');
+        //     }else {
+        //         console.log('error: ' +  error);
         //     }
-        // ];
-        // var GCObjectsStr = JSON.stringify(GCObjects);
-        // socket.emit('GCObjectUpdate', GCObjects);
-        // console.log('Have send event to client');
-        // socket.on('my other event', function (data) {
-        //     console.log(data);
+        //
         // });
     });
 
-    gcObjectAd.getItemsValue(nodeId, function (err,theNodeId, data) {
-        console.log('data: ');
-        console.dir(data);
-        console.log('read nodeId: ' + nodeId + '. value: ' + data.value.value);
-        console.log('read nodeId: ' + nodeId + '. type: ' + data.value.dataType);
-    });
-    var data = {
-        type: opcua.DataType.Boolean,
-        value: true
-    };
-    console.log('data to write:');
-    console.dir(data);
-    gcObjectAd.setItemValue(nodeId, data, function (error) {
-        if(!error){
-            console.log('write successfully');
-        }else {
-            console.log('error: ' +  error);
-        }
-
-    });
+    // var GCObjects = [
+    //     {
+    //         id: 'A_1001_MXZ01',
+    //         State: 30
+    //     },
+    //     {
+    //         id: 'A_1003_QXV01',
+    //         State: 40
+    //     }
+    // ];
+    // var GCObjectsStr = JSON.stringify(GCObjects);
+    // socket.emit('GCObjectUpdate', GCObjects);
+    // console.log('Have send event to client');
+    // socket.on('my other event', function (data) {
+    //     console.log(data);
+    // });
 });
+
 
 
 

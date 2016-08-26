@@ -17,6 +17,7 @@ module.exports = function (app, gcObjectAd, i18n,socket) {
         var clientEndGcObject = {};
         var parentNodeId = '';
         var promises = [];
+        console.log('ident: ' + ident);
         //for mode,0:manual,1;automatic
         //for status,0: close, 1: open
         GcObject.findOne({
@@ -118,7 +119,8 @@ function readGcObject(gcObjectAd, gcObjectParameter, parentNodeId, elementNodeId
 
                 nodeId = parentNodeId + '.' + p;
                 readParameter(gcObjectAd, nodeId, gcObjectParameter, promises);
-                gcObjectAd.monitor_a_variable_node_value(nodeId, function (monitored_nodeId, dataValue) {
+                gcObjectAd.monitor_a_variable_node_value(nodeId, function (monitored_nodeId, dataValue, count) {
+                    console.log('count: ' +count);
                     eventEmitter.emit('nodeChanged', {
                         monitored_nodeId: monitored_nodeId,
                         dataValue: dataValue

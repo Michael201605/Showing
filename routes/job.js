@@ -9,7 +9,7 @@ var Line = require('../models/eq/Line');
 // var ControllerAdapter = require('../adapters/ControllerAdapter');
 var JobState = require('../lib/stateAndCategory/jobState');
 // var Recipe = require('../../Models/pr/Recipe');
-module.exports = function (app, i18n) {
+module.exports = function (app, controllerManager, i18n,socket) {
     app.get('/job/jobList/:lineIdent',isLoggedIn, function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log('lineIdent: ' + lineIdent);
@@ -131,31 +131,17 @@ module.exports = function (app, i18n) {
         var originMessage = '';
         var error = '';
         var originError = '';
+        var controller =null;
         Job.findOne({
             where: {Ident: ident}
         }).then(function (theJob) {
             if (theJob) {
-                lineIdent = theJob.LineIdent;
-                if (lineIdent) {
-                    Line.fineone({
-                        where: {Ident: lineIdent}
-                    }).then(function (theLine) {
-                        lineController = ControllerAdapter.getController(theLine.ControllerName);
-                        lineController.startJob(theJob);
-                        message = i18n.__('Job {0} is starting', ident);
-                        res.send({
-                            messsage: message,
-                        });
-                    });
+                theLine =  theJob.getline();
+                if(theLine){
+                    controller = controllerManager.getController(theLine.controllerName);
+                    controller.startJob(theJob);
+                }
 
-                }
-                else {
-                    originError = 'the line: {0} is not found';
-                    error = i18n.__(originError, lineIdent);
-                    res.send({
-                        error: error
-                    });
-                }
             }
             else {
                 originError = 'the job: {0} is not found';
@@ -181,5 +167,5 @@ function isLoggedIn(req, res, next) {
 
 
     // if they aren't redirect them to the home page
-    res.redirect('/');
+    res.redirect('/login');
 }

@@ -1,7 +1,7 @@
 /**
  * Created by pi on 8/17/16.
  */
-var GcObjectDialog, StorageDialog, ScaleDialog;
+var GcObjectDialog, StorageDialog, ScaleDialog,socket;
 $(function () {
     //modal dialog------
 
@@ -28,7 +28,7 @@ $(function () {
 
         }
     });
-
+    socket = io('http://172.26.203.71:3000');
 
     // form = dialog.find( "form" ).on( "submit", function( event ) {
     //     event.preventDefault();
@@ -47,9 +47,58 @@ $(function () {
 
 
     //socket communication with server to update GCObject's state
+    try {
 
+        socket.on('AllGcObjectsStateChanged', function (nodeData) {
+            // var GCObjects = JSON.parse(GCObjectsStr);
+            console.log('has received event');
+            console.dir(nodeData);
+
+            var nodeId = nodeData.monitored_nodeId;
+            if(nodeId){
+                var segments = nodeId.split('.');
+                var ident = segments[3];
+                var category = segments[4];
+                var paraName = segments[5];
+                var value = nodeData.dataValue.value.value;
+                console.log('category: ' + ident);
+                console.log('category: ' + category);
+                console.log('paraName: ' + paraName);
+                switch (category){
+                    case 'BeltMonitor':
+                        break;
+                    case 'FilterControl':
+                        break;
+                    case 'HighLevel':
+                        break;
+                    case 'SimpleMotor':
+                        break;
+                    case 'SpeedMonitor':
+                        break;
+                    case 'ValveOpenClose':
+                        break;
+                }
+                $('#' + ident)
+            }
+
+
+        });
+        socket.on('connect_timeout', function (data) {
+            console.log('connect_timeout', data);
+        });
+        socket.on('error', function (data) {
+            console.log('error', data);
+        });
+        socket.on('disconnect', function () {
+            console.log('disconnected......');
+        });
+
+    } catch (ex) {
+        console.log('exception happened:', ex);
+    }
 
 });
+
 function Storage(BinIdent) {
     if (BinIdent) {
         var url = '/storage/StorageDetail/:' + BinIdent;
@@ -72,7 +121,7 @@ function Scale(Ident) {
 }
 function GcObject(gcIdent) {
     console.log('ident: ' + gcIdent);
-    var socket = io('http://172.26.203.71:3000');
+
 
     $.get('/gcobject/:' + gcIdent, function (gcObject) {
         console.log('gcObejct:');
@@ -123,18 +172,21 @@ function GcObject(gcIdent) {
                 console.dir(nodeData);
 
                 var nodeId = nodeData.monitored_nodeId;
-                var segments = nodeId.split('.');
-                var ident = segments[3];
-                var category = segments[4];
-                var paraName = segments[5];
-                var value = nodeData.dataValue.value.value;
-                console.log('category: ' + ident);
-                console.log('category: ' + category);
-                console.log('paraName: ' + paraName);
-                if(ident === gcObject.ident){
-                    gcObject[category][paraName] = value;
-                    setGcObjectButtons(gcObject);
+                if(nodeId){
+                    var segments = nodeId.split('.');
+                    var ident = segments[3];
+                    var category = segments[4];
+                    var paraName = segments[5];
+                    var value = nodeData.dataValue.value.value;
+                    console.log('category: ' + ident);
+                    console.log('category: ' + category);
+                    console.log('paraName: ' + paraName);
+                    if(ident === gcObject.ident){
+                        gcObject.gcObjectParameter[category][paraName] = value;
+                        setGcObjectButtons(gcObject);
+                    }
                 }
+
 
             });
             socket.on('connect_timeout', function (data) {
@@ -159,6 +211,8 @@ function sendCommandToServer(command) {
 
         if(err){
             console.log(err);
+        }else {
+            console.log('no error');
         }
     });
 }
@@ -262,3 +316,5 @@ function setBKColor($node, color) {
     $node.children().attr('fill', color);
     $node.find('rect').attr('fill', color);
 }
+
+
