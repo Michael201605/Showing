@@ -26,9 +26,6 @@ var Job = modelBase.define('Job', properties, {
         getNewJobIdent: function (lineIdent) {
             Job.findOne({
                 attributes: [[modelBase.fn('MAX', modelBase.col('id'))]]
-            }).then(function (data) {
-                console.log('get max id: ' + data);
-                return lineIdent + ':' + data;
             });
         },
         getTranslatedJobs: function (jobs,i18n) {
@@ -62,7 +59,7 @@ Job.Instance.prototype.getTranslatedJob = function (i18n) {
     JSONJob.displayState = i18n.__(getDisplayState(JobState, this.state));
     return JSONJob;
 };
-Job.belongsTo(Line,{as: 'line'});
+Job.belongsTo(Line,{as: 'Line'});
 
 
 

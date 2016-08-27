@@ -11,7 +11,7 @@ var Promise = require('promise');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 
-module.exports = function (app, gcObjectAd, i18n,socket) {
+module.exports = function (app, gcObjectAd, i18n,io) {
     app.get('/gcobject/:ident', function (req, res) {
         var ident = req.params.ident.substring(1);
         var clientEndGcObject = {};
@@ -70,7 +70,9 @@ module.exports = function (app, gcObjectAd, i18n,socket) {
     });
     eventEmitter.addListener('nodeChanged', function (nodeData) {
         log('D', 'Event: nodeChanged');
-        socket.emit('GCObjectUpdate', nodeData);
+        io.on('connection', function (socket) {
+            socket.emit('GCObjectUpdate', nodeData);
+        });
     });
 
 };

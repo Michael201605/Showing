@@ -166,80 +166,96 @@ require('./routes/index')(app, passport); // load our routes and pass in our app
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
-io.on('connection', function (socket) {
-    console.log('io socket connection success!');
-    new GcObjectAdapter(socket).then(function (gcObjectAd) {
-        console.log('gcobjectAdapter created success!');
-        gcObjectAd.DataType = opcua.DataType;
 
-        new ControllerManager().then(function (controllerManager) {
-            require('./routes/job')(app,controllerManager, i18n,socket);
-        });
-        require('./routes/line')(app,gcObjectAd, i18n,socket);
-        require('./routes/storage')(app,gcObjectAd, i18n,socket);
-        require('./routes/gcObject')(app,gcObjectAd, i18n,socket);
 
-        // gcObjectAd.getItemsValue(nodeId, function (err,theNodeId, data) {
-        //     console.log('data: ');
-        //     console.dir(data);
-        //     console.log('read nodeId: ' + nodeId + '. value: ' + data.value.value);
-        //     console.log('read nodeId: ' + nodeId + '. type: ' + data.value.dataType);
-        // });
-        // var data = {
-        //     type: opcua.DataType.Boolean,
-        //     value: true
-        // };
-        // console.log('data to write:');
-        // console.dir(data);
-        // gcObjectAd.setItemValue(nodeId, data, function (error) {
-        //     if(!error){
-        //         console.log('write successfully');
-        //     }else {
-        //         console.log('error: ' +  error);
-        //     }
-        //
-        // });
+new GcObjectAdapter(io).then(function (gcObjectAd) {
+    console.log('gcobjectAdapter created success!');
+    gcObjectAd.DataType = opcua.DataType;
+    gcObjectAd.MonitorAllGcObjects();
+    new ControllerManager(gcObjectAd).then(function (controllerManager) {
+        console.log('controllerManager created success!');
+        require('./routes/job')(app,controllerManager, i18n,io);
     });
-
-    // var GCObjects = [
-    //     {
-    //         id: 'A_1001_MXZ01',
-    //         State: 30
-    //     },
-    //     {
-    //         id: 'A_1003_QXV01',
-    //         State: 40
-    //     }
-    // ];
-    // var GCObjectsStr = JSON.stringify(GCObjects);
-    // socket.emit('GCObjectUpdate', GCObjects);
-    // console.log('Have send event to client');
-    // socket.on('my other event', function (data) {
-    //     console.log(data);
-    // });
+    require('./routes/line')(app,gcObjectAd, i18n,io);
+    require('./routes/storage')(app,gcObjectAd, i18n,io);
+    require('./routes/gcObject')(app,gcObjectAd, i18n,io);
 });
 
 
+// io.on('connection', function (socket) {
+//     console.log('io socket connection success!');
+//     new GcObjectAdapter(socket).then(function (gcObjectAd) {
+//         console.log('gcobjectAdapter created success!');
+//         gcObjectAd.DataType = opcua.DataType;
+//
+//         new ControllerManager().then(function (controllerManager) {
+//             require('./routes/job')(app,controllerManager, i18n,socket);
+//         });
+//         require('./routes/line')(app,gcObjectAd, i18n,socket);
+//         require('./routes/storage')(app,gcObjectAd, i18n,socket);
+//         require('./routes/gcObject')(app,gcObjectAd, i18n,socket);
+//
+//         // gcObjectAd.getItemsValue(nodeId, function (err,theNodeId, data) {
+//         //     console.log('data: ');
+//         //     console.dir(data);
+//         //     console.log('read nodeId: ' + nodeId + '. value: ' + data.value.value);
+//         //     console.log('read nodeId: ' + nodeId + '. type: ' + data.value.dataType);
+//         // });
+//         // var data = {
+//         //     type: opcua.DataType.Boolean,
+//         //     value: true
+//         // };
+//         // console.log('data to write:');
+//         // console.dir(data);
+//         // gcObjectAd.setItemValue(nodeId, data, function (error) {
+//         //     if(!error){
+//         //         console.log('write successfully');
+//         //     }else {
+//         //         console.log('error: ' +  error);
+//         //     }
+//         //
+//         // });
+//     });
+//
+//     // var GCObjects = [
+//     //     {
+//     //         id: 'A_1001_MXZ01',
+//     //         State: 30
+//     //     },
+//     //     {
+//     //         id: 'A_1003_QXV01',
+//     //         State: 40
+//     //     }
+//     // ];
+//     // var GCObjectsStr = JSON.stringify(GCObjects);
+//     // socket.emit('GCObjectUpdate', GCObjects);
+//     // console.log('Have send event to client');
+//     // socket.on('my other event', function (data) {
+//     //     console.log(data);
+//     // });
+// });
 
 
-io.on('connection', function (socket) {
-    // var GCObjects = [
-    //     {
-    //         id: 'A_1001_MXZ01',
-    //         State: 30
-    //     },
-    //     {
-    //         id: 'A_1003_QXV01',
-    //         State: 40
-    //     }
-    // ];
-    // var GCObjectsStr = JSON.stringify(GCObjects);
-    // socket.emit('GCObjectUpdate', GCObjects);
-    // console.log('Have send event to client');
-    // socket.on('my other event', function (data) {
-    //     console.log(data);
-    // });
-});
+
+
+// io.on('connection', function (socket) {
+//     // var GCObjects = [
+//     //     {
+//     //         id: 'A_1001_MXZ01',
+//     //         State: 30
+//     //     },
+//     //     {
+//     //         id: 'A_1003_QXV01',
+//     //         State: 40
+//     //     }
+//     // ];
+//     // var GCObjectsStr = JSON.stringify(GCObjects);
+//     // socket.emit('GCObjectUpdate', GCObjects);
+//     // console.log('Have send event to client');
+//     // socket.on('my other event', function (data) {
+//     //     console.log(data);
+//     // });
+// });
 
 // launch ======================================================================
 server.listen(port);

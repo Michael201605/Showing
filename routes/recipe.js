@@ -11,12 +11,33 @@ module.exports = function (app, i18n) {
             where: {IsTemplate: true}
         }).then(function (recipes) {
             console.log('recipes: \n' + recipes);
+
+            // recipes.forEach(function (recipe) {
+            //     // console.log('recipe:');
+            //     // console.dir(recipe);
+            //     // console.log(recipe.getLine);
+            //     // console.dir(recipe.getJob);
+            //     // for(var p in recipe){
+            //     //     console.log('p: ' + p);
+            //     // }
+            //     recipeJson = recipe.getJsonObject();
+            //     recipe.getLine().then(function (line) {
+            //         recipeJson.lineIdent =  line.ident;
+            //         console.log('lineIdent: ' + recipeJson.lineIdent );
+            //         recipeJsons.push(recipeJson);
+            //         var recipesStr = JSON.stringify(recipeJsons);
+            //         res.render('admin/recipe/recipeList', {
+            //                 recipes: recipesStr
+            //             }
+            //         );
+            //     });
+            // });
+
             var recipesStr = JSON.stringify(recipes);
             res.render('admin/recipe/recipeList', {
                     recipes: recipesStr
                 }
             );
-            //res.json(recipes);
         });
 
     });
@@ -25,13 +46,16 @@ module.exports = function (app, i18n) {
         // var lineIdent = req.params.lineIdent.substring(1);
         // console.log(lineIdent);
         var recipeInfo = {
-            Ident: 'newRecipeTemplate',
-            IsTemplate: true
+            ident: 'newRecipeTemplate',
+            isTemplate: true
         };
+        var recipeJson = {};
         Recipe.create(recipeInfo).then(function (newRecipe) {
             console.log('newRecipe: ' + JSON.stringify(newRecipe));
             // console.log('newRecipe.save: ' +newRecipe.save);
-            res.json(newRecipe);
+            recipeJson = newRecipe.getJsonObject();
+            recipeJson.lineIdent = newRecipe.getLine().ident;
+            res.json({recipe: recipeJson});
         });
 
     });
@@ -39,10 +63,10 @@ module.exports = function (app, i18n) {
         var toDeleteIdsStr = req.params.toDeleteIds.substring(1);
         var toDeleteIds = JSON.parse(toDeleteIdsStr);
         Recipe.destroy({
-            where:{
-              id: {
-                  $in: toDeleteIds
-              }
+            where: {
+                id: {
+                    $in: toDeleteIds
+                }
             }
         }).then(function (message) {
             res.json(message);

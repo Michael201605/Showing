@@ -5,12 +5,15 @@ var modelBase = require('../ModelBase');
 var Line = require('../eq/Line');
 var Job = require('./Job');
 var IngredientComponent = require('./IngredientComponent');
-
+var BusinessBase = require('../BusinessBase');
+var utils = require('../../lib/utils');
 var Recipe = modelBase.define('Recipe', {
     ident: modelBase.Sequelize.STRING,
     name: modelBase.Sequelize.STRING,
     category: modelBase.Sequelize.INTEGER,
-    isTemplate: modelBase.Sequelize.BOOLEAN
+    isTemplate: modelBase.Sequelize.BOOLEAN,
+    lineIdent: modelBase.Sequelize.STRING,
+    jobIdent: modelBase.Sequelize.STRING
 }, {
     classMethods: {
         copyFromTemplate: function (lineIdent, newJob) {
@@ -33,10 +36,11 @@ var Recipe = modelBase.define('Recipe', {
 });
 
 
-Recipe.hasMany(IngredientComponent, {as: 'senders'});
-Recipe.hasMany(IngredientComponent, {as: 'receivers'});
-Line.hasOne(Recipe);
+Recipe.hasMany(IngredientComponent, {as: 'Senders'});
+Recipe.hasMany(IngredientComponent, {as: 'Receivers'});
+
 Recipe.belongsTo(Job);
+Recipe.belongsTo(Line);
 
-
+utils.inherits(Recipe.Instance.prototype, BusinessBase.prototype);
 module.exports = Recipe;

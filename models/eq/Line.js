@@ -15,6 +15,6 @@ var Line = modelBase.define('Line',{
     controllerName : modelBase.Sequelize.STRING
 });
 Line.hasMany(Section);
-utils(Line.Instance.prototype, BusinessBase.prototype);
-// Line.sync();
+utils.inherits(Line.Instance.prototype, BusinessBase.prototype);
+console.log('Line executed');
 module.exports = Line;

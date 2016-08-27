@@ -8,17 +8,17 @@
                 <tr>
                     <th><input type="checkbox" ng-model="selectedAll" ng-click="checkAll()"/></th>
                     <th>{{{__ "Ident"}}}</th>
+                    <th>{{{__ "Name"}}}</th>
                     <th>{{{__ "LineIdent"}}}</th>
-                    <th>{{{__ "Category"}}}</th>
                 </tr>
                 </thead>
                 <tr ng-repeat="recipe in recipes">
                     <td>
                         <input type="checkbox" ng-model="recipe.selected"/>
                     </td>
-                    <td><a href="/admin/recipe/recipeDetail/:{[{recipe.id}]}">{[{recipe.Ident}]}</a></td>
-                    <td>{[{recipe.Name}]}</td>
-                    <td>{[{recipe.LineIdent}]}</td>
+                    <td><a href="/admin/recipe/recipeDetail/:{[{recipe.id}]}">{[{recipe.ident}]}</a></td>
+                    <td>{[{recipe.name}]}</td>
+                    <td>{[{recipe.lineIdent}]}</td>
                 </tr>
             </table>
         </div>
