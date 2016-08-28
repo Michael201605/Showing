@@ -1,12 +1,14 @@
 <div class="container" ng-app="recipeApp" ng-controller="RecipeDetailCtrl">
     <div class="row">
-        <div class="col-lg-3">
-            <label>{[{result}]}</label>
-        </div>
+        <!--<div class="col-lg-3">-->
+            <!--<label>{[{result}]}</label>-->
+        <!--</div>-->
         <div class="col-lg-8">
             <h2>{{{__ "Recipe Detail"}}}</h2>
         </div>
-
+        <div class="col-lg-3">
+            <h4><a href="/admin/recipe/recipeList">{{{__ "Recipe List"}}}</a></h4>
+        </div>
     </div>
 
     <div class="row">
@@ -70,17 +72,19 @@
                                 <th><input type="checkbox" ng-model="sendersSelectedAll" ng-click="senderCheckAll()"/>
                                 </th>
                                 <th>{{{__ "ProductIdent"}}}</th>
+                                <th>{{{__ "StorageIdent"}}}</th>
                                 <th>{{{__ "TargetPercentage"}}}</th>
                                 <th>{{{__ "TargetWeight"}}}</th>
                             </tr>
                             </thead>
-                            <tr ng-repeat="sender in senders">
+                            <tr ng-repeat="sender in recipe.senders">
                                 <td>
                                     <input type="checkbox" ng-model="sender.selected"/>
                                 </td>
-                                <th>{[{sender.ProductIdent}]}</th>
-                                <th>{[{sender.TargetPercentage}]}</th>
-                                <th>{[{sender.TargetWeight}]}</th>
+                                <th>{[{sender.productIdent}]}</th>
+                                <th>{[{sender.storageIdent}]}</th>
+                                <th>{[{sender.targetPercentage}]}</th>
+                                <th>{[{sender.targetWeight}]}</th>
                             </tr>
                         </table>
                     </div>
@@ -108,7 +112,7 @@
                                 <th>{{{__ "TargetWeight"}}}</th>
                             </tr>
                             </thead>
-                            <tr ng-repeat="receiver in receivers">
+                            <tr ng-repeat="receiver in recipe.receivers">
                                 <td>
                                     <input type="checkbox" ng-model="receiver.selected"/>
                                 </td>

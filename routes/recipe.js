@@ -4,6 +4,7 @@
 var Job = require('../models/pr/Job');
 var Line = require('../models/eq/Line');
 var Recipe = require('../models/pr/Recipe');
+var IngredientComponent = require('../models/pr/IngredientComponent');
 module.exports = function (app, i18n) {
     app.get('/admin/recipe/recipeList', function (req, res) {
         console.log("Recipe localed in i18n: " + i18n.getLocale(req));
@@ -51,11 +52,16 @@ module.exports = function (app, i18n) {
         };
         var recipeJson = {};
         Recipe.create(recipeInfo).then(function (newRecipe) {
-            console.log('newRecipe: ' + JSON.stringify(newRecipe));
-            // console.log('newRecipe.save: ' +newRecipe.save);
-            recipeJson = newRecipe.getJsonObject();
-            recipeJson.lineIdent = newRecipe.getLine().ident;
-            res.json({recipe: recipeJson});
+            if(newRecipe){
+                console.log('newRecipe: ' + JSON.stringify(newRecipe));
+                // console.log('newRecipe.save: ' +newRecipe.save);
+                recipeJson = newRecipe.getJsonObject();
+                recipeJson.lineIdent = newRecipe.getLine().ident;
+                res.json({recipe: recipeJson});
+            }else {
+                res.json({error: i18n.__('recipe is not found.')});
+            }
+
         });
 
     });
@@ -77,17 +83,31 @@ module.exports = function (app, i18n) {
     //--------------------------------------------------------------------
     app.get('/admin/recipe/recipeDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
+        var receiversJson = [];
+        var sendersJson = [];
         console.log('Recipe id: ' + id);
         Recipe.findOne({
             where: {id: id}
         }).then(function (theRecipe) {
-            var recipeStr = JSON.stringify(theRecipe);
-            console.log('recipe string: ' + recipeStr);
-            res.render('admin/recipe/recipeDetail',
-                {
-                    recipe: recipeStr
-
+            var recipeJson = theRecipe.getJsonObject();
+            theRecipe.getSenders().then(function (senders) {
+                senders.forEach(function (sender) {
+                    sendersJson.push(sender.getJsonObject());
                 });
+                theRecipe.getReceivers().then(function (receivers) {
+                    receivers.forEach(function (receiver) {
+                        receiversJson.push(receiver.getJsonObject());
+                    });
+                    recipeJson.receivers = receiversJson;
+                    recipeJson.senders = sendersJson;
+                    res.render('admin/recipe/recipeDetail',
+                        {
+                            recipe: JSON.stringify(recipeJson)
+
+                        });
+                });
+            });
+
         });
     });
     app.get('/admin/recipe/recipeDetail/updateRecipe/:recipeJsonStr', function (req, res) {
@@ -105,5 +125,38 @@ module.exports = function (app, i18n) {
         });
 
     });
+//--------------------------------------------------------------------
+    app.get('/admin/recipe/createIngredient/:recipeId/:category', function (req, res) {
+        var recipeId = req.params.id.substring(1);
+        var category = req.params.category.substring(1);
+        var receiversJson = [];
+        var sendersJson = [];
+        console.log('Recipe id: ' + recipeId);
+        console.log('type of ingredient to create: ' + type);
+        IngredientComponent.create({
+            category:category,
+            RecipeId:recipeId
+        }).then(function (newIngredient) {
+            if(newIngredient){
+                res.json({newIngredient: newIngredient});
+            }else {
+                res.json({error: i18n.__('new ingredient is empty.')});
+            }
 
-}
+        })
+    });
+    app.post('/admin/recipe/updateIngredient', function (req, res) {
+        var ingredientStr = req.body.ingredientStr;
+        console.log('ingredientStr: ' + ingredientStr);
+        var ingredientFromClient = JSON.ingredientStr(lineStr);
+        console.log('lineFromClient: ' + ingredientFromClient);
+        IngredientComponent.findOne({
+            where: {id: ingredientFromClient.id}
+        }).then(function (theIngredient) {
+            theIngredient.update(ingredientFromClient).then(function () {
+                console.log("save successfully");
+                res.json("save successfully");
+            });
+        });
+    });
+};

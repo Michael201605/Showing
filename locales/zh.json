@@ -89,5 +89,7 @@
 	"Open": "Open",
 	"Mode": "Mode",
 	"Operation": "Operation",
-	"storage not found": "storage not found"
+	"storage not found": "storage not found",
+	"StorageIdent": "StorageIdent",
+	"Recipe List": "Recipe List"
 }

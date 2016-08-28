@@ -105,8 +105,8 @@ recipeApp.controller('RecipeDetailCtrl', function ($scope, $http, $filter) {
     $scope.receivers =[];
     $scope.sendersSelectedAll = false;
     $scope.receiversSelectedAll = false;
-    getIngredients(0);
-    getIngredients(1);
+    // getIngredients(0);
+    // getIngredients(1);
     // $scope.recipe = {
     //     id: $("#id").val(),
     //     Ident: $("#Ident").val(),
