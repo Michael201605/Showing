@@ -90,11 +90,11 @@ module.exports = function (app, i18n) {
             where: {id: id}
         }).then(function (theRecipe) {
             var recipeJson = theRecipe.getJsonObject();
-            theRecipe.getSenders().then(function (senders) {
+            theRecipe.getSenders({where:{category:0}}).then(function (senders) {
                 senders.forEach(function (sender) {
                     sendersJson.push(sender.getJsonObject());
                 });
-                theRecipe.getReceivers().then(function (receivers) {
+                theRecipe.getReceivers({where:{category:1}}).then(function (receivers) {
                     receivers.forEach(function (receiver) {
                         receiversJson.push(receiver.getJsonObject());
                     });
@@ -127,23 +127,28 @@ module.exports = function (app, i18n) {
     });
 //--------------------------------------------------------------------
     app.get('/admin/recipe/createIngredient/:recipeId/:category', function (req, res) {
-        var recipeId = req.params.id.substring(1);
+        var recipeId = req.params.recipeId.substring(1);
         var category = req.params.category.substring(1);
         var receiversJson = [];
         var sendersJson = [];
         console.log('Recipe id: ' + recipeId);
-        console.log('type of ingredient to create: ' + type);
+        console.log('type of ingredient to create: ' + category);
         IngredientComponent.create({
             category:category,
-            RecipeId:recipeId
+            RecipeId:recipeId,
+            targetPercentage: 0,
+            targetWeight:0
         }).then(function (newIngredient) {
+            console.log('newIngredient');
+            console.log(newIngredient);
             if(newIngredient){
-                res.json({newIngredient: newIngredient});
+                console.log('response to send new ingredient:');
+                res.json({newIngredient: newIngredient.getJsonObject()});
             }else {
                 res.json({error: i18n.__('new ingredient is empty.')});
             }
 
-        })
+        });
     });
     app.post('/admin/recipe/updateIngredient', function (req, res) {
         var ingredientStr = req.body.ingredientStr;
@@ -159,4 +164,23 @@ module.exports = function (app, i18n) {
             });
         });
     });
+
+    app.post('/admin/recipe/deleteIngredient', function (req, res) {
+
+        var toDeleteIngredientIdsStr = req.body.toDeleteIngredientIdsStr;
+        console.log('toDeleteIngredientIdsStr:  ' + toDeleteIngredientIdsStr);
+        var toDeleteIngredientIds = JSON.parse(toDeleteIngredientIdsStr);
+        IngredientComponent.destroy({
+            where:{
+                id: {
+                    $in: toDeleteIngredientIds
+                }
+            }
+        }).then(function (deleteNo) {
+            console.log('deleteNo: ' + deleteNo);
+            res.json(i18n.__('Have delete ingredient number: %d', deleteNo));
+        });
+
+    });
+
 };

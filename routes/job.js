@@ -6,12 +6,14 @@ var Job = require('../models/pr/Job');
 var Recipe = require('../models/pr/Recipe');
 var Line = require('../models/eq/Line');
 var IngredientComponent = require('../models/pr/IngredientComponent');
+var Promise = require('promise');
+var getDisplayState = require('../lib/tools/getDisplayState');
 // Job.belongsTo(Line,{as: 'line'});
 // var ControllerAdapter = require('../adapters/ControllerAdapter');
 var JobState = require('../lib/stateAndCategory/jobState');
 // var Recipe = require('../../Models/pr/Recipe');
-module.exports = function (app, controllerManager, i18n,socket) {
-    app.get('/job/jobList/:lineIdent',isLoggedIn, function (req, res) {
+module.exports = function (app, controllerManager, i18n, socket) {
+    app.get('/job/jobList/:lineIdent', function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log('lineIdent: ' + lineIdent);
 
@@ -32,7 +34,7 @@ module.exports = function (app, controllerManager, i18n,socket) {
         });
 
     });
-    app.get('/job/jobList/createJob/:lineIdent',isLoggedIn,  function (req, res) {
+    app.get('/job/jobList/createJob/:lineIdent', function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         var errors = [];
         var error = '';
@@ -40,72 +42,84 @@ module.exports = function (app, controllerManager, i18n,socket) {
         Line.findOne({
             where: {Ident: lineIdent}
         }).then(function (theLine) {
-            if(!theLine) {
+            if (!theLine) {
                 error = i18n.__('the line is not defined');
-                res.json({error:error});
-            }else {
+                res.json({error: error});
+            } else {
                 Job.getNewJobIdent(lineIdent).then(function (data) {
                     console.log('get max id: ' + data);
                     var jobInfo = {
-                        Ident: lineIdent + ':' + data,
-                        Name: lineIdent,
-                        LineIdent: lineIdent,
-                        IsTemplate: false,
-                        State: JobState.Created,
+                        ident: lineIdent + ':' + data,
+                        name: lineIdent,
+                        lineIdent: lineIdent,
+                        ssTemplate: false,
+                        state: JobState.Created,
                         LineId: theLine.id
                     };
                     Job.create(jobInfo).then(function (newJob) {
                         // for(var p in newJob){
                         //     console.log('Job property: ' + p);
                         // }
+                        console.log('newJob');
+                        console.dir(newJob);
+                        var promises = [];
                         Recipe.findOne({
                             where: {
-                                LineId : theLine.id,
+                                LineId: theLine.id,
                                 isTemplate: true
                             }
                         }).then(function (RecipeTemplate) {
-                            if(RecipeTemplate){
+                            console.log('RecipeTemplate');
+                            console.dir(RecipeTemplate);
+                            if (RecipeTemplate) {
                                 Recipe.create({
                                     Ident: newJob.Ident,
                                     Name: newJob.Ident,
-                                    IsTemplate: false,
+                                    isTemplate: false,
                                     State: JobState.Created,
                                     JobId: newJob.id
                                 }).then(function (newRecipe) {
-                                    RecipeTemplate.getSenders().forEach(function (send) {
-                                        IngredientComponent.create({
-                                            category: send.category,
-                                            targetPercentage: send.targetPercentage,
-                                            targetWeight:send.targetWeight,
-                                            storageIdent:send.storageIdent,
-                                            ProductId: send.ProductId,
-                                            RecipeId: send.RecipeId
-                                        });
-                                    });
-                                    RecipeTemplate.getReceivers().forEach(function (send) {
-                                        IngredientComponent.create({
-                                            category: send.category,
-                                            targetPercentage: send.targetPercentage,
-                                            targetWeight:send.targetWeight,
-                                            storageIdent:send.storageIdent,
-                                            ProductId: send.ProductId,
-                                            RecipeId: send.RecipeId
+                                    console.log('newRecipe');
+                                    console.dir(newRecipe);
+                                    RecipeTemplate.getSenders().then(function (ingredients) {
+                                        ingredients.forEach(function (ingredient) {
+                                            IngredientComponent.create({
+                                                category: ingredient.category,
+                                                targetPercentage: ingredient.targetPercentage,
+                                                targetWeight: ingredient.targetWeight,
+                                                storageIdent: ingredient.storageIdent,
+                                                ProductId: ingredient.ProductId,
+                                                RecipeId: newRecipe.id,
+                                                productIdent: ingredient.productIdent
+                                            }).then(function (newIngredient) {
+                                                console.log('newIngredient');
+                                                console.dir(newIngredient);
+                                                if (newIngredient) {
+                                                    console.log('created new ingredient');
+
+                                                }
+                                                else {
+                                                    console.log('ingredient is empty');
+                                                }
+                                            });
                                         });
                                     });
                                 });
-                            }else{
+                            } else {
                                 error = i18n.__('the recipe template is not defined');
-                                res.json({error:error});
+                                res.json({error: error});
                             }
-                            //console.log('Job addLine: ' + newJob.addLine);
-                            console.log('Job setLine: ' + newJob.setLine);
-                            console.log('Job getLine: ' + newJob.getLine);
-                            console.log('new Job: ' + JSON.stringify(newJob));
-                            var newJobStr = newJob.getTranslatedJobStr(i18n);
-                            console.log('converted new Job: ' + newJobStr);
-                            res.json({newJobStr: newJobStr});
-                        });
 
+                            // //console.log('Job addLine: ' + newJob.addLine);
+                            // console.log('Job setLine: ' + newJob.setLine);
+                            // console.log('Job getLine: ' + newJob.getLine);
+                            // console.log('new Job: ' + JSON.stringify(newJob));
+                            // var newJobStr = newJob.getTranslatedJobStr(i18n);
+                            // console.log('converted new Job: ' + newJobStr);
+                            // res.json({newJobStr: newJobStr});
+                        });
+                        var jobJson = newJob.getTranslatedJob(i18n);
+                        res.json({job:jobJson});
                     });
                 });
 
@@ -119,7 +133,7 @@ module.exports = function (app, controllerManager, i18n,socket) {
         console.log('toDeleteJobIdsStr:  ' + toDeleteJobIdsStr);
         var toDeleteJobIds = JSON.parse(toDeleteJobIdsStr);
         Job.destroy({
-            where:{
+            where: {
                 id: {
                     $in: toDeleteJobIds
                 }
@@ -149,7 +163,7 @@ module.exports = function (app, controllerManager, i18n,socket) {
         });
 
     });
-    app.get('/job/jobDetail/:id',isLoggedIn,  function (req, res) {
+    app.get('/job/jobDetail/:id', isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
         Job.findOne({
             where: {id: id}
@@ -162,7 +176,7 @@ module.exports = function (app, controllerManager, i18n,socket) {
         });
 
     });
-    app.get('/job/jobDetail/startJob/:ident',isLoggedIn,  function (req, res) {
+    app.get('/job/jobDetail/startJob/:ident', isLoggedIn, function (req, res) {
         var lineIdent = '';
         var theLine,
             lineController;
@@ -171,15 +185,15 @@ module.exports = function (app, controllerManager, i18n,socket) {
         var originMessage = '';
         var error = '';
         var originError = '';
-        var controller =null;
+        var controller = null;
         Job.findOne({
             where: {Ident: ident}
         }).then(function (theJob) {
             if (theJob) {
-                theLine =  theJob.getLine();
+                theLine = theJob.getLine();
                 console.log('TheLine:');
                 console.dir(theLine);
-                if(theLine){
+                if (theLine) {
                     controller = controllerManager.getController(theLine.controllerName);
                     controller.startJob(theJob);
                 }
@@ -201,7 +215,7 @@ module.exports = function (app, controllerManager, i18n,socket) {
 function isLoggedIn(req, res, next) {
 
     // if user is authenticated in the session, carry on
-    if (req.isAuthenticated()){
+    if (req.isAuthenticated()) {
 
         console.log('is Authenticated!!!');
         return next();

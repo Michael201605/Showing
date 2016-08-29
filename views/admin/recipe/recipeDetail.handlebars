@@ -1,10 +1,12 @@
 <div class="container" ng-app="recipeApp" ng-controller="RecipeDetailCtrl">
     <div class="row">
         <!--<div class="col-lg-3">-->
-            <!--<label>{[{result}]}</label>-->
+        <!--<label>{[{result}]}</label>-->
         <!--</div>-->
         <div class="col-lg-8">
             <h2>{{{__ "Recipe Detail"}}}</h2>
+            <br>
+            <label>{[{result}]}</label>
         </div>
         <div class="col-lg-3">
             <h4><a href="/admin/recipe/recipeList">{{{__ "Recipe List"}}}</a></h4>
@@ -25,21 +27,28 @@
                     <label class="col-md-2 control-label">{{{__ "Ident"}}}</label>
                     <div class="col-md-4">
                         <input type="text" class="form-control" name="Ident"
-                               ng-model="recipe.Ident"/>
+                               ng-model="recipe.ident"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "Name"}}}</label>
                     <div class="col-md-4">
                         <input type="text" class="form-control" name="Name"
-                               ng-model="recipe.Name"/>
+                               ng-model="recipe.name"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "LineIdent"}}}</label>
                     <div class="col-md-4">
                         <input type="text" class="form-control" name="LineIdent"
-                               ng-model="recipe.LineIdent"/>
+                               ng-model="recipe.lineIdent"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{{__ "Is Produce"}}}</label>
+                    <div class="col-md-4">
+                        <input type="checkbox" class="form-control" name="isProduce"
+                               ng-model="isProduce" ng-change="setStorages()"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -62,6 +71,7 @@
         </div>
         <div class="col-lg-7">
             <!--visualization-->
+
             <div class="tab-content">
                 <div id="Senders" class="tab-pane fade in active">
                     <div class="col-lg-9">
@@ -81,10 +91,15 @@
                                 <td>
                                     <input type="checkbox" ng-model="sender.selected"/>
                                 </td>
-                                <th>{[{sender.productIdent}]}</th>
-                                <th>{[{sender.storageIdent}]}</th>
-                                <th>{[{sender.targetPercentage}]}</th>
-                                <th>{[{sender.targetWeight}]}</th>
+                                <td>{[{sender.productIdent}]}</td>
+                                <td><select class="col-md-8" name="senderStorage" id="senderStorage" ng-model="sender.StorageId">
+                                    <option ng-repeat="senderStorage in senderStorages" value="{[{senderStorage.id}]}">
+                                        {[{senderStorage.ident}]}
+                                    </option>
+                                </select>
+                                </td>
+                                <td><input type="number" min="0.0" max="100.0" ng-model="sender.targetPercentage">%</td>
+                                <td><input type="number" min="0.0" max="100.0" ng-model="sender.targetWeight"></td>
                             </tr>
                         </table>
                     </div>
@@ -103,11 +118,8 @@
                             <tr>
                                 <th><input type="checkbox" ng-model="receiversSelectedAll"
                                            ng-click="receiversCheckAll()"/></th>
-                                <th><select ng-model="senderProductIdent"
-                                            class="optional overall classes"
-                                            data-btn-class="option toggle classes">
-                                    <!-- ... -->
-                                </select></th>
+                                <th>{{{__ "ProductIdent"}}}</th>
+                                <th>{{{__ "StorageIdent"}}}</th>
                                 <th>{{{__ "TargetPercentage"}}}</th>
                                 <th>{{{__ "TargetWeight"}}}</th>
                             </tr>
@@ -116,9 +128,18 @@
                                 <td>
                                     <input type="checkbox" ng-model="receiver.selected"/>
                                 </td>
-                                <th>{[{receiver.productIdent}]}</th>
-                                <th>{[{receiver.targetPercentage}]}</th>
-                                <th>{[{receiver.targetWeight}]}</th>
+                                <td>{[{receiver.productIdent}]}</td>
+                                <td><select class="col-md-8" name="receiverStorage" id="receiverStorage"
+                                            ng-model="receiver.StorageId">
+                                    <option ng-repeat="receiverStorage in receiverStorages"
+                                            value="{[{receiverStorage.id}]}">
+                                        {[{receiverStorage.ident}]}
+                                    </option>
+                                </select>
+                                </td>
+                                <td><input type="number" min="0.0" max="100.0" ng-model="receiver.targetPercentage">%
+                                </td>
+                                <td><input type="number" min="0.0" max="100.0" ng-model="receiver.targetWeight"></td>
                             </tr>
                         </table>
                     </div>

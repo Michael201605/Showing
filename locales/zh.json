@@ -1,4 +1,6 @@
 {
+	"2": 2,
+	"4": 4,
 	"text to test": "text to test 测试",
 	"%d cat": {
 		"one": "%d cat",
@@ -91,5 +93,8 @@
 	"Operation": "Operation",
 	"storage not found": "storage not found",
 	"StorageIdent": "StorageIdent",
-	"Recipe List": "Recipe List"
+	"Recipe List": "Recipe List",
+	"Have delete ingredient: %d": "Have delete ingredient: %d",
+	"Have delete ingredient number: %d": "Have delete ingredient number: %d",
+	"Is Produce": "Is Produce"
 }

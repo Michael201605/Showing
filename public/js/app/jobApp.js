@@ -50,14 +50,19 @@ jobApp.controller('JobListCtrl', function ($scope, $http, $filter) {
 
     //function defintions
     function createJob() {
-        $.getJSON('/job/jobList/createJob/:' +$scope.LineIdent, function (newJobStr) {
-            var newJob = JSON.parse(newJobStr);
+        $.get('/job/jobList/createJob/:' +$scope.LineIdent, function (data) {
+            var newJob = null;
+            console.log('data: ' + data);
+            if(!data.error){
+                newJob = data.job;
+                console.log('newJob: ' + newJob);
+                console.log('newJob id: ' + newJob.id);
+                console.log('newJob State: ' + newJob.DisplayState);
+                $scope.jobs.push(newJob);
 
-            console.log('newJob: ' + newJobStr);
-            console.log('newJob id: ' + newJob.id);
-            console.log('newJob State: ' + newJob.DisplayState);
-            $scope.jobs.push(newJob);
-            window.location.replace("/job/jobList/:"+$scope.LineIdent);
+            }
+            location.reload();
+
         });
     }
 

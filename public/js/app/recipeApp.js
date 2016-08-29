@@ -89,38 +89,19 @@ recipeApp.controller('RecipeListCtrl', function ($scope, $http, $filter) {
 recipeApp.controller('RecipeDetailCtrl', function ($scope, $http, $filter) {
 
     //internal variables
-    var targetXML = {};
-    var resourceXML = {};
-    var filterList = {
-        id: '',
-        label: '',
-        OriginalText: '',
-        innerText: ''
-    };
-    var log = "";
-    var targetTexts = [];
-    var resourceTexts = [];
+
+    var line = {};
     $scope.recipe = JSON.parse($("#recipe").val());
-    $scope.senders =[];
-    $scope.receivers =[];
+    $scope.receiverStorages = [];
+    $scope.senderStorages = [];
     $scope.sendersSelectedAll = false;
     $scope.receiversSelectedAll = false;
-    // getIngredients(0);
-    // getIngredients(1);
-    // $scope.recipe = {
-    //     id: $("#id").val(),
-    //     Ident: $("#Ident").val(),
-    //     Name: $("#Name").val(),
-    //     JobIdent: $("#JobIdent").val(),
-    //     LineIdent: $("#LineIdent").val(),
-    //     SenderList: $("#SenderList").val(),
-    //     ReceiverList: $("#ReceiverList").val()
-    // };
-    //console.log($("#recipe").val());
+    $scope.isProduce = false;
     console.log($scope.recipe);
-    $scope.result = "";
-
-
+    $scope.result = '';
+    $scope.sender = {};
+    $scope.setStorages = setStorages;
+    setStorages();
     $scope.update = function () {
         var recipeStr = JSON.stringify($scope.recipe);
         $.getJSON('/admin/recipe/recipeDetail/updateRecipe/:' + recipeStr, function (message) {
@@ -131,41 +112,172 @@ recipeApp.controller('RecipeDetailCtrl', function ($scope, $http, $filter) {
     };
 
     $scope.senderCheckAll = function () {
-        angular.forEach($scope.senders, function (sender) {
+        angular.forEach($scope.recipe.senders, function (sender) {
             sender.selected = $scope.sendersSelectedAll;
         });
     };
     $scope.createSender = function () {
-        var newSender = {
-            Category: 0,
-            TargetPercentage: 0,
-
-        };
-
+        $.get('/admin/recipe/createIngredient/:' + $scope.recipe.id + '/:' + 0, function (data) {
+            console.log('data');
+            console.dir(data);
+            if (data.error) {
+                $scope.result = data.error;
+            } else {
+                $scope.result = '';
+                $scope.recipe.senders.push(data.newIngredient);
+                location.reload();
+            }
+        });
     };
-    $scope.removeSender = function () {
 
+    $scope.removeSender = function () {
+        var toDeleteSenderIds = [];
+        var remainSenders = [];
+        $scope.sendersSelectedAll = false;
+        angular.forEach($scope.recipe.senders, function (selectedSender) {
+            if (selectedSender.selected) {
+                toDeleteSenderIds.push(selectedSender.id);
+            } else {
+                remainSenders.push(selectedSender);
+            }
+        });
+        $scope.recipe.senders = remainSenders;
+        var toDeleteSenderIdsStr = JSON.stringify(toDeleteSenderIds);
+        console.log('toDeleteSenderIdsStr: ' + toDeleteSenderIdsStr);
+        $.post('/admin/recipe/deleteIngredient', {toDeleteIngredientIdsStr: toDeleteSenderIdsStr}, function (message) {
+            $scope.result = message;
+            console.log(message);
+        });
     };
     $scope.receiversCheckAll = function () {
-        angular.forEach($scope.receivers, function (receiver) {
+        angular.forEach($scope.recipe.receivers, function (receiver) {
             receiver.selected = $scope.receiversSelectedAll;
         });
     };
     $scope.createReceiver = function () {
-
+        $.get('/admin/recipe/createIngredient/:' + $scope.recipe.id + '/:' + 1, function (data) {
+            console.log('data');
+            console.dir(data);
+            if (data.error) {
+                $scope.result = data.error;
+            } else {
+                $scope.result = '';
+                $scope.recipe.receivers.push(data.newIngredient);
+                location.reload();
+            }
+        });
     };
     $scope.removeReceiver = function () {
-
-    };
-
-    function getIngredients(category) {
-        $.getJSON('/admin/recipe/recipeDetail/getIngredients/:' + category, function (ingredients) {
-            if (category == 0) {
-                $scope.senders = ingredients;
+        var toDeleteReceiverIds = [];
+        var remainReceivers = [];
+        $scope.receiversSelectedAll = false;
+        angular.forEach($scope.recipe.receivers, function (selectedReceiver) {
+            if (selectedReceiver.selected) {
+                toDeleteReceiverIds.push(selectedReceiver.id);
             } else {
-                $scope.receivers = ingredients;
+                remainReceivers.push(selectedReceiver);
             }
+        });
+        $scope.recipe.receivers = remainReceivers;
+        var toDeleteReceiverIdsStr = JSON.stringify(toDeleteReceiverIds);
+        console.log('toDeleteReceiverIdsStr: ' + toDeleteReceiverIdsStr);
+        $.post('/admin/recipe/deleteIngredient', {toDeleteIngredientIdsStr: toDeleteReceiverIdsStr}, function (message) {
+            $scope.result = message;
+            console.log(message);
+        });
+    };
+    function changeStorages() {
+        console.log('Is produce: ' + $scope.isProduce);
+        $scope.senderStorages = [
+            {
+                id: 11111,
+                ident: '11111'
+            },
+            {
+                id: 22222,
+                ident: '22222'
+            },
+            {
+                id: 33333,
+                ident: '33333'
+            }
+        ];
+        $scope.receiverStorages = [
+            {
+                id: 111,
+                ident: '111'
+            },
+            {
+                id: 222,
+                ident: '222'
+            },
+            {
+                id: 333,
+                ident: '333'
+            }
+        ];
+        if ($scope.isProduce) {
+            getStorages(10, setStorageForSenders);
+            // getStorages(1, setStorageForReceivers);
+        } else {
+            getStorages(1, setStorageForSenders);
+            // getStorages(10, setStorageForReceivers);
+        }
+    }
 
+
+    function setStorages() {
+        var isProduce = $scope.isProduce;
+        if (isProduce) {
+            $.get('/storage/getStorageList/:' + 1, function (storages) {
+                console.log('storages');
+                console.log(storages);
+                $scope.receiverStorages = storages;
+
+                console.log('receiverStorages');
+                console.dir($scope.receiverStorages);
+            });
+            $.get('/storage/getStorageList/:' + 10, function (storages) {
+                console.log('storages');
+                console.log(storages);
+                $scope.senderStorages = storages;
+
+                console.log('senderStorages');
+                console.dir($scope.senderStorages);
+            });
+        }else {
+            $.get('/storage/getStorageList/:' + 10, function (storages) {
+                console.log('storages');
+                console.log(storages);
+                $scope.receiverStorages = storages;
+
+                console.log('receiverStorages');
+                console.dir($scope.receiverStorages);
+            });
+            $.get('/storage/getStorageList/:' + 1, function (storages) {
+                console.log('storages');
+                console.log(storages);
+                $scope.senderStorages = storages;
+
+                console.log('senderStorages');
+                console.dir($scope.senderStorages);
+            });
+        }
+
+
+    }
+
+    function setStorageForSenders(storages) {
+        $scope.senderStorages = storages;
+        console.log('senderStorages');
+        console.dir($scope.senderStorages);
+    }
+
+    function getStorages(category, callback) {
+        $.get('/storage/getStorageList/:' + category, function (storages) {
+            console.log('storages');
+            console.log(storages);
+            callback(storages);
         });
     }
 

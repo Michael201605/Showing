@@ -3,10 +3,10 @@
  */
 //var Job = require('../../Models/pr/Job');
 var Storage = require('../models/eq/Storage');
-var GcsState = require('../lib/stateAndCategory/gcsState');
+var StorageCategory = require('../lib/stateAndCategory/storageCategory');
 module.exports = function (app, i18n) {
-    app.get('/storage/StorageList', function (req, res) {
-        Storage.findAll({}).then(function (storages) {
+    app.get('/storage/storageList', function (req, res) {
+        Storage.findAll().then(function (storages) {
             console.log('storages: ' + storages);
             res.render('storage/StorageList',
                 {
@@ -15,15 +15,14 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/storage/StorageList/createLine', function (req, res) {
-        var lineInfo = {
-            Ident: 'newLine',
-            State: GcsState.Passive
+    app.get('/storage/storageList/createStorage', function (req, res) {
+        var storageInfo = {
+            Ident: 'newStorage',
         };
-        Storage.create(lineInfo).then(function (newLine) {
-            console.log('newLine: ' + JSON.stringify(newLine));
+        Storage.create(storageInfo).then(function (newStorage) {
+            console.log('newLine: ' + JSON.stringify(newStorage));
             // console.log('newRecipe.save: ' +newRecipe.save);
-            res.json(newLine);
+            res.json(newStorage);
         });
     });
     app.post('/storage/StorageList/deleteStorage', function (req, res) {
@@ -87,6 +86,21 @@ module.exports = function (app, i18n) {
         });
 
     });
+    app.get('/storage/getStorageList/:category', function (req, res) {
+        var category = req.params.category.substring(1);
+        var gateStoragesJson = [];
+        Storage.findAll({
+            where: {
+                category: category
+            }
+        }).then(function (storages) {
+            console.log('storages: ' + storages);
+            storages.forEach(function (gateStorage) {
+                gateStoragesJson.push(gateStorage.getJsonObject());
+            });
+            res.json(gateStoragesJson);
+        });
 
+    });
 
 }
