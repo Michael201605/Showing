@@ -166,13 +166,13 @@ require('./routes/index')(app, passport); // load our routes and pass in our app
 require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
-
+require('./routes/product')(app, i18n);
 
 new GcObjectAdapter(io).then(function (gcObjectAd) {
     console.log('gcobjectAdapter created success!');
     gcObjectAd.DataType = opcua.DataType;
     gcObjectAd.MonitorAllGcObjects();
-    new ControllerManager(gcObjectAd).then(function (controllerManager) {
+    new ControllerManager(gcObjectAd,i18n).then(function (controllerManager) {
         console.log('controllerManager created success!');
         require('./routes/job')(app,controllerManager, i18n,io);
     });

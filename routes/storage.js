@@ -4,7 +4,7 @@
 //var Job = require('../../Models/pr/Job');
 var Storage = require('../models/eq/Storage');
 var StorageCategory = require('../lib/stateAndCategory/storageCategory');
-module.exports = function (app, i18n) {
+module.exports = function (app, gcObjectAd, i18n,io) {
     app.get('/storage/storageList', function (req, res) {
         Storage.findAll().then(function (storages) {
             console.log('storages: ' + storages);
@@ -25,7 +25,7 @@ module.exports = function (app, i18n) {
             res.json(newStorage);
         });
     });
-    app.post('/storage/StorageList/deleteStorage', function (req, res) {
+    app.post('/storage/storageList/deleteStorage', function (req, res) {
         var toDeleteStorageIdsStr = req.body.toDeleteStorageIdsStr;
         console.log('toDeleteStorageIdsStr:  ' + toDeleteStorageIdsStr);
         var toDeleteLineIds = JSON.parse(toDeleteStorageIdsStr);
@@ -40,7 +40,7 @@ module.exports = function (app, i18n) {
         });
     });
 
-    app.get('/storage/StorageDetail/:id', function (req, res) {
+    app.get('/storage/storageDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
         var storageStr='';
         var error ='';
@@ -68,7 +68,36 @@ module.exports = function (app, i18n) {
 
         });
     });
-    app.post('/storage/StorageDetail', function (req, res) {
+    app.get('/storage/getStorage/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var storageStr='';
+        var error ='';
+        console.log('storage id: ' + id);
+        Storage.findOne({
+            where: {id: id}
+        }).then(function (theStorage) {
+            console.log('storage: ');
+            console.dir(theStorage);
+            if (theStorage) {
+                res.json(
+                    {
+                        storage: theStorage.getJsonObject()
+                    });
+            }
+            else {
+
+                error = i18n.__('storage not found');
+                console.log(error);
+                res.json(
+                    {
+                        error: error
+                    });
+            }
+
+
+        });
+    });
+    app.post('/storage/storageDetail', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }

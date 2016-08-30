@@ -7,6 +7,7 @@ var utils = require('../../lib/utils');
 var BusinessBase = require('../BusinessBase');
 var JobState = require('../../lib/stateAndCategory/jobState');
 var getDisplayState = require('../../lib/tools/getDisplayState');
+
 var Promise = require('promise');
 var properties = {
     ident: {type: modelBase.Sequelize.STRING},
@@ -31,6 +32,10 @@ var Job = modelBase.define('Job', properties, {
                     console.log('max ' + data);
                     console.dir( data);
                     var max = data[0]['max(id)'];
+                    if(!max){
+                        max = 0;
+                    }
+                    max++;
                     resolve(pad(max,6));
                 });
                 // Job.max('id').then(function (max) {
@@ -76,6 +81,19 @@ Job.Instance.prototype.getTranslatedJob = function (i18n) {
     var JSONJob = this.getJsonObject();
     JSONJob.displayState = i18n.__(getDisplayState(JobState, this.state));
     return JSONJob;
+};
+Job.Instance.prototype.getRecipe = function () {
+    var Recipe = require('./Recipe');
+    var me = this;
+    return new Promise(function (resolve, reject) {
+        Recipe.findOne({where:{JobId: me.id}}).then(function (theRecipe) {
+            if(theRecipe){
+                resolve(theRecipe);
+            }else {
+                reject('Recipe not found');
+            }
+        });
+    });
 };
 Job.belongsTo(Line,{as: 'Line'});
 

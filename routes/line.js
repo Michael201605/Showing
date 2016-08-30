@@ -17,6 +17,19 @@ module.exports = function (app, i18n) {
         });
 
     });
+    app.get('/line/getLineList', function (req, res) {
+        Line.findAll({
+
+        }).then(function (lines) {
+            console.log('lines: '+ lines);
+
+            res.json(
+                {
+                    lines: JSON.stringify(lines)
+                });
+        });
+
+    });
     app.get('/line/lineList/createLine',isLoggedIn, function (req, res) {
         var lineInfo = {
             Ident: 'newLine',
@@ -76,7 +89,21 @@ module.exports = function (app, i18n) {
         });
 
     });
+    app.get('/line/getLine/:ident', function (req, res) {
+        var ident = req.params.ident.substring(1);
+        console.log('Line ident: ' + ident);
+        Line.findOne({
+            where: {ident: ident}
+        }).then(function (theLine) {
+            console.log('line: ');
+            console.dir(theLine.getJsonObject());
+            res.json(
+                {
+                    line: theLine.getJsonObject()
 
+                });
+        });
+    });
 
 };
 

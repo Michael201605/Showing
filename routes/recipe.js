@@ -43,26 +43,35 @@ module.exports = function (app, i18n) {
 
     });
 
-    app.get('/admin/recipe/recipeList/createRecipe', function (req, res) {
-        // var lineIdent = req.params.lineIdent.substring(1);
+    app.get('/admin/recipe/recipeList/createRecipe/:lineId', function (req, res) {
+        var lineId = req.params.lineId.substring(1);
         // console.log(lineIdent);
         var recipeInfo = {
             ident: 'newRecipeTemplate',
             isTemplate: true
         };
         var recipeJson = {};
-        Recipe.create(recipeInfo).then(function (newRecipe) {
-            if(newRecipe){
-                console.log('newRecipe: ' + JSON.stringify(newRecipe));
-                // console.log('newRecipe.save: ' +newRecipe.save);
-                recipeJson = newRecipe.getJsonObject();
-                recipeJson.lineIdent = newRecipe.getLine().ident;
-                res.json({recipe: recipeJson});
-            }else {
-                res.json({error: i18n.__('recipe is not found.')});
-            }
+        Line.findOne({
+            where:{id:lineId}
+        }).then(function (theLine) {
+            if(theLine){
+                recipeInfo.LineId = theLine.id;
+                recipeInfo.lineIdent= theLine.ident;
+                Recipe.create(recipeInfo).then(function (newRecipe) {
+                    if(newRecipe){
+                        console.log('newRecipe: ' + JSON.stringify(newRecipe));
+                        // console.log('newRecipe.save: ' +newRecipe.save);
+                        recipeJson = newRecipe.getJsonObject();
+                        res.json({recipe: recipeJson});
 
-        });
+                    }else {
+                        res.json({error: i18n.__('recipe is not found.')});
+                    }
+
+                });
+
+            }
+        })
 
     });
     app.get('/admin/recipe/recipeList/deleteRecipe/:toDeleteIds', function (req, res) {
@@ -152,16 +161,22 @@ module.exports = function (app, i18n) {
     });
     app.post('/admin/recipe/updateIngredient', function (req, res) {
         var ingredientStr = req.body.ingredientStr;
-        console.log('ingredientStr: ' + ingredientStr);
-        var ingredientFromClient = JSON.ingredientStr(lineStr);
-        console.log('lineFromClient: ' + ingredientFromClient);
+        //console.log('ingredientStr: ' + ingredientStr);
+        var ingredientFromClient = JSON.parse(ingredientStr);
+        console.log('ingredientFromClient: ' + ingredientFromClient);
+        console.log('ingredientFromClient id: ' + ingredientFromClient.id);
         IngredientComponent.findOne({
             where: {id: ingredientFromClient.id}
         }).then(function (theIngredient) {
-            theIngredient.update(ingredientFromClient).then(function () {
-                console.log("save successfully");
-                res.json("save successfully");
-            });
+            if(theIngredient){
+                theIngredient.update(ingredientFromClient).then(function () {
+                    console.log("save successfully");
+                    res.json("save successfully");
+                });
+            }else {
+                console.log("ingredient not found");
+            }
+
         });
     });
 

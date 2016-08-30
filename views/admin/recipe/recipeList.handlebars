@@ -33,7 +33,15 @@
         </div>
     </div>
 </div>
+<div id="getLineIdent" title="Create new recipe">
+    <label  id ="Category" class="GCObject type">GCObject</label>
+    <fieldset>
+        <legend class="title">{{{__ "select a line"}}}</legend>
+        <select name="line" id="lineList">
+        </select>
+    </fieldset>
+</div>
 {{#section 'jquery'}}
     <script src="/js/app/recipeApp.js"></script>
-
+    <script src="/js/dialogLineIdent.js"></script>
 {{/section}}

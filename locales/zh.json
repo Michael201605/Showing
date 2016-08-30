@@ -96,5 +96,16 @@
 	"Recipe List": "Recipe List",
 	"Have delete ingredient: %d": "Have delete ingredient: %d",
 	"Have delete ingredient number: %d": "Have delete ingredient number: %d",
-	"Is Produce": "Is Produce"
+	"Is Produce": "Is Produce",
+	"the recipe template is not defined": "the recipe template is not defined",
+	"select a line": "select a line",
+	"Sender": "Sender",
+	"Receiver": "Receiver",
+	"Job Detail": "Job Detail",
+	"Job List": "Job List",
+	"Line Ident": "Line Ident",
+	"Start Job": "Start Job",
+	"Suspend Job": "Suspend Job",
+	"check Job": "check Job",
+	"save": "save"
 }

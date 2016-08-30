@@ -11,128 +11,42 @@ selectTestApp.controller('SelectTestCtrl', function ($scope, $http, $filter) {
     //internal variables
 
 
+    var gateStorages =[];
+    var bulkStorages =[];
+    // $scope.job = JSON.parse($("#job").val());
+    $scope.senderStorages =[];
+    $scope.receiverStorages =[];
+    $scope.line = {};
 
-    $scope.receiverStorages = [];
-    $scope.senderStorages = [];
+    $.get('localhost:3000/storage/getStorageList/:' + 1, function (storagesOfGate) {
+        console.log('storagesOfGate');
+        console.log(storagesOfGate);
+        gateStorages = storagesOfGate;
 
-    $scope.isProduce = false;
-    $scope.sender={
-        id: -1,
-    };
-    $scope.changeStorages = changeStorages;
-    changeStorages();
+        $.get('172.26.203.71:3000/storage/getStorageList/:' + 10, function (storagesOfBulk) {
+            console.log('storagesOfBulk');
+            console.log(storagesOfBulk);
+            bulkStorages = storagesOfBulk;
 
-    function changeStorages() {
-        if ($scope.isProduce) {
-            $scope.receiverStorages = [
-                {
-                id: 1,
-                ident: '501',
-                category: 1
-                },
-                {
-                    id: 2,
-                    ident: '502',
-                    category: 1
-                },
-                {
-                    id: 3,
-                    ident: '801',
-                    category: 1
-                },
-                {
-                    id: 4,
-                    ident: '901',
-                    category: 1
-                },
-                {
-                    id: 5,
-                    ident: '902',
-                    category: 1
+
+
+            $.get('172.26.203.71:3000/line/getLine/:' + $scope.job.LineId, function (data) {
+                console.log('line data');
+                console.dir(data);
+                if(!data.error){
+                    $scope.line = data.line;
+                    if($scope.line.category === 1){
+                        $scope.senderStorages = gateStorages;
+                        $scope.receiverStorages = bulkStorages;
+                    }
+                    else {
+                        $scope.senderStorages = bulkStorages;
+                        $scope.receiverStorages = gateStorages;
+                    }
+
                 }
-            ];
-            $scope.senderStorages = [
-                {
-                    id: 6,
-                    ident: '001',
-                    category: 10
-                },
-                {
-                    id: 7,
-                    ident: '002',
-                    category: 10
-                },
-                {
-                    id: 8,
-                    ident: '003',
-                    category: 10
-                },
-                {
-                    id: 9,
-                    ident: '004',
-                    category: 10
-                },
-                {
-                    id: 10,
-                    ident: '005',
-                    category: 10
-                }
-            ];
-        } else {
-            $scope.senderStorages = [
-                {
-                    id: 1,
-                    ident: '501',
-                    category: 1
-                },
-                {
-                    id: 2,
-                    ident: '502',
-                    category: 1
-                },
-                {
-                    id: 3,
-                    ident: '801',
-                    category: 1
-                },
-                {
-                    id: 4,
-                    ident: '901',
-                    category: 1
-                },
-                {
-                    id: 5,
-                    ident: '902',
-                    category: 1
-                }
-            ];
-            $scope.receiverStorages = [
-                {
-                    id: 6,
-                    ident: '001',
-                    category: 10
-                },
-                {
-                    id: 7,
-                    ident: '002',
-                    category: 10
-                },
-                {
-                    id: 8,
-                    ident: '003',
-                    category: 10
-                },
-                {
-                    id: 9,
-                    ident: '004',
-                    category: 10
-                },
-                {
-                    id: 10,
-                    ident: '005',
-                    category: 10
-                }
-            ];
-        }
-    }
+            });
+        });
+    });
+
 });

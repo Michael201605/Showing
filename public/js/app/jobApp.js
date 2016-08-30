@@ -100,18 +100,46 @@ jobApp.controller('JobListCtrl', function ($scope, $http, $filter) {
 jobApp.controller('JobDetailCtrl', function ($scope, $http, $filter) {
 
     //internal variables
-    var targetXML = {};
-    var resourceXML = {};
-    var filterList = {
-        id: '',
-        label: '',
-        OriginalText: '',
-        innerText: ''
-    };
-    var log = "";
-    var targetTexts = [];
-    var resourceTexts = [];
-    $scope.recipe = JSON.parse($("#recipe").val());
+    var gateStorages =[];
+    var bulkStorages =[];
+    //$scope.job = JSON.parse($("#job").val());
+    $scope.senderStorages =[];
+    $scope.receiverStorages =[];
+    $scope.line = {};
+
+    $.get('/storage/getStorageList/:' + 1, function (storagesOfGate) {
+        console.log('storagesOfGate');
+        console.log(storagesOfGate);
+        gateStorages = storagesOfGate;
+
+        $.get('/storage/getStorageList/:' + 10, function (storagesOfBulk) {
+            console.log('storagesOfBulk');
+            console.log(storagesOfBulk);
+            bulkStorages = storagesOfBulk;
+
+
+
+            $.get(' /line/getLine/:' + $scope.job.LineId, function (data) {
+                console.log('line data');
+                console.dir(data);
+                if(!data.error){
+                    $scope.line = data.line;
+                    if($scope.line.category === 1){
+                        $scope.senderStorages = gateStorages;
+                        $scope.receiverStorages = bulkStorages;
+                    }
+                    else {
+                        $scope.senderStorages = bulkStorages;
+                        $scope.receiverStorages = gateStorages;
+                    }
+
+                }
+            });
+        });
+    });
+
+
+
     // $scope.recipe = {
     //     id: $("#id").val(),
     //     Ident: $("#Ident").val(),
@@ -122,17 +150,17 @@ jobApp.controller('JobDetailCtrl', function ($scope, $http, $filter) {
     //     ReceiverList: $("#ReceiverList").val()
     // };
     //console.log($("#recipe").val());
-    console.log($scope.recipe);
+    console.log($scope.job);
     $scope.result = "";
 
-
+    $scope.job.recipe.senders[0].storageIdent = '501';
     $scope.update = function () {
-        var recipeStr = JSON.stringify($scope.recipe);
-        $.getJSON('/admin/recipe/RecipeDetail/UpdateRecipe/:'+ recipeStr, function (message) {
+        var jobStr = JSON.stringify($scope.job);
+        $.post('/job/jobDetail',{jobStr:jobStr}, function (message) {
             console.log(message);
             $scope.result = message;
-            window.location.replace("/admin/recipe/RecipeList");
-        })
+            location.reload();
+        },'json');
     }
 
 });

@@ -29,7 +29,7 @@ module.exports = function (app, controllerManager, i18n, socket) {
             res.render('job/jobList',
                 {
                     jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
-                    LineIdent: lineIdent
+                    lineIdent: lineIdent
                 });
         });
 
@@ -52,7 +52,11 @@ module.exports = function (app, controllerManager, i18n, socket) {
                         ident: lineIdent + ':' + data,
                         name: lineIdent,
                         lineIdent: lineIdent,
-                        ssTemplate: false,
+                        visible: true,
+                        isTemplate: false,
+                        locked: false,
+                        targetWeight: 0.0,
+                        actualWeight: 0.0,
                         state: JobState.Created,
                         LineId: theLine.id
                     };
@@ -107,7 +111,6 @@ module.exports = function (app, controllerManager, i18n, socket) {
                                 });
                             } else {
                                 error = i18n.__('the recipe template is not defined');
-                                res.json({error: error});
                             }
 
                             // //console.log('Job addLine: ' + newJob.addLine);
@@ -142,38 +145,101 @@ module.exports = function (app, controllerManager, i18n, socket) {
             res.json(message);
         });
     });
-    app.get('/job/jobList/:lineIdent', isLoggedIn, function (req, res) {
-        var lineIdent = req.params.lineIdent.substring(1);
-        console.log(lineIdent);
-
-
-        // var jobs =[];
-        Job.findAll({
-            where: {
-                LineIdent: lineIdent,
-            }
-        }).then(function (jobs) {
-
-            console.log('jobs: ' + jobs);
-            res.render('job/jobList',
-                {
-                    jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
-                    LineIdent: lineIdent
-                });
-        });
-
-    });
-    app.get('/job/jobDetail/:id', isLoggedIn, function (req, res) {
+    // app.get('/job/jobList/:lineIdent', isLoggedIn, function (req, res) {
+    //     var lineIdent = req.params.lineIdent.substring(1);
+    //     console.log(lineIdent);
+    //
+    //
+    //     // var jobs =[];
+    //     Job.findAll({
+    //         where: {
+    //             LineIdent: lineIdent,
+    //         }
+    //     }).then(function (jobs) {
+    //
+    //         console.log('jobs: ' + jobs);
+    //         res.render('job/jobList',
+    //             {
+    //                 jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
+    //                 LineIdent: lineIdent
+    //             });
+    //     });
+    //
+    // });
+    app.get('/job/jobDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
+        var jobJson = {};
+
         Job.findOne({
             where: {id: id}
         }).then(function (theJob) {
-            res.render('job/jobDetail',
-                {
-                    job: theJob
+            if(theJob){
+                jobJson = theJob.getTranslatedJob(i18n);
+                theJob.getRecipe().then(function (theRecipe) {
+                    if(theRecipe){
+                        jobJson.recipe = theRecipe.getJsonObject();
+                        jobJson.recipe.senders=[];
+                        jobJson.recipe.receivers=[];
+                        theRecipe.getSenders().then(function (ingredients) {
+                            ingredients.forEach(function (ingredient) {
+                                if(ingredient.category === 0){
+                                    jobJson.recipe.senders.push(ingredient.getJsonObject());
+                                }else {
+                                    jobJson.recipe.receivers.push(ingredient.getJsonObject());
+                                }
+                            });
+                            res.render('job/jobDetail',
+                                {
+                                    job: jobJson,
+                                    recipe: JSON.stringify(jobJson.recipe)
+
+                                });
+                        })
+                    }else {
+                        res.render('job/jobDetail',{error: i18n.__('Job: %s recipe is empty.', id)});
+                    }
 
                 });
+            }
+            else {
+                res.json({error: i18n.__('Job: %s is empty.', id)});
+            }
+
         });
+
+    });
+    app.get('/job/jobDetail/checkJob/:ident', function (req, res) {
+        var lineIdent = '';
+        var theLine,
+            lineController;
+        var ident = req.params.ident.substring(1);
+        var message = '';
+        var originMessage = '';
+        var error = '';
+        var originError = '';
+        var controller = null;
+        Job.findOne({
+            where: {Ident: ident}
+        }).then(function (theJob) {
+            if (theJob) {
+                theLine = theJob.getLine();
+                console.log('TheLine:');
+                console.dir(theLine);
+                if (theLine) {
+                    controller = controllerManager.getController(theLine.controllerName);
+                    controller.checkJob(theJob);
+                }
+
+            }
+            else {
+                originError = 'the job: {0} is not found';
+                error = i18n.__(originError, ident);
+                res.send({
+                    error: error
+                });
+            }
+        });
+
 
     });
     app.get('/job/jobDetail/startJob/:ident', isLoggedIn, function (req, res) {
@@ -208,6 +274,24 @@ module.exports = function (app, controllerManager, i18n, socket) {
             }
         });
 
+
+    });
+    app.post('/job/jobDetail',isLoggedIn, function (req, res) {
+        // for(var p in req){
+        //     console.log('property of req: '+ p);
+        // }
+        var jobStr = req.body.jobStr;
+        console.log('jobStr: ' + jobStr);
+        var jobFromClient = JSON.parse(jobStr);
+        console.log('jobFromClient: ' + jobFromClient);
+        Job.findOne({
+            where: {id: jobFromClient.id}
+        }).then(function (theJob) {
+            theJob.update(jobFromClient).then(function () {
+                console.log("save successfully");
+                res.json("save successfully");
+            });
+        });
 
     });
 };

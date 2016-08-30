@@ -46,10 +46,21 @@ recipeApp.controller('RecipeListCtrl', function ($scope, $http, $filter) {
 
     //function defintions
     function createRecipe() {
-        $.getJSON('/admin/recipe/recipeList/createRecipe', function (newRecipe) {
-            console.log('newRecipe: ' + newRecipe);
-            console.log('newRecipe id: ' + newRecipe.id);
-            $scope.recipes.push(newRecipe);
+        $.get('/line/getLineList', function (data) {
+            console.log('linesStr' + data.lines);
+
+            var lines = JSON.parse(data.lines);
+            var options = [];
+            for (i = 0; i < lines.length; i++) {
+                options.push("<option value='" + lines[i].id + "'>" + lines[i].ident + "</option>");
+            }
+            //append after populating all options
+            $('#lineList')
+                .append(options.join(""))
+                .selectmenu();
+            console.log('dialogLineIdent' + dialogLineIdent);
+            GcObjectDialog.dialog('option', 'title', 'Create recipe');
+            dialogLineIdent.dialog('open');
         });
     }
 
