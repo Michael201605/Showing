@@ -107,5 +107,12 @@
 	"Start Job": "Start Job",
 	"Suspend Job": "Suspend Job",
 	"check Job": "check Job",
-	"save": "save"
+	"save": "save",
+	"the job: %s is not found": "the job: %s is not found",
+	"target weight should be positive.": "target weight should be positive.",
+	"Product is not matched between storage and ingredient": "Product is not matched between storage and ingredient",
+	"save successfully": "save successfully",
+	"Infomations": "Infomations",
+	"Errors": "Errors",
+	"Infomations: ": "Infomations: "
 }

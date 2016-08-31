@@ -169,6 +169,7 @@ module.exports = function (app, i18n) {
             where: {id: ingredientFromClient.id}
         }).then(function (theIngredient) {
             if(theIngredient){
+
                 theIngredient.update(ingredientFromClient).then(function () {
                     console.log("save successfully");
                     res.json("save successfully");

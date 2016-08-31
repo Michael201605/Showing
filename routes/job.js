@@ -12,7 +12,7 @@ var getDisplayState = require('../lib/tools/getDisplayState');
 // var ControllerAdapter = require('../adapters/ControllerAdapter');
 var JobState = require('../lib/stateAndCategory/jobState');
 // var Recipe = require('../../Models/pr/Recipe');
-module.exports = function (app, controllerManager, i18n, socket) {
+module.exports = function (app, controllerManager, i18n, io) {
     app.get('/job/jobList/:lineIdent', function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log('lineIdent: ' + lineIdent);
@@ -208,33 +208,46 @@ module.exports = function (app, controllerManager, i18n, socket) {
         });
 
     });
-    app.get('/job/jobDetail/checkJob/:ident', function (req, res) {
-        var lineIdent = '';
-        var theLine,
-            lineController;
-        var ident = req.params.ident.substring(1);
-        var message = '';
-        var originMessage = '';
+    app.get('/job/jobDetail/checkJob/:id', function (req, res) {
+        var id = req.params.id.substring(1);
         var error = '';
-        var originError = '';
         var controller = null;
+        console.log('id: ' + id);
         Job.findOne({
-            where: {Ident: ident}
+            where: {id: id}
         }).then(function (theJob) {
             if (theJob) {
-                theLine = theJob.getLine();
-                console.log('TheLine:');
-                console.dir(theLine);
-                if (theLine) {
-                    controller = controllerManager.getController(theLine.controllerName);
-                    controller.checkJob(theJob);
-                }
+                console.log('theJob:' + theJob);
+                theJob.getLine().then(function (theLine) {
+                    console.log('TheLine:');
+                    console.dir(theLine);
+                    if (theLine) {
+                        console.log('TheLine controller name: ' + theLine.controllerName);
+                        controller = controllerManager.getController(theLine.controllerName);
+
+                        controller.checkJob(theJob).then(function (data) {
+                            console.log('check job is OK:');
+                            console.log(data);
+                            res.json({
+                                info: i18n.__('check job is OK:')
+                            });
+                        },function (errors) {
+                            console.log('check job failed');
+                            console.log(errors);
+                            res.json({
+                                errors: errors
+                            });
+                        });
+                    }
+                });
+
 
             }
             else {
-                originError = 'the job: {0} is not found';
-                error = i18n.__(originError, ident);
-                res.send({
+
+                error = i18n.__('the job: %s is not found', id);
+                console.log(error);
+                res.json({
                     error: error
                 });
             }
@@ -276,20 +289,26 @@ module.exports = function (app, controllerManager, i18n, socket) {
 
 
     });
-    app.post('/job/jobDetail',isLoggedIn, function (req, res) {
+    app.post('/job/jobDetail/:id', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
-        var jobStr = req.body.jobStr;
-        console.log('jobStr: ' + jobStr);
-        var jobFromClient = JSON.parse(jobStr);
-        console.log('jobFromClient: ' + jobFromClient);
+        var id = req.params.id.substring(1);
+        var targetWeight = req.body.targetWeight;
+        var locked = req.body.locked;
+        var info = '';
+        console.log('TargetWeight: ' + targetWeight);
+        console.log('locked: ' + locked);
         Job.findOne({
-            where: {id: jobFromClient.id}
+            where: {id: id}
         }).then(function (theJob) {
-            theJob.update(jobFromClient).then(function () {
-                console.log("save successfully");
-                res.json("save successfully");
+            theJob.update({
+                locked: locked,
+                targetWeight: targetWeight
+            }).then(function (theJob) {
+                info = i18n.__("save successfully");
+
+                res.json({info:info});
             });
         });
 

@@ -75,11 +75,15 @@ $(function () {
                             recipe.receivers[0].StorageId = ui.item.value;
                             recipe.receivers[0].storageIdent = ui.item.label;
                             $('#receiver').val(ui.item.label);
-                            getProduct(recipe.receivers[0].StorageId);
-                            $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (message) {
-                                console.log(message);
-
+                            getProduct(recipe.receivers[0].StorageId).then(function (productId) {
+                                recipe.receivers[0].ProductId = productId;
+                                console.log('receiver productid: ' + recipe.receivers[0].ProductId);
+                                $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (message) {
+                                    console.log(message);
+                                    $('#infos').append('<li>' + message + '</li>');
+                                });
                             });
+
                         }
                     });
             });
@@ -87,7 +91,18 @@ $(function () {
     });
 
     $('#checkJob').click(function () {
-
+        $('#error').val('');
+        var jobId = $('#jobId').val();
+        $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
+            if(data.errors){
+                data.errors.forEach(function (error) {
+                    $('#errors').append('<li>' + error + '</li>');
+                });
+            }
+            if(data.info){
+                $('#infos').append('<li>' + data.info + '</li>');
+            }
+        });
     });
     $('#startJob').click(function () {
         $('#error').val('');
@@ -97,34 +112,59 @@ $(function () {
         });
     });
 
+    $( "form" ).submit(function( event ) {
+        console.log('prevent event');
+        event.preventDefault();
+        var jobInfo ={
+            targetWeight:parseFloat($('#targetWeight').val()).toFixed(2) ,
+            locked: $('#locked').prop('checked')
+        };
+        console.log('Job info: ');
+        console.dir(jobInfo);
+        $.post('/job/jobDetail/:'+ $('#jobId').val() ,jobInfo, function (data) {
+            console.log(data);
+            $('#infos').empty();
+            if(!data.error){
+                $('#infos').append('<li>' + data.info + '</li>');
+            }else {
+                $('#errors').append('<li>' + data.error + '</li>');
+            }
+        });
+    });
     function getProduct(storageId) {
         console.log("storageId: " + storageId);
-        if(storageId){
-            $.get('/storage/getStorage/:' + storageId, function (data) {
-                if(!data.error){
-                    var productId = data.storage.ProductId;
-                    console.log("productId: " + productId);
-                    if(productId){
-                        $.get('/product/getProduct/:' + productId, function (data) {
-                            if (!data.error) {
-                                product = data.product;
-                                console.log("product: ");
-                                console.dir(product);
-                                $('#product').val(data.product.ident);
-                            }else {
-                                $('#error').html(data.error);
+        return new Promise (function (resolve,reject) {
+            if(storageId){
+                $.get('/storage/getStorage/:' + storageId, function (data) {
+                    if(!data.error){
+                        var productId = data.storage.ProductId;
+                        console.log("productId: " + productId);
+                        resolve(productId);
+                        if(productId){
+                            $.get('/product/getProduct/:' + productId, function (data) {
+                                if (!data.error) {
+                                    product = data.product;
+                                    console.log("product: ");
+                                    console.dir(product);
+                                    $('#product').val(data.product.ident);
 
-                            }
-                        });
+                                }else {
+                                    $('#error').html(data.error);
+
+                                }
+                            });
+                        }
+
+                    }
+                    else {
+                        console.log("error: " + data.error);
+                        reject(data.error);
                     }
 
-                }
-                else {
-                    console.log("error: " + data.error);
-                }
+                });
+            }
+        });
 
-            });
-        }
 
 
     }

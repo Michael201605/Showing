@@ -9,7 +9,8 @@ var Section = modelBase.define('Section',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
-    state :  modelBase.Sequelize.INTEGER
+    state :  modelBase.Sequelize.INTEGER,
+    nodeId: modelBase.Sequelize.STRING
 });
 Section.hasMany(Scale);
 Section.hasMany(Packer);

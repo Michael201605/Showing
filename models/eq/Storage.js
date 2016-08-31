@@ -11,7 +11,8 @@ var BusinessBase = require('../BusinessBase');
 var Storage = modelBase.define('Storage',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
-    category : modelBase.Sequelize.INTEGER
+    category : modelBase.Sequelize.INTEGER,
+    lineIdent: modelBase.Sequelize.STRING
 });
 
 Storage.hasMany(Filler);
