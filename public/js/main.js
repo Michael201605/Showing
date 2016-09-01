@@ -12,7 +12,7 @@ $(function () {
     // password = $( "#password" ),
     // allFields = $( [] ).add( name ).add( email ).add( password ),
     // tips = $( ".validateTips" );
-
+    $('#errors').selectmenu();
     GcObjectDialog = $("#GCObject-form").dialog({
         title: 'GcObject',
         autoOpen: false,
@@ -45,7 +45,6 @@ $(function () {
         $('#' + nav.index).load(url);
     });
 
-
     //socket communication with server to update GCObject's state
     try {
 
@@ -57,34 +56,34 @@ $(function () {
             var nodeId = nodeData.monitored_nodeId;
             if (nodeId) {
                 var segments = nodeId.split('.');
-                var ident = segments[3];
-                var category = segments[4];
+                var ident = segments[3].substring(1);
+                var category = segments[2];
                 var state = segments[5];
-                var value = nodeData.dataValue.value.value;
-                var color='';
+                var value = nodeData.dataValue;
+                var color = '';
                 console.log('category: ' + ident);
                 console.log('category: ' + category);
                 console.log('paraName: ' + state);
                 var $gcObject = $('#' + ident);
-                if($gcObject){
+                if ($gcObject) {
                     switch (category) {
                         case 'BeltMonitor':
-                            setBeltMonitorColorByState($gcObject, state, value);
+                            setBeltMonitorColorByState(ident, state, value);
                             break;
                         case 'FilterControl':
-                            setFilterControlColorByState($gcObject, state, value);
+                            setFilterControlColorByState(ident, state, value);
                             break;
                         case 'HighLevel':
-                            setHighLevelColorByState($gcObject, state, value);
+                            setHighLevelColorByState(ident, state, value);
                             break;
                         case 'SimpleMotor':
-                            setSimpleMotorColorByState($gcObject, state, value);
+                            setSimpleMotorColorByState(ident, state, value);
                             break;
                         case 'SpeedMonitor':
-                            setSpeedMonitorColorByState($gcObject, state, value);
+                            setSpeedMonitorColorByState(ident, state, value);
                             break;
                         case 'ValveOpenClose':
-                            setValveOpenCloseColorByState($gcObject, state, value);
+                            setValveOpenCloseColorByState(ident, state, value);
                             break;
                         default:
                             break;
@@ -95,6 +94,36 @@ $(function () {
             }
 
 
+        });
+        socket.on('sectionStateChanged', function (section) {
+            if (section) {
+                $('#' + section.ident)
+                    .removeClass()
+                    .addClass(function (section) {
+                        var stateClass;
+                        switch (section.state) {
+                            case GcsState.Passive:
+                                stateClass = 'Passive';
+                                break;
+                            case GcsState.Active:
+                                stateClass = 'Active';
+                                break;
+                            case GcsState.Emptying:
+                                stateClass = 'Emptying';
+                                break;
+                            case GcsState.Ready:
+                                stateClass = 'Ready';
+                                break;
+                            case GcsState.Waiting:
+                                stateClass = 'Waiting';
+                                break;
+                            default:
+                                stateClass = 'Passive';
+                                break;
+                        }
+                        return stateClass;
+                    });
+            }
         });
         socket.on('connect_timeout', function (data) {
             console.log('connect_timeout', data);
@@ -187,10 +216,10 @@ function GcObject(gcIdent) {
                 var nodeId = nodeData.monitored_nodeId;
                 if (nodeId) {
                     var segments = nodeId.split('.');
-                    var ident = segments[3];
+                    var ident = segments[3].substring(1);
                     var category = segments[4];
                     var paraName = segments[5];
-                    var value = nodeData.dataValue.value.value;
+                    var value = nodeData.dataValue;
                     console.log('category: ' + ident);
                     console.log('category: ' + category);
                     console.log('paraName: ' + paraName);
@@ -331,18 +360,21 @@ function getColorByState(state, value) {
     return color;
 }
 
-function setBeltMonitorColorByState($gcObject,state, value) {
+function setBeltMonitorColorByState(ident, state, value) {
     var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
     switch (state) {
         case 'StaFaulted':
-            $gcObject.attr(state,value);
-            if(value) {
+            $gcObject.attr(state, value);
+            if (value) {
                 color = 'red';
             }
             break;
         case 'StaHealty':
             //running
-            if(value){
+            if (value) {
                 color = 'Green';
             }
             break;
@@ -350,34 +382,38 @@ function setBeltMonitorColorByState($gcObject,state, value) {
             color = 'Black';
     }
     setBKColor($gcObject, color);
+    setBKColor($path, color);
 }
-function setFilterControlColorByState($gcObject,state, value) {
+function setFilterControlColorByState(ident, state, value) {
     var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
     switch (state) {
         case 'StaFault':
-            $gcObject.attr(state,value);
-            if(value) {
+            $gcObject.attr(state, value);
+            if (value) {
                 color = 'red';
             }
             break;
         case 'StaStarted':
             //running
-            if(value){
+            if (value) {
                 color = 'Green';
             }
             break;
         case 'StaStarting':
-            if(value){
+            if (value) {
                 color = 'LightGreen';
             }
             break;
         case 'StaStopped':
-            if(value){
+            if (value) {
                 color = 'Grey';
             }
             break;
         case 'StaStopping':
-            if(value){
+            if (value) {
                 color = 'Blue';
             }
             break;
@@ -385,34 +421,38 @@ function setFilterControlColorByState($gcObject,state, value) {
             color = 'Black';
     }
     setBKColor($gcObject, color);
+    setBKColor($path, color);
 }
-function setHighLevelColorByState($gcObject,state, value) {
+function setHighLevelColorByState(ident, state, value) {
     var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
     switch (state) {
         case 'StaCover':
-            $gcObject.attr(state,value);
-            if(value) {
+            $gcObject.attr(state, value);
+            if (value) {
                 color = 'LightGreen';
             }
             break;
         case 'StaCovered':
             //running
-            if(value){
+            if (value) {
                 color = 'Blue';
             }
             break;
         case 'StaFaulted':
-            if(value){
+            if (value) {
                 color = 'Red';
             }
             break;
         case 'StaUncover':
-            if(value){
+            if (value) {
                 color = 'LightGreen';
             }
             break;
         case 'StaUncovered':
-            if(value){
+            if (value) {
                 color = 'Grey';
             }
             break;
@@ -420,34 +460,137 @@ function setHighLevelColorByState($gcObject,state, value) {
             color = 'Black';
     }
     setBKColor($gcObject, color);
+    setBKColor($path, color);
 }
-function setSimpleMotorColorByState($gcObject,state, value) {
+function setSimpleMotorColorByState(ident, state, value) {
     var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
     switch (state) {
         case 'StaFault':
-            $gcObject.attr(state,value);
-            if(value) {
+            $gcObject.attr(state, value);
+            if (value) {
                 color = 'red';
             }
             break;
         case 'StaStarted':
             //running
-            if(value){
+            if (value) {
                 color = 'Green';
             }
             break;
         case 'StaStarting':
-            if(value){
+            if (value) {
                 color = 'LightGreen';
             }
             break;
         case 'StaStopped':
-            if(value){
+            if (value) {
                 color = 'Grey';
             }
             break;
         case 'StaStopping':
-            if(value){
+            if (value) {
+                color = 'Blue';
+            }
+            break;
+        default:
+            color = 'Black';
+    }
+    setBKColor($gcObject, color);
+    setBKColor($path, color);
+
+}
+function setSpeedMonitorColorByState(ident, state, value) {
+    var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
+    switch (state) {
+        case 'StaFaulted':
+            $gcObject.attr(state, value);
+            if (value) {
+                color = 'red';
+            }
+            break;
+        case 'StaHealty':
+            //running
+            if (value) {
+                color = 'Green';
+            }
+            break;
+        default:
+            color = 'Black';
+    }
+    setBKColor($gcObject, color);
+    setBKColor($path, color);
+}
+function setValveOpenCloseColorByState(ident, state, value) {
+    var color = '';
+    var pathId = ident + '-path';
+    var $gcObject = $('#' + ident);
+    var $path = $('#' + pathId);
+    switch (state) {
+        case 'StaClosed':
+            if (value) {
+                color = 'Grey';
+            }
+            break;
+        case 'StaClosing':
+            //running
+            if (value) {
+                color = 'LightGreen';
+            }
+            break;
+        case 'StaFault':
+            if (value) {
+                color = 'Red';
+            }
+            break;
+        case 'StaOpened':
+            if (value) {
+                color = 'Green';
+            }
+            break;
+        case 'StaOpening':
+            if (value) {
+                color = 'LightGreen';
+            }
+            break;
+        default:
+            color = 'Black';
+    }
+    setBKColor($gcObject, color);
+    setBKColor($path, color);
+}
+function setSectionColorByState($gcObject, state, value) {
+    var color = '';
+    switch (state) {
+        case 'StaFault':
+            $gcObject.attr(state, value);
+            if (value) {
+                color = 'red';
+            }
+            break;
+        case 'StaStarted':
+            //running
+            if (value) {
+                color = 'Green';
+            }
+            break;
+        case 'StaStarting':
+            if (value) {
+                color = 'LightGreen';
+            }
+            break;
+        case 'StaStopped':
+            if (value) {
+                color = 'Grey';
+            }
+            break;
+        case 'StaStopping':
+            if (value) {
                 color = 'Blue';
             }
             break;
@@ -456,63 +599,11 @@ function setSimpleMotorColorByState($gcObject,state, value) {
     }
     setBKColor($gcObject, color);
 }
-function setSpeedMonitorColorByState($gcObject,state, value) {
-    var color = '';
-    switch (state) {
-        case 'StaFaulted':
-            $gcObject.attr(state,value);
-            if(value) {
-                color = 'red';
-            }
-            break;
-        case 'StaHealty':
-            //running
-            if(value){
-                color = 'Green';
-            }
-            break;
-        default:
-            color = 'Black';
-    }
-    setBKColor($gcObject, color);
-}
-function setValveOpenCloseColorByState($gcObject,state, value) {
-    var color = '';
-    switch (state) {
-        case 'StaClosed':
-            if(value) {
-                color = 'Grey';
-            }
-            break;
-        case 'StaClosing':
-            //running
-            if(value){
-                color = 'LightGreen';
-            }
-            break;
-        case 'StaFault':
-            if(value){
-                color = 'Red';
-            }
-            break;
-        case 'StaOpened':
-            if(value){
-                color = 'Green';
-            }
-            break;
-        case 'StaOpening':
-            if(value){
-                color = 'LightGreen';
-            }
-            break;
-        default:
-            color = 'Black';
-    }
-    setBKColor($gcObject, color);
-}
+
 function setBKColor($node, color) {
     $node.children().attr('fill', color);
     $node.find('rect').attr('fill', color);
+    $node.attr('stroke', color);
 }
 
 

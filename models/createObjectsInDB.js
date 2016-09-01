@@ -29,25 +29,106 @@ var LineCategory = require('../lib/stateAndCategory/lineCategory');
 var GcsState = require('../lib/stateAndCategory/gcsState');
 var StorageCategory = require('../lib/stateAndCategory/storageCategory');
 var bcrypt = require('bcrypt-nodejs');
+var fs = require('fs');
+
+
+
+var prefix = 'ns=1;s=PLC1';
+var lines=[];
+var nodeId ='';
+var infos=[];
+var pathInfo = '';
+var type = '';
+var segments = [];
+var elements =[];
+
+fs.readFile('PLC.csv', 'utf8', function (err, data) {
+    if (err) {
+        console.log( err);
+    }
+    else {
+        lines = data.split('\n');
+        nodeId= 'ns=1;s=PLC1';
+        //remove header
+        lines.splice(0, 1);
+        console.log('PLC.csv , lines length: ' + lines.length);
+        lines.forEach(function (line) {
+
+            infos= [];
+            // log('D','line: ' + line);
+
+            if (line) {
+                //first info is path; second info is type
+                infos = line.split(',');
+            }
+
+            if (infos.length >= 2) {
+
+                pathInfo = infos[0];
+                type = infos[2];
+                //remove double quotes
+                pathInfo = pathInfo.substring(1, pathInfo.length-1);
+                segments = pathInfo.split('.');
+                // log('D','pathInfo: ' + pathInfo);
+                if(segments[0] === 'Element'){
+                    var category = segments[1];
+                    var ident = segments[2].substring(1);
+                    var nodeId = prefix + '.' + segments.slice(0,3).join('.');
+                    console.log('nodeId: ' + nodeId);
+                    console.log(elements[ident]);
+                    if(!elements[ident]){
+                        elements[ident] =ident;
+                        GcObject.create({
+                            ident:ident,
+                            nodeId: nodeId,
+                            category: category
+                        }).then(function (newGcObject) {
+                            console.log('newGcObject: ');
+                            // console.dir(newGcObject);
+                        })
+                    }
+
+
+                }else if(segments[0] === 'Unit'){
+
+
+                }else if(segments[0] === 'Section'){
+
+
+                }else if(segments[0] === 'Line'){
+
+                }
+
+
+            }
+        });
+    }
+
+});
 
 // GcObject.bulkCreate([
 //     {
-//         ident: 'A-1006-MXZ01',
+//         ident: '=A-0006-MXZ01',
 //         nodeId: 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01',
 //         category: 'SimpleMotor'
 //     },
 //     {
-//         ident: 'A-1003-BZA19',
-//         nodeId: 'ns=1;s=PLC1.Element.BeltMonitor.=A-1003-BZA19',
+//         ident: '=A-0002-MXZ01',
+//         nodeId: 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01',
+//         category: 'SimpleMotor'
+//     },
+//     {
+//         ident: '=A-0003-BZA19',
+//         nodeId: 'ns=1;s=PLC1.Element.BeltMonitor.=A-0003-BZA19',
 //         category: 'BeltMonitor'
 //     },
 //     {
-//         ident: 'A-1004-KFC10',
-//         nodeId: 'ns=1;s=PLC1.Element.FilterControl.=A-1003-BZA19',
+//         ident: '=A-0004-KFC10',
+//         nodeId: 'ns=1;s=PLC1.Element.FilterControl.=A-0004-KFC10',
 //         category: 'FilterControl'
 //     },
 //     {
-//         ident: 'A-1004-KFC10',
+//         ident: '=A-1011-BLH01',
 //         nodeId: 'ns=1;s=PLC1.Element.HighLevel.=A-1011-BLH01',
 //         category: 'HighLevel'
 //     }
@@ -286,60 +367,60 @@ var bcrypt = require('bcrypt-nodejs');
 // }).then(function(storages) {
 //     console.log(storages); // ... in order to get the array of user objects
 // });
-
-Section.bulkCreate([
-    {
-        ident: 'INT1S01',
-        name: 'INT1S01',
-        nodeId: 'ns=1;s=PLC1.Section.INT1S01',
-        LineId: 1,
-        state: 10
-    },
-    {
-        ident: 'INT2S01',
-        name: 'INT2S01',
-        nodeId: 'ns=1;s=PLC1.Section.INT2S01',
-        LineId: 2,
-        state: 10
-    },
-    {
-        ident: 'MIX1S01',
-        name: 'MIX1S01',
-        nodeId: 'ns=1;s=PLC1.Section.MIX1S01',
-        LineId: 3,
-        state: 10
-    },
-    {
-        ident: 'MIX1S02',
-        name: 'MIX1S02',
-        nodeId: 'ns=1;s=PLC1.Section.MIX1S02',
-        LineId: 3,
-        state: 10
-    },
-    {
-        ident: 'MIX1S03',
-        name: 'MIX1S03',
-        nodeId: 'ns=1;s=PLC1.Section.MIX1S03',
-        LineId: 3,
-        state: 10
-    },
-    {
-        ident: 'MIX1S04',
-        name: 'MIX1S04',
-        nodeId: 'ns=1;s=PLC1.Section.MIX1S04',
-        LineId: 3,
-        state: 10
-    },
-    {
-        ident: 'MIX1S05',
-        name: 'MIX1S05',
-        nodeId: 'ns=1;s=PLC1.Section.MIX1S05',
-        LineId: 3,
-        state: 10
-    }
-
-]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
-    return Section.findAll();
-}).then(function(sections) {
-    console.log(sections); // ... in order to get the array of user objects
-});
+//
+// Section.bulkCreate([
+//     {
+//         ident: 'INT1S01',
+//         name: 'INT1S01',
+//         nodeId: 'ns=1;s=PLC1.Section.INT1S01',
+//         LineId: 1,
+//         state: 10
+//     },
+//     {
+//         ident: 'INT2S01',
+//         name: 'INT2S01',
+//         nodeId: 'ns=1;s=PLC1.Section.INT2S01',
+//         LineId: 2,
+//         state: 10
+//     },
+//     {
+//         ident: 'MIX1S01',
+//         name: 'MIX1S01',
+//         nodeId: 'ns=1;s=PLC1.Section.MIX1S01',
+//         LineId: 3,
+//         state: 10
+//     },
+//     {
+//         ident: 'MIX1S02',
+//         name: 'MIX1S02',
+//         nodeId: 'ns=1;s=PLC1.Section.MIX1S02',
+//         LineId: 3,
+//         state: 10
+//     },
+//     {
+//         ident: 'MIX1S03',
+//         name: 'MIX1S03',
+//         nodeId: 'ns=1;s=PLC1.Section.MIX1S03',
+//         LineId: 3,
+//         state: 10
+//     },
+//     {
+//         ident: 'MIX1S04',
+//         name: 'MIX1S04',
+//         nodeId: 'ns=1;s=PLC1.Section.MIX1S04',
+//         LineId: 3,
+//         state: 10
+//     },
+//     {
+//         ident: 'MIX1S05',
+//         name: 'MIX1S05',
+//         nodeId: 'ns=1;s=PLC1.Section.MIX1S05',
+//         LineId: 3,
+//         state: 10
+//     }
+//
+// ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+//     return Section.findAll();
+// }).then(function(sections) {
+//     console.log(sections); // ... in order to get the array of user objects
+// });

@@ -102,3 +102,10 @@ svg {
 .title{
     color : #9acfea;
 }
+.Passive{
+    fill: grey;
+}
+
+.Active{
+    fill: green;
+}

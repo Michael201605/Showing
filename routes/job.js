@@ -122,7 +122,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                             // res.json({newJobStr: newJobStr});
                         });
                         var jobJson = newJob.getTranslatedJob(i18n);
-                        res.json({job:jobJson});
+                        res.json({job: jobJson});
                     });
                 });
 
@@ -173,18 +173,18 @@ module.exports = function (app, controllerManager, i18n, io) {
         Job.findOne({
             where: {id: id}
         }).then(function (theJob) {
-            if(theJob){
+            if (theJob) {
                 jobJson = theJob.getTranslatedJob(i18n);
                 theJob.getRecipe().then(function (theRecipe) {
-                    if(theRecipe){
+                    if (theRecipe) {
                         jobJson.recipe = theRecipe.getJsonObject();
-                        jobJson.recipe.senders=[];
-                        jobJson.recipe.receivers=[];
+                        jobJson.recipe.senders = [];
+                        jobJson.recipe.receivers = [];
                         theRecipe.getSenders().then(function (ingredients) {
                             ingredients.forEach(function (ingredient) {
-                                if(ingredient.category === 0){
+                                if (ingredient.category === 0) {
                                     jobJson.recipe.senders.push(ingredient.getJsonObject());
-                                }else {
+                                } else {
                                     jobJson.recipe.receivers.push(ingredient.getJsonObject());
                                 }
                             });
@@ -195,8 +195,8 @@ module.exports = function (app, controllerManager, i18n, io) {
 
                                 });
                         })
-                    }else {
-                        res.render('job/jobDetail',{error: i18n.__('Job: %s recipe is empty.', id)});
+                    } else {
+                        res.render('job/jobDetail', {error: i18n.__('Job: %s recipe is empty.', id)});
                     }
 
                 });
@@ -231,7 +231,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                             res.json({
                                 info: i18n.__('check job is OK:')
                             });
-                        },function (errors) {
+                        }, function (errors) {
                             console.log('check job failed');
                             console.log(errors);
                             res.json({
@@ -255,33 +255,49 @@ module.exports = function (app, controllerManager, i18n, io) {
 
 
     });
-    app.get('/job/jobDetail/startJob/:ident', isLoggedIn, function (req, res) {
-        var lineIdent = '';
-        var theLine,
-            lineController;
-        var ident = req.params.ident.substring(1);
-        var message = '';
-        var originMessage = '';
+    app.get('/job/jobDetail/startJob/:id', function (req, res) {
+        var id = req.params.id.substring(1);
         var error = '';
-        var originError = '';
         var controller = null;
         Job.findOne({
-            where: {Ident: ident}
+            where: {id: id}
         }).then(function (theJob) {
             if (theJob) {
-                theLine = theJob.getLine();
-                console.log('TheLine:');
-                console.dir(theLine);
-                if (theLine) {
-                    controller = controllerManager.getController(theLine.controllerName);
-                    controller.startJob(theJob);
-                }
+                theJob.getLine().then(function (theLine) {
+                    console.log('TheLine:');
+                    console.dir(theLine);
+                    if (theLine) {
+                        controller = controllerManager.getController(theLine.controllerName);
+                        controller.startJob(theJob).then(function (Pres) {
+                            theJob.update({
+                                state: JobState.Loading
+                            }).then(function (theJob) {
+                                console.log("save successfully");
 
+                            });
+                            res.json({
+                                update: {
+                                    state: getDisplayState(JobState, JobState.Loading)
+                                }
+                            });
+                        }, function (Perr) {
+                            res.json({
+                                error: Perr
+                            });
+                        });
+                    } else {
+                        error = i18n.__('the line: %s is not found', theJob.LineId);
+                        console.log(error);
+                        res.json({
+                            error: error
+                        });
+                    }
+                });
             }
             else {
-                originError = 'the job: {0} is not found';
-                error = i18n.__(originError, ident);
-                res.send({
+                error = i18n.__('the job: %s is not found', id);
+                console.log(error);
+                res.json({
                     error: error
                 });
             }
@@ -308,7 +324,7 @@ module.exports = function (app, controllerManager, i18n, io) {
             }).then(function (theJob) {
                 info = i18n.__("save successfully");
 
-                res.json({info:info});
+                res.json({info: info});
             });
         });
 

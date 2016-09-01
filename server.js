@@ -171,8 +171,12 @@ require('./routes/product')(app, i18n);
 new GcObjectAdapter(io).then(function (gcObjectAd) {
     console.log('gcobjectAdapter created success!');
     gcObjectAd.DataType = opcua.DataType;
-    gcObjectAd.MonitorAllGcObjects();
-    new ControllerManager(gcObjectAd,i18n).then(function (controllerManager) {
+    io.on('connection', function (socket) {
+        gcObjectAd.socket = socket;
+        gcObjectAd.MonitorAllGcObjects();
+    })
+
+    new ControllerManager(gcObjectAd,i18n,io).then(function (controllerManager) {
         console.log('controllerManager created success!');
         require('./routes/job')(app,controllerManager, i18n,io);
     });

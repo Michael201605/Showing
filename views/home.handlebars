@@ -55,13 +55,13 @@
             </nav>
         </div>
     </div>
-    <div class="row row-md-height" ng-app="mainApp" ng-controller="MainCtrl">
+    <div class="row row-md-height">
         <div class="col-lg-8">
             <!--showing message-->
             <div class="form-group">
                 <label class="col-md-1 control-label">{{{__ "ErrorList"}}}</label>
-                <select class="col-md-11" name="ErrorList" id="ErrorList" ng-model="selectedError">
-                    <option ng-repeat="error in errors" value="{[{error.id}]}">{[{error.message}]}</option>
+                <select class="col-md-11 has-error" name="ErrorList" id="errors" >
+                    <option></option>
                 </select>
             </div>
         </div>
@@ -79,6 +79,6 @@
     </div>
 </div>
 {{#section 'jquery'}}
-    <script src="/js/app/mainApp.js"></script>
-    <script src="/js/svgCtrl.js"></script>
+    <script src="/js/gcsState.js"></script>
+    <script src="/js/main.js"></script>
 {{/section}}

@@ -68,12 +68,16 @@ module.exports = function (app, gcObjectAd, i18n,io) {
             }
         });
     });
-    eventEmitter.addListener('nodeChanged', function (nodeData) {
-        log('D', 'Event: nodeChanged');
-        io.on('connection', function (socket) {
+    io.on('connection', function (socket) {
+        log('D','io has connected');
+        eventEmitter.addListener('nodeChanged', function (nodeData) {
+            log('D', 'Event: nodeChanged');
             socket.emit('GCObjectUpdate', nodeData);
+
         });
+
     });
+
 
 };
 function readParameter(gcObjectAd, nodeId, gcObjectParameter, promises) {
@@ -89,7 +93,7 @@ function readParameter(gcObjectAd, nodeId, gcObjectParameter, promises) {
                 resolve(gcObjectParameter[pro]);
             }
             else {
-                log('D', err);
+                log('D', 'error: ' + err);
                 reject(err);
             }
 
@@ -122,10 +126,10 @@ function readGcObject(gcObjectAd, gcObjectParameter, parentNodeId, elementNodeId
                 nodeId = parentNodeId + '.' + p;
                 readParameter(gcObjectAd, nodeId, gcObjectParameter, promises);
                 gcObjectAd.monitor_a_variable_node_value(nodeId, function (monitored_nodeId, dataValue, count) {
-                    console.log('count: ' +count);
+                    console.log('At callback, monitored_nodeId changed: ' +monitored_nodeId + ' value: ' + dataValue.value.value);
                     eventEmitter.emit('nodeChanged', {
                         monitored_nodeId: monitored_nodeId,
-                        dataValue: dataValue
+                        dataValue: dataValue.value.value
                     });
                 });
             } else {

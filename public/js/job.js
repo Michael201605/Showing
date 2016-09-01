@@ -13,7 +13,7 @@ $(function () {
     var line = {};
     var lineIdent = $('#lineIdent').val();
     var recipe = JSON.parse($('#recipe').val());
-    var product ={};
+    var product = {};
     console.log('senders: ');
     console.log(recipe.senders);
     $('#sender').val(recipe.senders[0].storageIdent);
@@ -94,12 +94,12 @@ $(function () {
         $('#error').val('');
         var jobId = $('#jobId').val();
         $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
-            if(data.errors){
+            if (data.errors) {
                 data.errors.forEach(function (error) {
                     $('#errors').append('<li>' + error + '</li>');
                 });
             }
-            if(data.info){
+            if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
             }
         });
@@ -107,40 +107,45 @@ $(function () {
     $('#startJob').click(function () {
         $('#error').val('');
         var jobId = $('#jobId').val();
-        $.get('/job/jobDetail/startJob/:' + jobId, function (message) {
-            $('#error').val(message);
+        $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#error').val(data.error);
+            } else if (data.update && data.update.state) {
+                $('#state').val(data.update.state);
+            }
+
         });
     });
 
-    $( "form" ).submit(function( event ) {
+    $("form").submit(function (event) {
         console.log('prevent event');
         event.preventDefault();
-        var jobInfo ={
-            targetWeight:parseFloat($('#targetWeight').val()).toFixed(2) ,
+        var jobInfo = {
+            targetWeight: parseFloat($('#targetWeight').val()).toFixed(2),
             locked: $('#locked').prop('checked')
         };
         console.log('Job info: ');
         console.dir(jobInfo);
-        $.post('/job/jobDetail/:'+ $('#jobId').val() ,jobInfo, function (data) {
+        $.post('/job/jobDetail/:' + $('#jobId').val(), jobInfo, function (data) {
             console.log(data);
             $('#infos').empty();
-            if(!data.error){
+            if (!data.error) {
                 $('#infos').append('<li>' + data.info + '</li>');
-            }else {
+            } else {
                 $('#errors').append('<li>' + data.error + '</li>');
             }
         });
     });
     function getProduct(storageId) {
         console.log("storageId: " + storageId);
-        return new Promise (function (resolve,reject) {
-            if(storageId){
+        return new Promise(function (resolve, reject) {
+            if (storageId) {
                 $.get('/storage/getStorage/:' + storageId, function (data) {
-                    if(!data.error){
+                    if (!data.error) {
                         var productId = data.storage.ProductId;
                         console.log("productId: " + productId);
                         resolve(productId);
-                        if(productId){
+                        if (productId) {
                             $.get('/product/getProduct/:' + productId, function (data) {
                                 if (!data.error) {
                                     product = data.product;
@@ -148,7 +153,7 @@ $(function () {
                                     console.dir(product);
                                     $('#product').val(data.product.ident);
 
-                                }else {
+                                } else {
                                     $('#error').html(data.error);
 
                                 }
@@ -164,7 +169,6 @@ $(function () {
                 });
             }
         });
-
 
 
     }

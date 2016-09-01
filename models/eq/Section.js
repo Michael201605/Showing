@@ -10,7 +10,8 @@ var Section = modelBase.define('Section',{
     name : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
     state :  modelBase.Sequelize.INTEGER,
-    nodeId: modelBase.Sequelize.STRING
+    nodeId: modelBase.Sequelize.STRING,
+    jobIdent: modelBase.Sequelize.STRING
 });
 Section.hasMany(Scale);
 Section.hasMany(Packer);
