@@ -32,15 +32,16 @@ var bcrypt = require('bcrypt-nodejs');
 var fs = require('fs');
 
 
-
 var prefix = 'ns=1;s=PLC1';
-var lines=[];
-var nodeId ='';
-var infos=[];
+var lines = [];
+var nodeId = '';
+var infos = [];
 var pathInfo = '';
 var type = '';
 var segments = [];
-var elements =[];
+var elements = [];
+
+
 
 fs.readFile('PLC.csv', 'utf8', function (err, data) {
     if (err) {

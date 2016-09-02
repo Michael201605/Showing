@@ -603,6 +603,12 @@ function setSectionColorByState($gcObject, state, value) {
 function setBKColor($node, color) {
     $node.children().attr('fill', color);
     $node.find('rect').attr('fill', color);
+    $node.find('path').attr('fill', color);
+    $node.attr('stroke', color);
+}
+function setPathBKColor($node, color) {
+    $node.children().attr('fill', color);
+    $node.find('rect').attr('fill', color);
     $node.attr('stroke', color);
 }
 

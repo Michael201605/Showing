@@ -2,7 +2,7 @@
  * Created by pi on 7/21/16.
  */
 var Sequelize = require('sequelize');
-var database = require('../database');
+var database = require('../lib/database');
 
 // var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password);
 var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password, {

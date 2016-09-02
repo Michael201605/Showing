@@ -61,12 +61,12 @@ GcObject.Instance.prototype.getClientEndObject = function (i18n) {
 
     return jsonObject;
 };
-function  inherit(sub, parent) {
-    for(var p in parent){
-        sub[p] = parent[p];
-        log('D',p + sub[p]);
-    }
-    log('D',sub);
-    return sub;
-}
+// function  inherit(sub, parent) {
+//     for(var p in parent){
+//         sub[p] = parent[p];
+//         log('D',p + sub[p]);
+//     }
+//     log('D',sub);
+//     return sub;
+// }
 module.exports = GcObject;

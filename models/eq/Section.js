@@ -4,7 +4,8 @@
 var modelBase = require('../ModelBase');
 var Scale = require('./Scale');
 var Packer = require('./Packer');
-
+var utils = require('../../lib/utils');
+var BusinessBase = require('../BusinessBase');
 var Section = modelBase.define('Section',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
@@ -15,4 +16,6 @@ var Section = modelBase.define('Section',{
 });
 Section.hasMany(Scale);
 Section.hasMany(Packer);
+
+utils.inherits(Section.Instance.prototype, BusinessBase.prototype);
 module.exports = Section;

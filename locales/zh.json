@@ -115,5 +115,10 @@
 	"Infomations": "Infomations",
 	"Errors": "Errors",
 	"Infomations: ": "Infomations: ",
-	"check job is OK:": "check job is OK:"
+	"check job is OK:": "check job is OK:",
+	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.JobId": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.JobId",
+	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.WeightTotal": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.WeightTotal",
+	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.SndBinNo": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.SndBinNo",
+	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.RcvBinNo": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.RcvBinNo",
+	"Loading": "Loading"
 }
