@@ -120,5 +120,9 @@
 	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.WeightTotal": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.WeightTotal",
 	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.SndBinNo": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.SndBinNo",
 	"write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.RcvBinNo": "write successfully: ns=1;s=PLC1.Section.INT1S01.Parameter.RcvBinNo",
-	"Loading": "Loading"
+	"Loading": "Loading",
+	"Done Job": "Done Job",
+	"section is not found.": "section is not found.",
+	"write successfully: ns=1;s=PLC1.Section.INT1S01.Commands.CmdJobReset": "write successfully: ns=1;s=PLC1.Section.INT1S01.Commands.CmdJobReset",
+	"Done": "Done"
 }

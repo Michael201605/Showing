@@ -28,7 +28,9 @@ $(function () {
 
         }
     });
-    socket = io('http://172.26.203.71:3000');
+    var server = location.href;
+    console.log(server);
+    socket = io(server);
 
     // form = dialog.find( "form" ).on( "submit", function( event ) {
     //     event.preventDefault();
@@ -376,6 +378,9 @@ function setBeltMonitorColorByState(ident, state, value) {
             //running
             if (value) {
                 color = 'Green';
+            }
+            else{
+                color = '#c0c0c0';
             }
             break;
         default:

@@ -305,6 +305,57 @@ module.exports = function (app, controllerManager, i18n, io) {
 
 
     });
+    app.get('/job/jobDetail/doneJob/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var error = '';
+        var controller = null;
+        Job.findOne({
+            where: {id: id}
+        }).then(function (theJob) {
+            if (theJob) {
+                theJob.getLine().then(function (theLine) {
+                    console.log('TheLine:');
+                    console.dir(theLine);
+                    if (theLine) {
+                        controller = controllerManager.getController(theLine.controllerName);
+                        controller.stopJob(theJob).then(function (Pres) {
+                            theJob.update({
+                                state: JobState.Done
+                            }).then(function (theJob) {
+                                console.log("save successfully");
+
+                            });
+                            res.json({
+                                update: {
+                                    state: getDisplayState(JobState, JobState.Done)
+                                }
+                            });
+
+                        }, function (Perr) {
+                            res.json({
+                                error: Perr
+                            });
+                        });
+                    } else {
+                        error = i18n.__('the line: %s is not found', theJob.LineId);
+                        console.log(error);
+                        res.json({
+                            error: error
+                        });
+                    }
+                });
+            }
+            else {
+                error = i18n.__('the job: %s is not found', id);
+                console.log(error);
+                res.json({
+                    error: error
+                });
+            }
+        });
+
+
+    });
     app.post('/job/jobDetail/:id', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);

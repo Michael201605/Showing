@@ -116,7 +116,18 @@ $(function () {
 
         });
     });
+    $('#doneJob').click(function () {
+        $('#error').val('');
+        var jobId = $('#jobId').val();
+        $.get('/job/jobDetail/doneJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#error').val(data.error);
+            } else if (data.update && data.update.state) {
+                $('#state').val(data.update.state);
+            }
 
+        });
+    });
     $("form").submit(function (event) {
         console.log('prevent event');
         event.preventDefault();

@@ -109,3 +109,10 @@ svg {
 .Active{
     fill: green;
 }
+.moveDown{
+   padding-top: 30%;
+}
+.command{
+    padding-left: 0;
+    padding-right: 0;
+}
