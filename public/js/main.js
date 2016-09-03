@@ -470,8 +470,10 @@ function setHighLevelColorByState(ident, state, value) {
 function setSimpleMotorColorByState(ident, state, value) {
     var color = '';
     var pathId = ident + '-path';
+    var selectorId = ident + '-selector';
     var $gcObject = $('#' + ident);
     var $path = $('#' + pathId);
+    var $selector = $('#' + selectorId);
     switch (state) {
         case 'StaFault':
             $gcObject.attr(state, value);
@@ -505,6 +507,8 @@ function setSimpleMotorColorByState(ident, state, value) {
     }
     setBKColor($gcObject, color);
     setBKColor($path, color);
+    setBKColor($selector, color);
+
 
 }
 function setSpeedMonitorColorByState(ident, state, value) {
