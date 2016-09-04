@@ -27,15 +27,29 @@ module.exports = function (app, i18n) {
     });
     app.get('/warehouse/createReceipt', isLoggedIn, function (req, res) {
         var info = {
-            Ident: 'newReceipt',
-            Name: 'Raw',
-            Visible: true,
-            State: 10,
+            ident: 'newReceipt',
+            name: 'Raw',
+            visible: true,
+            state: 10,
         };
         console.log('try to create new receipt.... ');
         Receipt.create(info).then(function (newReceipt) {
             console.log('newReceipt: ' + newReceipt);
             res.json(newReceipt);
+        });
+    });
+    app.post('/warehouse/receiptList/deleteReceipt',isLoggedIn, function (req, res) {
+        var toDeleteReceiptIdsStr = req.body.toDeleteReceiptIdsStr;
+        console.log('toDeleteReceiptIdsStr:  ' + toDeleteReceiptIdsStr);
+        var toDeleteReceiptIds = JSON.parse(toDeleteReceiptIdsStr);
+        Receipt.destroy({
+            where:{
+                id: {
+                    $in: toDeleteReceiptIds
+                }
+            }
+        }).then(function (message) {
+            res.json(message);
         });
     });
     app.get('/warehouse/receiptDetail/:id',isLoggedIn, function (req, res) {

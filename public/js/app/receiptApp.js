@@ -50,8 +50,8 @@ receiptApp.controller('ReceiptListCtrl', function ($scope, $http, $filter) {
             }
         });
         $scope.receipts = remainreceipts;
-        var toDeleteIdsStr = JSON.stringify(toDeleteIds);
-        $.getJSON('/admin/recipe/recipeList/deleteRecipe/:' + toDeleteIdsStr, function (data) {
+        var toDeleteReceiptIdsStr = JSON.stringify(toDeleteIds);
+        $.post('/warehouse/receiptList/deleteReceipt',{toDeleteReceiptIdsStr:toDeleteReceiptIdsStr}, function (data) {
             console.log(data);
         });
 

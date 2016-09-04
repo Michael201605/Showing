@@ -59,7 +59,7 @@ recipeApp.controller('RecipeListCtrl', function ($scope, $http, $filter) {
                 .append(options.join(""))
                 .selectmenu();
             console.log('dialogLineIdent' + dialogLineIdent);
-            GcObjectDialog.dialog('option', 'title', 'Create recipe');
+            dialogLineIdent.dialog('option', 'title', 'Create recipe');
             dialogLineIdent.dialog('open');
         });
     }
