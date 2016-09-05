@@ -18,13 +18,14 @@
                     <td>
                         <input type="checkbox" ng-model="receipt.selected"/>
                     </td>
-                    <td><a href="/warehouse/station/receiptDetail/:{[{receipt.id}]}">{[{receipt.Ident}]}</a></td>
-                    <td>{[{receipt.ActualWeight}]}</td>
-                    <td>{[{receipt.ActualUnitSize}]}</td>
-                    <td>{[{receipt.PackagingType}]}</td>
+                    <td><a href="/warehouse/station/receiptDetail/:{[{receipt.id}]}">{[{receipt.ident}]}</a></td>
+                    <td>{[{receipt.actualWeight}]}</td>
+                    <td>{[{receipt.actualUnitSize}]}</td>
+                    <td>{[{receipt.packagingType}]}</td>
                 </tr>
             </table>
         </div>
+
     </div>
 </div>
 {{#section 'jquery'}}

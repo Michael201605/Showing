@@ -6,6 +6,8 @@ var Company = require('../eq/Company');
 var Product = require('./Product');
 var LogisticUnit = require('./LogisticUnit');
 var Layer = require('./Layer');
+var utils = require('../../lib/utils');
+var BusinessBase = require('../BusinessBase');
 var WarehousePackingType = require('../../lib/stateAndCategory/warehousePackingType');
 
 var properties = {
@@ -105,5 +107,6 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
         return errors;
     }
 };
+utils.inherits(Receipt.Instance.prototype, BusinessBase.prototype);
 console.log('Receipt executed');
 module.exports = Receipt;

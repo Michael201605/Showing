@@ -124,5 +124,15 @@
 	"Done Job": "Done Job",
 	"section is not found.": "section is not found.",
 	"write successfully: ns=1;s=PLC1.Section.INT1S01.Commands.CmdJobReset": "write successfully: ns=1;s=PLC1.Section.INT1S01.Commands.CmdJobReset",
-	"Done": "Done"
+	"Done": "Done",
+	"Receipt List": "Receipt List",
+	"Targe tWeight": "Targe tWeight",
+	"Target Unit Size": "Target Unit Size",
+	"Actual Weight": "Actual Weight",
+	"Actual Unit Size": "Actual Unit Size",
+	"actual Nb Of Units": "actual Nb Of Units",
+	"Creation Time": "Creation Time",
+	"Update Time": "Update Time",
+	"Target Weight": "Target Weight",
+	"confirm Receipt": "confirm Receipt"
 }

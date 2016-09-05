@@ -10,7 +10,7 @@ var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 
 
 module.exports = function (app, i18n) {
-    app.get('/warehouse/receiptList/:state',isLoggedIn, function (req, res) {
+    app.get('/warehouse/receiptList/:state', function (req, res) {
         var state = req.params.state.substring(1);
 
         Receipt.findAll({
@@ -25,7 +25,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/createReceipt', isLoggedIn, function (req, res) {
+    app.get('/warehouse/createReceipt', function (req, res) {
         var info = {
             ident: 'newReceipt',
             name: 'Raw',
@@ -38,7 +38,7 @@ module.exports = function (app, i18n) {
             res.json(newReceipt);
         });
     });
-    app.post('/warehouse/receiptList/deleteReceipt',isLoggedIn, function (req, res) {
+    app.post('/warehouse/receiptList/deleteReceipt', function (req, res) {
         var toDeleteReceiptIdsStr = req.body.toDeleteReceiptIdsStr;
         console.log('toDeleteReceiptIdsStr:  ' + toDeleteReceiptIdsStr);
         var toDeleteReceiptIds = JSON.parse(toDeleteReceiptIdsStr);
@@ -52,7 +52,7 @@ module.exports = function (app, i18n) {
             res.json(message);
         });
     });
-    app.get('/warehouse/receiptDetail/:id',isLoggedIn, function (req, res) {
+    app.get('/warehouse/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -69,7 +69,7 @@ module.exports = function (app, i18n) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
                     res.render('warehouse/receiptDetail', {
-                        receipt: receiptStr,
+                        receipt: receipt.getJsonObject(),
                         packingCategory: packingCategoryStr,
                         products: productsStr,
                         companys: companysStr
@@ -82,25 +82,32 @@ module.exports = function (app, i18n) {
 
     });
 
-    app.post('/warehouse/receiptDetail',isLoggedIn, function (req, res) {
+    app.post('/warehouse/receiptDetail/:id', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
-        var receiptStr = req.body.receiptStr;
-        console.log('receiptStr: ' + receiptStr);
-        var receiptFromClient = JSON.parse(receiptStr);
-        console.log('receiptFromClient: ' + receiptFromClient);
-        Receipt.findOne({
-            where: {id: receiptFromClient.id}
-        }).then(function (theReceipt) {
-            theReceipt.update(receiptFromClient).then(function () {
-                console.log("save successfully");
-                res.json("save successfully");
+        var id = req.params.id.substring(1);
+
+        var receiptInfo = req.body.receiptInfo;
+        console.log('receipt: ');
+        console.dir(receiptInfo);
+        try {
+            Receipt.findOne({
+                where: {id: id}
+            }).then(function (theReceipt) {
+                theReceipt.update(receiptInfo).then(function () {
+                    console.log("save successfully");
+                    res.json({info: i18n.__("save successfully")});
+                });
             });
-        });
+        }
+        catch (err){
+            res.json({error: i18n.__(err)});
+        }
+
 
     });
-    app.get('/warehouse/station/receiptList',isLoggedIn, function (req, res) {
+    app.get('/warehouse/station/receiptList', function (req, res) {
 
         Receipt.findAll({
             where: {State: 10}
@@ -114,7 +121,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/station/receiptDetail/:id',isLoggedIn, function (req, res) {
+    app.get('/warehouse/station/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -131,7 +138,7 @@ module.exports = function (app, i18n) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
                     res.render('warehouse/station/receiptDetail', {
-                        receipt: receiptStr,
+                        receipt: receipt.getJsonObject(),
                         packingCategory: packingCategoryStr,
                         products: productsStr,
                         companys: companysStr
@@ -143,7 +150,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/confirmReceipt/:id',isLoggedIn, function (req, res) {
+    app.get('/warehouse/confirmReceipt/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -155,10 +162,7 @@ module.exports = function (app, i18n) {
                     errors: JSON.stringify(errors)
                 });
             }else {
-                res.render('warehouse/receiptLabel', {
-                    receipt: receiptStr,
-                    packingCategory: packingCategoryStr
-                });
+                
             }
 
 
