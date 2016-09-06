@@ -23,14 +23,17 @@ var properties = {
     actualWeight: modelBase.Sequelize.DECIMAL,
     actualUnitSize: modelBase.Sequelize.DECIMAL,
     actualNbOfUnits: modelBase.Sequelize.DECIMAL,
-
+    productIdent: modelBase.Sequelize.STRING,
+    productName: modelBase.Sequelize.STRING,
+    supplierIdent: modelBase.Sequelize.STRING,
+    supplierName: modelBase.Sequelize.STRING
 };
 
 var Receipt = modelBase.define('Receipt', properties);
 
 
-Receipt.belongsTo(Company, {as: 'supplier'});
-Receipt.belongsTo(Product, {as: 'product'});
+Receipt.belongsTo(Company,{as: 'Supplier'});
+Receipt.belongsTo(Product);
 
 
 Receipt.Instance.prototype.checkReceipt = function (i18n) {

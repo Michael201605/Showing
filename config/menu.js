@@ -161,10 +161,12 @@ var ConfigureMenus = [
         SubMenus: [
             {
                 name: 'English',
+                keepPage: true,
                 url: '/en'
             },
             {
                 name: 'Chinese',
+                keepPage: true,
                 url: '/zh'
             }
         ],

@@ -1,0 +1,18 @@
+{
+  "receipt": {
+    "printer": "HP-LaserJet-5200-2",
+    "label": "receipt.html"
+  },
+  "dis1": {
+    "printer": "HP-LaserJet-5200-2",
+    "label": "dis1"
+  },
+  "dis2": {
+    "printer": "HP-LaserJet-5200-2",
+    "label": "dis2"
+  },
+  "dispatch": {
+    "printer": "HP-LaserJet-5200-2",
+    "label": "dispatch"
+  }
+}

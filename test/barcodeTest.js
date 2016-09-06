@@ -93,8 +93,8 @@ console.log('barcode base: ' + __dirname);
 var pdf = require('html-pdf');
 var thehtml = fs.readFileSync(labelFile, 'utf8');
 var theoptions = {
-    height: "120cm",        // allowed units: mm, cm, in, px
-    width: "80cm",
+    // height: "120cm",        // allowed units: mm, cm, in, px
+    // width: "80cm",
     format: 'Letter',
     base: 'file:///' + __dirname + '/'
 };

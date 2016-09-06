@@ -15,6 +15,10 @@ $(function () {
 
     var supplierId = parseInt($('#supplierId').val());
     var productId = parseInt($('#productId').val());
+    var productIdent ='';
+    var productName ='';
+    var supplierIdent ='';
+    var supplierName ='';
     var packagingType = parseInt($('#packagingType').val());
     console.log('supplierId: ' + supplierId);
     console.log('productId: ' + productId);
@@ -86,7 +90,23 @@ $(function () {
         var actualNbOfUnits = parseFloat($('#actualNbOfUnits').val()).toFixed(2);
         $('#actualWeight').val(actualUnitSize * actualNbOfUnits);
     }
-
+    function getIdentAndName(items, id, category) {
+        items.forEach(function (item) {
+            if(item.id === id){
+                switch (category){
+                    case 'product':
+                        productIdent = item.ident;
+                        productName =item.name;
+                        break;
+                    case 'supplier':
+                        supplierIdent = item.ident;
+                        supplierName =item.name;
+                        break;
+                }
+                return false;
+            }
+        })
+    }
     $('#actualUnitSize').change(changeWeight);
     $('#actualNbOfUnits').change(changeWeight);
     function getValidNumber(value) {
@@ -105,13 +125,19 @@ $(function () {
             packagingType: parseInt(getValidNumber($('#packagingType').val())),
             lot: $('#lot').val()
         };
-        var productId = parseInt(getValidNumber($('#productId').val()));
-        var supplierId = parseInt(getValidNumber($('#supplierId').val()));
+        productId = parseInt(getValidNumber($('#productId').val()));
+        supplierId = parseInt(getValidNumber($('#supplierId').val()));
         if(productId>0){
-            receiptInfo.productId = productId;
+            getIdentAndName(products,productId,'product');
+            receiptInfo.ProductId = productId;
+            receiptInfo.productIdent = productIdent;
+            receiptInfo.productName = productName;
         }
         if(supplierId>0){
-            receiptInfo.supplierId = supplierId;
+            getIdentAndName(companyList,supplierId,'supplier');
+            receiptInfo.SupplierId = supplierId;
+            receiptInfo.supplierIdent = supplierIdent;
+            receiptInfo.supplierName = supplierName;
         }
         console.log('receipt info: ');
         console.dir(receiptInfo);

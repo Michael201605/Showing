@@ -16,14 +16,24 @@
                             <ul>
                                 {{#each SubMenus}}
                                     <!-- Third level-->
-                                    <li><div><a target="_blank" href="{{url}}">{{name}}</a></div></li>
+                                    <li>
+                                        <div><a target="_blank" href="{{url}}">{{name}}</a></div>
+                                    </li>
                                 {{/each}}
                             </ul>
-                        {{else}}
-                            <a target="_blank" href="{{url}}">{{name}}</a>
+                        {{else }}
+
+                            {{#if keepPage}}
+                                <a href="{{url}}">{{name}}</a>
+                            {{else}}
+                                <a target="_blank" href="{{url}}">{{name}}</a>
+                            {{/if}}
+
                         {{/if}}
                     </li>
                 {{/each}}
+
+
             </ul>
         {{/if}}
 

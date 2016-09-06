@@ -60,5 +60,17 @@
 	"TargetUnitSize": "TargetUnitSize",
 	"ActualWeight": "ActualWeight",
 	"ActualUnitSize": "ActualUnitSize",
-	"ActualNbOfUnits": "ActualNbOfUnits"
+	"ActualNbOfUnits": "ActualNbOfUnits",
+	"Sign Up": "Sign Up",
+	"Login": "Login",
+	"ErrorList": "ErrorList",
+	"Reset": "Reset",
+	"Continue": "Continue",
+	"Stop": "Stop",
+	"Mode": "Mode",
+	"Mannual": "Mannual",
+	"Automatic": "Automatic",
+	"Operation": "Operation",
+	"Close": "Close",
+	"Open": "Open"
 }

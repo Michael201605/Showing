@@ -71,6 +71,29 @@ module.exports = function(app, passport) {
         req.logout();
         res.redirect('/');
     });
+
+    app.get('/about', function(req, res){
+        res.render('about', {
+
+            pageTestScript: '/qa/tests-about.js'
+        });
+    });
+    app.get('/zh', function(req, res){
+        console.log('Chinese------------');
+        res.locals.locale = 'zh';
+
+        res.cookie('locale', 'zh', { maxAge: 900000, httpOnly: true });
+        res.redirect('back');
+    });
+    app.get('/en', function (req, res) {
+        res.cookie('locale', 'en', { maxAge: 900000, httpOnly: true });
+        res.redirect('back');
+    });
+
+
+
+
+
 };
 
 // route middleware to make sure

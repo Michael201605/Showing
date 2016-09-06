@@ -7,7 +7,7 @@ var Company = require('../models/eq/Company');
 
 var WarehousePackingType = require('../lib/stateAndCategory/warehousePackingType');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
-
+var labelPrintManager = require('../lib/labelPrintManager');
 
 module.exports = function (app, i18n) {
     app.get('/warehouse/receiptList/:state', function (req, res) {
@@ -159,10 +159,22 @@ module.exports = function (app, i18n) {
             var errors = theReceipt.confirmReceipt(i18n);
             if(errors){
                 res.json({
-                    errors: JSON.stringify(errors)
+                    errors: errors
                 });
             }else {
-                
+                labelPrintManager('receipt',{
+                    count:theReceipt.actualNbOfUnits,
+                    parameter: {
+                        ident:theReceipt.productIdent,
+                        name:theReceipt.productName,
+                        supplier: theReceipt.supplierName,
+                        lot: theReceipt.lot
+                    }
+                });
+                res.json({
+                    update:{},
+                    info: i18n.__('confirm successfully.')
+                });
             }
 
 
