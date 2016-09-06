@@ -38,9 +38,9 @@ var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
 var ControllerManager= require('./lib/controllers/controllerManager');
-var nodeId = 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01.Commands.CmdEnable';
-var opcua = require("node-opcua");
-var DataType = opcua.DataType;
+// var nodeId = 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01.Commands.CmdEnable';
+// var opcua = require("node-opcua");
+// var DataType = opcua.DataType;
 require('enum').register();
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
@@ -170,7 +170,7 @@ require('./routes/product')(app, i18n);
 
 new GcObjectAdapter(io).then(function (gcObjectAd) {
     console.log('gcobjectAdapter created success!');
-    gcObjectAd.DataType = opcua.DataType;
+
     io.on('connection', function (socket) {
         gcObjectAd.socket = socket;
         gcObjectAd.MonitorAllGcObjects();
