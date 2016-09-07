@@ -187,16 +187,16 @@ new GcObjectAdapter(io).then(function (gcObjectAd) {
 
 
 // 定制404 页面
-app.use(function(req, res, next){
-    res.status(404);
-    res.render('404');
-});
-// 500 错误处理器（中间件）
-app.use(function(err, req, res, next){
-    console.error(err.stack);
-    res.status(500);
-    res.render('500');
-});
+// app.use(function(req, res, next){
+//     res.status(404);
+//     res.render('404');
+// });
+// // 500 错误处理器（中间件）
+// app.use(function(err, req, res, next){
+//     console.error(err.stack);
+//     res.status(500);
+//     res.render('500');
+// });
 
 // io.on('connection', function (socket) {
 //     console.log('io socket connection success!');

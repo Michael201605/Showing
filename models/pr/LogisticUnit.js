@@ -23,7 +23,7 @@ var properties = {
 var LogisticUnit = modelBase.define('LogisticUnit', properties);
 LogisticUnit.hasMany(Layer);
 
-LogisticUnit.belongsTo(Product,{as: 'product'});
+LogisticUnit.belongsTo(Product);
 
 console.log('LogisticUnit executed');
 module.exports = LogisticUnit;

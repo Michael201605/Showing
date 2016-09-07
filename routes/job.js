@@ -380,6 +380,71 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
+
+    //station
+    app.get('/job/station/jobList/:lineIdent', function (req, res) {
+        var lineIdent = req.params.lineIdent.substring(1);
+        console.log('lineIdent: ' + lineIdent);
+
+        console.log('isAuthenticated: ' + req.isAuthenticated());
+        // var jobs =[];
+        Job.findAll({
+            where: {
+                LineIdent: lineIdent
+            }
+        }).then(function (jobs) {
+
+            console.log('jobs: ' + jobs);
+            res.render('job/station/jobList',
+                {
+                    jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
+                    lineIdent: lineIdent
+                });
+        });
+
+    });
+    app.get('/job/station/jobDetail/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var jobJson = {};
+
+        Job.findOne({
+            where: {id: id}
+        }).then(function (theJob) {
+            if (theJob) {
+                jobJson = theJob.getTranslatedJob(i18n);
+                theJob.getRecipe().then(function (theRecipe) {
+                    if (theRecipe) {
+                        jobJson.recipe = theRecipe.getJsonObject();
+                        jobJson.recipe.senders = [];
+                        jobJson.recipe.receivers = [];
+                        theRecipe.getSenders().then(function (ingredients) {
+                            ingredients.forEach(function (ingredient) {
+                                if (ingredient.category === 0) {
+                                    jobJson.recipe.senders.push(ingredient.getJsonObject());
+                                } else {
+                                    jobJson.recipe.receivers.push(ingredient.getJsonObject());
+                                }
+                            });
+                            res.render('job/station/jobDetail',
+                                {
+                                    job: jobJson,
+                                    recipe: JSON.stringify(jobJson.recipe)
+
+                                });
+                        })
+                    } else {
+                        res.render('job/station/jobDetail', {error: i18n.__('Job: %s recipe is empty.', id)});
+                    }
+
+                });
+            }
+            else {
+                res.json({error: i18n.__('Job: %s is empty.', id)});
+            }
+
+        });
+
+    });
 };
 
 function isLoggedIn(req, res, next) {

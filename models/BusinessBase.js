@@ -2,6 +2,9 @@
  * Created by pi on 8/26/16.
  */
 var GcObjectParameter = require('./eq/GcObjectParameter');
+var Promise = require('promise');
+var modelBase = require('./ModelBase');
+var utils = require('../lib/utils');
 function BusinessBase() {
 
 }
@@ -51,7 +54,24 @@ BusinessBase.prototype = {
         jsonObject.gcObjectParameter = gcObjectparameter;
 
         return jsonObject;
+    },
+    getMaxId: function (tableName) {
+        var me = this;
+        console.dir(me.Model);
+        return new Promise(function (resolve, reject) {
+            modelBase.query('select max(id) from ' + tableName, {type: modelBase.QueryTypes.SELECT}).then(function (data) {
+                console.log('max ' + data);
+                console.dir(data);
+                var max = data[0]['max(id)'];
+                if (!max) {
+                    max = 0;
+                }
+                max++;
+                resolve(utils.pad(max, 6));
+            });
+
+        });
+
     }
 };
-
 module.exports = BusinessBase;

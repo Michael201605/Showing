@@ -183,5 +183,12 @@ $(function () {
 
 
     }
+
+    $('#barcode').focus();
+    function _readBarcode(barcode) {
+        if(true){
+
+        }
+    }
 });
 

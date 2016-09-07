@@ -135,5 +135,8 @@
 	"Update Time": "Update Time",
 	"Target Weight": "Target Weight",
 	"confirm Receipt": "confirm Receipt",
-	"confirm successfully.": "confirm successfully."
+	"confirm successfully.": "confirm successfully.",
+	"confirm successfully": "confirm successfully",
+	"Please Scan barcode": "Please Scan barcode",
+	"confirm": "confirm"
 }

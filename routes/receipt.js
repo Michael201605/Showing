@@ -43,7 +43,7 @@ module.exports = function (app, i18n) {
         console.log('toDeleteReceiptIdsStr:  ' + toDeleteReceiptIdsStr);
         var toDeleteReceiptIds = JSON.parse(toDeleteReceiptIdsStr);
         Receipt.destroy({
-            where:{
+            where: {
                 id: {
                     $in: toDeleteReceiptIds
                 }
@@ -101,7 +101,7 @@ module.exports = function (app, i18n) {
                 });
             });
         }
-        catch (err){
+        catch (err) {
             res.json({error: i18n.__(err)});
         }
 
@@ -156,32 +156,29 @@ module.exports = function (app, i18n) {
         Receipt.findOne({
             where: {id: id}
         }).then(function (theReceipt) {
-            var errors = theReceipt.confirmReceipt(i18n);
-            if(errors){
+            theReceipt.confirmReceipt(i18n).then(function (info) {
+                // labelPrintManager('receipt', {
+                //     count: theReceipt.actualNbOfUnits,
+                //     parameter: {
+                //         ident: theReceipt.productIdent,
+                //         name: theReceipt.productName,
+                //         supplier: theReceipt.supplierName,
+                //         lot: theReceipt.lot
+                //     }
+                // });
+                res.json({
+                    update: {state:80},
+                    info: i18n.__('confirm successfully.')
+                });
+            }, function (errors) {
                 res.json({
                     errors: errors
                 });
-            }else {
-                labelPrintManager('receipt',{
-                    count:theReceipt.actualNbOfUnits,
-                    parameter: {
-                        ident:theReceipt.productIdent,
-                        name:theReceipt.productName,
-                        supplier: theReceipt.supplierName,
-                        lot: theReceipt.lot
-                    }
-                });
-                res.json({
-                    update:{},
-                    info: i18n.__('confirm successfully.')
-                });
-            }
-
-
+            });
         });
 
     });
-    app.get('/warehouse/receiptLabel/:id',isLoggedIn, function (req, res) {
+    app.get('/warehouse/receiptLabel/:id', isLoggedIn, function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({
@@ -190,20 +187,19 @@ module.exports = function (app, i18n) {
             // for(var pro in theReceipt){
             //     console.log('Property of receipt: ' + pro);
             // }
-            var data ={Lot: theReceipt.LOT};
+            var data = {Lot: theReceipt.LOT};
             console.log('prodcut: ' + theReceipt.getProduct());
             theReceipt.getProduct().then(function (product) {
-                data.Ident =product.Ident;
-                data.Name =product.Name;
+                data.Ident = product.Ident;
+                data.Name = product.Name;
                 theReceipt.getSupplier().then(function (supplier) {
-                    data.SupplierName =supplier.Name;
-                    console.log('data: '+ JSON.stringify(data));
+                    data.SupplierName = supplier.Name;
+                    console.log('data: ' + JSON.stringify(data));
                     res.render('warehouse/receiptLabel', {
                         data: data
                     });
                 });
             });
-
 
 
         });
@@ -214,7 +210,7 @@ module.exports = function (app, i18n) {
 function isLoggedIn(req, res, next) {
 
     // if user is authenticated in the session, carry on
-    if (req.isAuthenticated()){
+    if (req.isAuthenticated()) {
 
         console.log('is Authenticated!!!');
         return next();

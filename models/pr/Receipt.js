@@ -9,7 +9,7 @@ var Layer = require('./Layer');
 var utils = require('../../lib/utils');
 var BusinessBase = require('../BusinessBase');
 var WarehousePackingType = require('../../lib/stateAndCategory/warehousePackingType');
-
+var Promise = require('promise');
 var properties = {
     ident: {type: modelBase.Sequelize.STRING},
     name: modelBase.Sequelize.STRING,
@@ -35,6 +35,7 @@ var Receipt = modelBase.define('Receipt', properties);
 Receipt.belongsTo(Company,{as: 'Supplier'});
 Receipt.belongsTo(Product);
 
+utils.inherits(Receipt.Instance.prototype, BusinessBase.prototype);
 
 Receipt.Instance.prototype.checkReceipt = function (i18n) {
 
@@ -62,54 +63,70 @@ Receipt.Instance.prototype.checkReceipt = function (i18n) {
 };
 Receipt.Instance.prototype.confirmReceipt = function (i18n) {
     var errors = this.checkReceipt(i18n);
-    if (errors.length == 0) {
-        var theProduct = this.getProduct();
-        var theSupplier = this.getSupplier();
-        var sscc = '';
-        var supplierIdent = '';
-        var supplierName = '';
-        if (theProduct) {
-            SSCC = theProduct.ident + '_' + this.lot;
-        }
-        if (theSupplier) {
-            supplierIdent = theSupplier.ident;
-            supplierName = theSupplier.name;
-        }
-        var logisticUnitInfo = {
-            ident: 'WH:000',
-            name: 'WH',
-            unitSize: this.actualUnitSize,
-            nbOfUnits: this.actualNbOfUnits,
-            packagingType: this.packagingType,
-            isUnitSizeUsed: false,
-            sscc: sscc,
-            lot: this.lot,
-            productId: this.productId,
-            supplierIdent: supplierIdent,
-            supplierName:supplierName
-        };
-        LogisticUnit.create(logisticUnitInfo).then(function (newLogistic) {
-            console.log('newLogistic: ' + JSON.stringify(newLogistic));
-            if (newLogistic.packagingType == WarehousePackingType.Bag) {
-                for (var i = 0; i < newLogistic.UnitSize; i++) {
-                    var layInfo = {
-                        sscc: sscc + '_' + i.tostring('0000'),
-                        bagNO: i,
-                        size: newLogistic.unitSize,
-                        actualWeight: newLogistic.unitSize,
-                        logisticUnitId: newLogistic.id
-                    };
-                    Layer.create(layInfo).then(function (newLayer) {
-                        console.log('newLayer: ' + JSON.stringify(newLayer));
-                    });
+    var sscc = '';
+    var supplierIdent = '';
+    var supplierName = '';
+    var me = this;
+    return new Promise(function (resolve, reject) {
+        if (errors.length == 0) {
+            me.getProduct().then(function (theProduct) {
+                if(theProduct){
+                    sscc = theProduct.ident + '_' + me.lot;
                 }
-            }
-        })
-    }
-    else {
-        return errors;
-    }
+                me.getSupplier().then(function (theSupplier) {
+                    if (theSupplier) {
+                        supplierIdent = theSupplier.ident;
+                        supplierName = theSupplier.name;
+                    }
+                    me.getMaxId('LogisticUnits').then(function (maxId) {
+                        var logisticUnitInfo = {
+                            ident: 'WH:'+ maxId,
+                            name: 'WH',
+                            unitSize: me.actualUnitSize,
+                            nbOfUnits: me.actualNbOfUnits,
+                            packagingType: me.packagingType,
+                            isUnitSizeUsed: false,
+                            sscc: sscc,
+                            lot: me.lot,
+                            ProductId: me.ProductId,
+                            supplierIdent: supplierIdent,
+                            supplierName:supplierName
+                        };
+                        LogisticUnit.create(logisticUnitInfo).then(function (newLogistic) {
+                            console.log('newLogistic: ' + JSON.stringify(newLogistic));
+                            if (newLogistic.packagingType == WarehousePackingType.Bag) {
+                                for (var i = 1; i <= newLogistic.nbOfUnits; i++) {
+                                    var layInfo = {
+                                        sscc: sscc + '_' + utils.pad(i,4),
+                                        bagNo: i,
+                                        size: newLogistic.unitSize,
+                                        actualWeight: newLogistic.unitSize,
+                                        LogisticUnitId: newLogistic.id
+                                    };
+                                    Layer.create(layInfo).then(function (newLayer) {
+                                        console.log('newLayer: ' + JSON.stringify(newLayer));
+                                    });
+                                }
+
+                            }
+                            me.update({
+                                state: 80
+                            }).then(function (theReceipt) {
+
+                            });
+                            resolve({info: i18n.__('confirm successfully')});
+                        });
+                    });
+
+                });
+            });
+        }
+        else {
+            reject({errors:errors});
+        }
+    });
+
 };
-utils.inherits(Receipt.Instance.prototype, BusinessBase.prototype);
+
 console.log('Receipt executed');
 module.exports = Receipt;

@@ -158,6 +158,7 @@ $(function () {
             $('#infos').empty();
             if (!data.errors) {
                 $('#infos').append('<li>' + data.info + '</li>');
+                window.location.replace("/warehouse/station/receiptList");
             } else {
                 data.errors.forEach((function (error) {
                     $('#errors').append('<li>' + data.error + '</li>');
