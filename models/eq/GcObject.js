@@ -2,7 +2,7 @@
  * Created by pi on 8/23/16.
  */
 var modelBase = require('../ModelBase');
-var GcObjectParameter = require('./GcObjectParameter');
+var GcObjectParameter = require('./../../lib/GcObjectParameter');
 var util = require('util');
 var GcObject = modelBase.define('GcObject', {
     ident: modelBase.Sequelize.STRING,
@@ -13,26 +13,27 @@ var log = require('../../lib/log');
 GcObject.Instance.prototype.getGcObjectParameter = function () {
 
     var ElemGcObjectParameter = null;
-    switch (this.category){
-        case 'SimpleMotor':
-            ElemGcObjectParameter = GcObjectParameter.SimpleMotor;
-            break;
-        case 'FilterControl':
-            ElemGcObjectParameter = GcObjectParameter.FilterControl;
-            break;
-        case 'HighLevel':
-            ElemGcObjectParameter = GcObjectParameter.HighLevel;
-            break;
-        case 'BeltMonitor':
-            ElemGcObjectParameter = GcObjectParameter.BeltMonitor;
-            break;
-        case 'SpeedMonitor':
-            ElemGcObjectParameter = GcObjectParameter.SpeedMonitor;
-            break;
-        case 'ValveOpenClose':
-            ElemGcObjectParameter = GcObjectParameter.ValveOpenClose;
-            break;
-    }
+    ElemGcObjectParameter = GcObjectParameter[this.category];
+    // switch (this.category){
+    //     case 'SimpleMotor':
+    //         ElemGcObjectParameter = GcObjectParameter.SimpleMotor;
+    //         break;
+    //     case 'FilterControl':
+    //         ElemGcObjectParameter = GcObjectParameter.FilterControl;
+    //         break;
+    //     case 'HighLevel':
+    //         ElemGcObjectParameter = GcObjectParameter.HighLevel;
+    //         break;
+    //     case 'BeltMonitor':
+    //         ElemGcObjectParameter = GcObjectParameter.BeltMonitor;
+    //         break;
+    //     case 'SpeedMonitor':
+    //         ElemGcObjectParameter = GcObjectParameter.SpeedMonitor;
+    //         break;
+    //     case 'ValveOpenClose':
+    //         ElemGcObjectParameter = GcObjectParameter.ValveOpenClose;
+    //         break;
+    // }
     if (ElemGcObjectParameter) {
         console.log('created object.\n');
         return new ElemGcObjectParameter();

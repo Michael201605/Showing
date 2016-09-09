@@ -17,7 +17,8 @@ var properties = {
     state: modelBase.Sequelize.INTEGER,
     lot:  modelBase.Sequelize.STRING,
     supplierIdent: modelBase.Sequelize.STRING,
-    supplierName: modelBase.Sequelize.STRING
+    supplierName: modelBase.Sequelize.STRING,
+    location: modelBase.Sequelize.STRING
 };
 
 var LogisticUnit = modelBase.define('LogisticUnit', properties);

@@ -19,13 +19,28 @@ jobApp.controller('JobListCtrl', function ($scope, $http, $filter) {
     // });
     //var recipesStr = JSON.parse($("#recipes").val());
     $scope.jobs = JSON.parse($("#jobs").val());
-
+    var socket;
     console.log("jobs: " +  $scope.jobs);
 
+    var server = location.href;
+    console.log('server whole: ' + server);
+    var header = server.indexOf('//');
+    console.log('header: ' + header);
+    var index = server.indexOf('/', header+2);
+    console.log('index: ' + index);
+    if(index>-1){
+        server = server.substring(0,index);
+        console.log('server: ' + server);
+        socket = io(server);
+        socket.on('newJob', function () {
+            location.reload();
+        });
+    }
 
 
-    $scope.LineIdent = $("#LineIdent").val();
-    console.log("lineIdent: " +  $scope.LineIdent);
+
+    $scope.lineIdent = $("#lineIdent").val();
+    console.log("lineIdent: " +  $scope.lineIdent);
     $scope.result = "";
     // $scope.recipes = [
     //     {
@@ -50,16 +65,18 @@ jobApp.controller('JobListCtrl', function ($scope, $http, $filter) {
 
     //function defintions
     function createJob() {
-        $.get('/job/jobList/createJob/:' +$scope.LineIdent, function (data) {
+        $.get('/job/jobList/createJob/:' +$scope.lineIdent, function (data) {
             var newJob = null;
             console.log('data: ' + data);
             if(!data.error){
                 newJob = data.job;
                 console.log('newJob: ' + newJob);
                 console.log('newJob id: ' + newJob.id);
-                console.log('newJob State: ' + newJob.DisplayState);
+                console.log('newJob State: ' + newJob.displayState);
                 $scope.jobs.push(newJob);
 
+            }else {
+                $('#errors').append('<li>' + data.error + '</li>');
             }
             location.reload();
 

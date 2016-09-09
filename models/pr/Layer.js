@@ -6,6 +6,7 @@ var LogisticUnit = require('./LogisticUnit');
 
 var properties = {
     sscc: modelBase.Sequelize.STRING,
+    lot: modelBase.Sequelize.STRING,
     bagNo: modelBase.Sequelize.INTEGER,
     state: modelBase.Sequelize.INTEGER,
     size: modelBase.Sequelize.DECIMAL,

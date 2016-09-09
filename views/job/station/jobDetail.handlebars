@@ -35,7 +35,7 @@
             <h2 class="title">{{{__ "Job Detail"}}}</h2>
         </div>
         <div class="col-lg-3">
-            <a href="/job/jobList/:{{job.lineIdent}}">{{{__ "Job List"}}}</a>
+            <a href="/job/station/jobList/:{{job.lineIdent}}">{{{__ "Job List"}}}</a>
         </div>
     </header>
     <div class="row">
@@ -84,7 +84,9 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "State"}}}</label>
                     <div class="col-md-4">
-                        <input type="text" class="form-control" id="state" name="state" disabled
+                        <input type="text" class="form-control hidden" id="state" name="state"
+                               value="{{job.state}}"/>
+                        <input type="text" class="form-control" id="displayState" name="displayState" disabled
                                value="{{job.displayState}}"/>
                     </div>
                 </div>
@@ -97,7 +99,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "Product"}}}</label>
                     <div class="col-md-4">
-                        <input type="text" class="form-control" id="product" name="product" disabled
+                        <input type="text" class="form-control hidden" id="productIdent" name="productIdent" value="{{job.productIdent}}"/>
+                        <input type="text" class="form-control" id="productName" name="productName" value="{{job.productName}}" disabled
                         />
                     </div>
                 </div>
@@ -112,7 +115,7 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "ActualWeight"}}}</label>
                     <div class="col-md-4">
-                        <input type="number" class="form-control" name="ActualWeight" step="any" disabled
+                        <input type="number" class="form-control" id="actualWeight" name="actualWeight" step="any" disabled
                                value="{{job.actualWeight}}"/>
                     </div>
 
@@ -152,14 +155,15 @@
         </div>
         <div class="col-lg-3">
             <div class="btn-group right-button" role="group" aria-label="Basic example">
-                <button id="checkJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
-                <button id="startJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
+                <!--<button id="checkJob" class="btn btn-primary">{{{__ "check Job"}}}</button>-->
+                <!--<button id="startJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>-->
+                <button id="suspendJob" class="btn btn-danger">{{{__ "Suspend Job"}}}</button>
                 <button id="doneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
             </div>
         </div>
     </div>
 </div>
 {{#section 'jquery'}}
-    <script src="/js/job.js"></script>
+    <script src="/js/station/job.js"></script>
 
 {{/section}}

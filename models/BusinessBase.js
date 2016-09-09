@@ -1,7 +1,7 @@
 /**
  * Created by pi on 8/26/16.
  */
-var GcObjectParameter = require('./eq/GcObjectParameter');
+var GcObjectParameter = require('./../lib/GcObjectParameter');
 var Promise = require('promise');
 var modelBase = require('./ModelBase');
 var utils = require('../lib/utils');

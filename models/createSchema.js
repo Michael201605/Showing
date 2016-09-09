@@ -5,7 +5,6 @@ var Promise = require('promise');
 
 //------------------------------------
 //Module
-var modelBase = require('./ModelBase');
 var Filler = require('./eq/Filler');
 var Discharger = require('./eq/Discharger');
 var Storage = require('./eq/Storage');
@@ -30,8 +29,9 @@ var GroupUser = require('./um/GroupUser');
 var UserGroup = require('./um/UserGroup');
 var User = require('./um/User');
 var AccessRight = require('./um/AccessRight');
-
-
+var LotLog = require('./pr/LotLog');
+var LayerLog = require('./pr/LayerLog');
+var TraceLog = require('./pr/TraceLog');
 
 UserGroup.sync().then(function () {
 
@@ -82,4 +82,7 @@ Line.sync().then(function () {
 });
 
 JobLog.sync();
+LotLog.sync();
+LayerLog.sync();
+TraceLog.sync();
 GcObject.sync();

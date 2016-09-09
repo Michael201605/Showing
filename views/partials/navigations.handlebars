@@ -3,18 +3,10 @@
     <ul class="nav nav-pills nav-stacked">
         <li class="active"><a data-toggle="pill" href="#home">{{{__ "Start"}}}</a></li>
         {{#each partials.navigations}}
-            <li><a data-toggle="pill" href="#{{index}}">{{name}}</a></li>
+            <li><a data-toggle="pill" href="#{{index}}">{{name}}</a><button class="btn btn-info" id="{{index}}-cmd">{{{__ "Commands"}}}</button></li>
         {{/each}}
 
     </ul>
-</div>
-<div class="col-xs-1 command">
-    <!--navigation buttons-->
-    <div class="btn-group-vertical moveDown" >
-        {{#each partials.navigations}}
-            <button class="btn btn-primary" id="{{index}}-cmd">{{{__ "Commands"}}}</button>
-        {{/each}}
-    </div>
 </div>
 <div class="col-lg-10">
     <!--visualization-->

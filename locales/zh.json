@@ -138,5 +138,12 @@
 	"confirm successfully.": "confirm successfully.",
 	"confirm successfully": "confirm successfully",
 	"Please Scan barcode": "Please Scan barcode",
-	"confirm": "confirm"
+	"confirm": "confirm",
+	"take wrong product": "take wrong product",
+	"Layer is not found.": "Layer is not found.",
+	"Please scan next barcode.": "Please scan next barcode.",
+	"Storage of sender is not defined": "Storage of sender is not defined",
+	"Storage of receiver is not defined": "Storage of receiver is not defined",
+	"Job is loading, Please scan next barcode.": "Job is loading, Please scan next barcode.",
+	"The job has done.": "The job has done."
 }

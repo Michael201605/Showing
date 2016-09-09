@@ -14,6 +14,7 @@ $(function () {
     var lineIdent = $('#lineIdent').val();
     var recipe = JSON.parse($('#recipe').val());
     var product = {};
+
     console.log('senders: ');
     console.log(recipe.senders);
     $('#sender').val(recipe.senders[0].storageIdent);
@@ -92,33 +93,37 @@ $(function () {
         });
     });
 
-    $('#checkJob').click(function () {
-        $('#error').val('');
-        $('#errors').empty();
-        var jobId = $('#jobId').val();
-        $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
-            if (data.errors) {
-                data.errors.forEach(function (error) {
-                    $('#errors').append('<li>' + error + '</li>');
-                });
-            }
-            if (data.info) {
-                $('#infos').append('<li>' + data.info + '</li>');
-            }
-        });
+    // $('#checkJob').click(function () {
+    //     $('#error').val('');
+    //     $('#errors').empty();
+    //     var jobId = $('#jobId').val();
+    //     $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
+    //         if (data.errors) {
+    //             data.errors.forEach(function (error) {
+    //                 $('#errors').append('<li>' + error + '</li>');
+    //             });
+    //         }
+    //         if (data.info) {
+    //             $('#infos').append('<li>' + data.info + '</li>');
+    //         }
+    //     });
+    // });
+    // $('#startJob').click(function () {
+    //     $('#error').val('');
+    //     var jobId = $('#jobId').val();
+    //     $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
+    //         if (data.error) {
+    //             $('#error').val(data.error);
+    //         } else if (data.update && data.update.state) {
+    //             $('#state').val(data.update.state);
+    //         }
+    //
+    //     });
+    // });
+    $('#suspendJob').click(function () {
+        //TODO
     });
-    $('#startJob').click(function () {
-        $('#error').val('');
-        var jobId = $('#jobId').val();
-        $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
-            if (data.error) {
-                $('#error').val(data.error);
-            } else if (data.update && data.update.state) {
-                $('#state').val(data.update.state);
-            }
 
-        });
-    });
     $('#doneJob').click(function () {
         $('#error').val('');
         var jobId = $('#jobId').val();
@@ -134,6 +139,9 @@ $(function () {
             if(data.info){
                 $('#infos').append('<li>' + data.info + '</li>');
             }
+            setTimeout(function () {
+                window.location.replace('/job/station/jobList/:' + lineIdent);
+            },1000);
 
         });
     });
@@ -200,6 +208,41 @@ $(function () {
 
     }
 
+    $('#barcode').focus();
+    $('#confirmBarcode').click(function () {
+        var barcode = $('#barcode').val();
+        _scaneBarcode(barcode);
+    });
+    function _scaneBarcode(barcode) {
+        var jobId = $('#jobId').val();
+        $('#barcode').attr('disabled', true);
+        if (barcode) {
+            $.get('/job/station/scaneBarcode/:' + jobId + '/:' + barcode, function (data) {
+                if (data) {
+                    if (data.error) {
+                        $('#errors').append('<li>' + data.error + '</li>');
+                        console.log('Error:');
+                        console.dir(data.error);
+                    }else {
+                        if (data.update) {
+                            $('#displayState').val(data.update.displayState);
+                            $('#state').val(data.update.state);
+                            setBKColor(data.update.state);
+                            $('#actualWeight').val(data.update.actualWeight);
+                        }
+                        if (data.info) {
+                            $('#infos').append('<li>' + data.info + '</li>');
+                        }
+                        $('#barcode').val('');
+                    }
+
+                }
+                $('#barcode').removeAttr('disabled');
+
+            });
+        }
+    }
+
 
 });
 
@@ -221,6 +264,10 @@ function setBKColor(state) {
         case 50:
             //Suspended
             color = 'Pink';
+            break;
+        case 80:
+            //Suspended
+            color = 'Silver';
             break;
 
     }

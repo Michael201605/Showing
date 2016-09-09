@@ -3,11 +3,18 @@
  */
 
 var Job = require('../models/pr/Job');
+var Layer = require('../models/pr/Layer');
+var LogisticUnit = require('../models/pr/LogisticUnit');
 var Recipe = require('../models/pr/Recipe');
 var Line = require('../models/eq/Line');
 var IngredientComponent = require('../models/pr/IngredientComponent');
 var Promise = require('promise');
 var getDisplayState = require('../lib/tools/getDisplayState');
+var WarehousePackingType = require('../lib/stateAndCategory/warehousePackingType');
+var util = require('util');
+var log = require('../lib/log');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 // Job.belongsTo(Line,{as: 'line'});
 // var ControllerAdapter = require('../adapters/ControllerAdapter');
 var JobState = require('../lib/stateAndCategory/jobState');
@@ -21,7 +28,8 @@ module.exports = function (app, controllerManager, i18n, io) {
         // var jobs =[];
         Job.findAll({
             where: {
-                LineIdent: lineIdent
+                LineIdent: lineIdent,
+                state : {$notIn: [JobState.Done]}
             }
         }).then(function (jobs) {
 
@@ -54,7 +62,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                         lineIdent: lineIdent,
                         visible: true,
                         isTemplate: false,
-                        locked: false,
+                        locked: true,
                         targetWeight: 0.0,
                         actualWeight: 0.0,
                         state: JobState.Created,
@@ -94,7 +102,8 @@ module.exports = function (app, controllerManager, i18n, io) {
                                                 storageIdent: ingredient.storageIdent,
                                                 ProductId: ingredient.ProductId,
                                                 RecipeId: newRecipe.id,
-                                                productIdent: ingredient.productIdent
+                                                productIdent: ingredient.productIdent,
+                                                isActive: ingredient.isActive
                                             }).then(function (newIngredient) {
                                                 console.log('newIngredient');
                                                 console.dir(newIngredient);
@@ -228,7 +237,14 @@ module.exports = function (app, controllerManager, i18n, io) {
                         controller.checkJob(theJob).then(function (data) {
                             console.log('check job is OK:');
                             console.log(data);
+                            theJob.update({
+                                locked: false
+                            }).then(function (updatedJob) {
+                                console.log('save updated job is OK');
+                                eventEmitter.emit('checkJobOk');
+                            });
                             res.json({
+                                update: {locked:false},
                                 info: i18n.__('check job is OK:')
                             });
                         }, function (errors) {
@@ -319,16 +335,13 @@ module.exports = function (app, controllerManager, i18n, io) {
                     if (theLine) {
                         controller = controllerManager.getController(theLine.controllerName);
                         controller.stopJob(theJob).then(function (Pres) {
-                            theJob.update({
-                                state: JobState.Done
-                            }).then(function (theJob) {
-                                console.log("save successfully");
 
-                            });
                             res.json({
                                 update: {
-                                    state: getDisplayState(JobState, JobState.Done)
-                                }
+                                    displayState: getDisplayState(JobState, JobState.Done),
+                                    state: JobState.Done
+                                },
+                                info: i18n.__('The job has done.')
                             });
 
                         }, function (Perr) {
@@ -363,16 +376,28 @@ module.exports = function (app, controllerManager, i18n, io) {
         var id = req.params.id.substring(1);
         var targetWeight = req.body.targetWeight;
         var locked = req.body.locked;
+        var productIdent = req.body.productIdent;
+        var productName = req.body.productName;
         var info = '';
+        var updateInfo = {};
+        if(targetWeight){
+            updateInfo.targetWeight = targetWeight;
+        }
+        if(locked){
+            updateInfo.locked = locked;
+        }
+        if(productIdent){
+            updateInfo.productIdent = productIdent;
+        }
+        if(productName){
+            updateInfo.productName = productName;
+        }
         console.log('TargetWeight: ' + targetWeight);
         console.log('locked: ' + locked);
         Job.findOne({
             where: {id: id}
         }).then(function (theJob) {
-            theJob.update({
-                locked: locked,
-                targetWeight: targetWeight
-            }).then(function (theJob) {
+            theJob.update(updateInfo).then(function (theJob) {
                 info = i18n.__("save successfully");
 
                 res.json({info: info});
@@ -390,7 +415,9 @@ module.exports = function (app, controllerManager, i18n, io) {
         // var jobs =[];
         Job.findAll({
             where: {
-                LineIdent: lineIdent
+                LineIdent: lineIdent,
+                locked: false,
+                state : {$notIn: [JobState.Done]}
             }
         }).then(function (jobs) {
 
@@ -445,6 +472,85 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
+    app.get('/job/station/scaneBarcode/:id/:barcode', function (req, res) {
+        var id = req.params.id.substring(1);
+        var barcode = req.params.barcode.substring(1);
+        var jobJson = {};
+        var segments = barcode.split('_');
+        var productIdent = '';
+        var lotIdent = '';
+        if(segments.length && segments.length>1){
+            productIdent = segments[0];
+            lotIdent = segments[1];
+            Job.findOne({
+                where: {id: id}
+            }).then(function (theJob) {
+                if (theJob) {
+                    if(productIdent === theJob.productIdent){
+                        if(segments.length === 3){
+                            console.log('barcode: ' + barcode);
+                            Layer.findOne({where:{sscc: barcode}}).then(function (theLayer) {
+                                if(theLayer){
+
+                                    if(theJob.state === JobState.Created){
+                                        theJob.start(controllerManager,i18n).then(function () {
+                                            theJob.registerAssemblyToStorage(theLayer, i18n).then(function (remainWeight) {
+                                                theJob.update({actualWeight: remainWeight});
+                                                res.json({
+                                                    update: {
+                                                        displayState: getDisplayState(JobState, JobState.Loading),
+                                                        state: JobState.Loading,
+                                                        actualWeight: remainWeight
+                                                    },
+                                                    info: i18n.__('Job is loading, Please scan next barcode.')
+                                                });
+                                            },function (pError1) {
+                                                res.json(pError1);
+                                            });
+                                        }, function (pError) {
+                                            res.json(pError);
+                                        });
+                                    }else {
+                                        theJob.registerAssemblyToStorage(theLayer).then(function () {
+                                            res.json({
+                                                info: i18n.__('Please scan next barcode.')
+                                            });
+                                        }, function (pError1) {
+                                            res.json(pError1);
+                                        });
+
+                                    }
+                                }else{
+                                    res.json({error: i18n.__('Layer is not found.')});
+                                }
+                            });
+                        }else {
+                            res.json({error: i18n.__('barcode length is invalid')});
+                        }
+
+                    }else{
+                        res.json({error: i18n.__('take wrong product')});
+                    }
+                }
+                else {
+                    res.json({error: i18n.__('Job: %s is empty.', id)});
+                }
+
+            });
+        }else{
+            res.json({error: i18n.__('barcode is invalid')});
+        }
+
+
+    });
+
+    io.on('connection', function (socket) {
+        eventEmitter.on('checkJobOk', function (nodeData) {
+            log('D', 'Event: newJob');
+            socket.emit('newJob');
+
+        });
+    })
 };
 
 function isLoggedIn(req, res, next) {

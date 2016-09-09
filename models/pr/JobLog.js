@@ -10,7 +10,8 @@ var JobLog = modelBase.define('JobLog',{
     name : modelBase.Sequelize.STRING,
     state :  modelBase.Sequelize.INTEGER,
     recipeIdent : modelBase.Sequelize.STRING,
-    lineIdent : modelBase.Sequelize.STRING
+    lineIdent : modelBase.Sequelize.STRING,
+    actualWeight: modelBase.Sequelize.DECIMAL
 });
 
 console.log('Joblog executed');

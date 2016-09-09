@@ -11,7 +11,8 @@ var properties = {
     displayName: modelBase.Sequelize.STRING,
     password: modelBase.Sequelize.STRING,
     isAdministrator: modelBase.Sequelize.BOOLEAN,
-    isEngineer: modelBase.Sequelize.BOOLEAN
+    isEngineer: modelBase.Sequelize.BOOLEAN,
+    isActive: modelBase.Sequelize.BOOLEAN
 };
 
 var User = modelBase.define('User', properties);
