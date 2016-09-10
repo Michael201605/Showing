@@ -12,7 +12,8 @@ var Storage = modelBase.define('Storage',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
-    lineIdent: modelBase.Sequelize.STRING
+    lineIdent: modelBase.Sequelize.STRING,
+    currentWeight: modelBase.Sequelize.DECIMAL
 });
 
 Storage.hasMany(Filler);

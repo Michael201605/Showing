@@ -3,6 +3,7 @@
  */
 var modelBase = require('../ModelBase');
 var Line = require('../eq/Line');
+var Storage = require('../eq/Storage');
 var LayerLog = require('./LayerLog');
 var TraceLog = require('./TraceLog');
 var utils = require('../../lib/utils');
@@ -125,7 +126,18 @@ Job.Instance.prototype.registerAssemblyToStorage = function (theLayer, i18n) {
                                 theLayerLog.remainWeight += theLayer.actualWeight;
                                 theLayerLog.save().then(function () {
                                     theLayer.destroy();
-                                    resolve(theLayerLog.remainWeight);
+
+                                    Storage.findOne({where:{ident: storageIdent}}).then(function (theStorage) {
+                                        if(theStorage){
+                                            theStorage.currentWeight +=theLayer.actualWeight;
+                                            theStorage.save();
+                                            resolve(theLayerLog.remainWeight);
+                                        }
+                                        else {
+                                            reject({error: i18n.__('theStorage not found')});
+                                        }
+                                    });
+
                                 }).catch(function (error) {
                                     reject({error: error});
                                 });

@@ -10,6 +10,7 @@ var Section = modelBase.define('Section',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
+    previousState :  modelBase.Sequelize.INTEGER,
     state :  modelBase.Sequelize.INTEGER,
     nodeId: modelBase.Sequelize.STRING,
     jobIdent: modelBase.Sequelize.STRING
