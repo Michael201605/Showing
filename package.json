@@ -1,21 +1,21 @@
 {
-  "name": "fast-light-control",
+  "name": "hwlt",
   "version": "1.0.0",
-  "description": "fast light control",
-  "main": "FLCos.js",
+  "description": "hwlt",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lhf552004/FLCos.git"
+    "url": "git+https://github.com/ffftaw/hwlt.git"
   },
   "author": "Allen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lhf552004/FLCos/issues"
+    "url": "https://github.com/ffftaw/hwlt/issues"
   },
-  "homepage": "https://github.com/lhf552004/FLCos#readme",
+  "homepage": "https://github.com/ffftaw/hwlt#readme",
   "dependencies": {
     "angular-animate": "^1.5.8",
     "angular-aria": "^1.5.8",
