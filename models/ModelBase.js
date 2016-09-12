@@ -3,7 +3,9 @@
  */
 var Sequelize = require('sequelize');
 var database = require('../lib/database');
-
+var cls = require('continuation-local-storage'),
+    namespace = cls.createNamespace('model-ns');
+Sequelize.cls = namespace;
 // var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password);
 var sequelize = new Sequelize(database.database, database.connection.user, database.connection.password, {
     host: 'localhost',

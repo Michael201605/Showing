@@ -54,7 +54,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                 error = i18n.__('the line is not defined');
                 res.json({error: error});
             } else {
-                Job.getNewJobIdent(lineIdent).then(function (data) {
+                Job.getMaxId().then(function (data) {
                     console.log('get max id: ' + data);
                     var jobInfo = {
                         ident: lineIdent + ':' + data,

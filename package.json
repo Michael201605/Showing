@@ -29,6 +29,7 @@
     "browser-serialport": "^2.0.3",
     "colors": "^1.1.2",
     "connect-flash": "^0.1.1",
+    "continuation-local-storage": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "easy-table": "^1.0.0",
     "enum": "^2.3.0",

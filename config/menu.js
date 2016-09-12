@@ -119,11 +119,11 @@ var ConfigureMenus = [
                 SubMenus: [
                     {
                         name: 'PendingOrder',
-                        url: '/Order/process/processOderList'
+                        url: '/Order/process/processOrderList/:10'
                     },
                     {
                         name: 'OrderLog',
-                        url: '/Order/process/processOderLogList'
+                        url: '/Order/process/processOrderLogList/:80'
                     }
                 ],
                 url: '#'

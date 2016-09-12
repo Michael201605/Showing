@@ -7,6 +7,7 @@ var Storage = require('../eq/Storage');
 var LayerLog = require('./LayerLog');
 var TraceLog = require('./TraceLog');
 var utils = require('../../lib/utils');
+var log = require('../../lib/log');
 var BusinessBase = require('../BusinessBase');
 var JobState = require('../../lib/stateAndCategory/jobState');
 var getDisplayState = require('../../lib/tools/getDisplayState');
@@ -30,7 +31,7 @@ var properties = {
 
 var Job = modelBase.define('Job', properties, {
     classMethods: {
-        getNewJobIdent: function (lineIdent) {
+        getMaxId: function () {
             return new Promise(function (resolve, reject) {
                 modelBase.query('select max(id) from Jobs', {type: modelBase.QueryTypes.SELECT}).then(function (data) {
                     console.log('max ' + data);
@@ -57,7 +58,88 @@ var Job = modelBase.define('Job', properties, {
             });
             return translatedJobs;
         },
-        createJob: function () {
+        createJob: function (jobInfo, options) {
+            var Recipe = require('./Recipe');
+            var IngredientComponent = require('./IngredientComponent');
+            return modelBase.transaction(function (t1) {
+                return Job.create(jobInfo).then(function (newJob) {
+                    // for(var p in newJob){
+                    //     console.log('Job property: ' + p);
+                    // }
+                    log.debug('newJob');
+                    log.debug(newJob);
+
+                    Recipe.findOne({
+                        where: {
+                            LineId: newJob.LineId,
+                            isTemplate: true
+                        }
+                    }).then(function (RecipeTemplate) {
+                        log.debug('RecipeTemplate: ');
+                        log.debug(RecipeTemplate);
+                        if (RecipeTemplate) {
+                            return Recipe.create({
+                                Ident: newJob.Ident,
+                                Name: newJob.Ident,
+                                isTemplate: false,
+                                State: JobState.Created,
+                                JobId: newJob.id
+                            }).then(function (newRecipe) {
+                                log.debug('newRecipe');
+                                log.debug(newRecipe);
+                                RecipeTemplate.getSenders().then(function (ingredients) {
+                                    var promises = [];
+                                    ingredients.forEach(function (ingredient) {
+                                        promises.push(IngredientComponent.create({
+                                            category: ingredient.category,
+                                            targetPercentage: ingredient.targetPercentage,
+                                            targetWeight: ingredient.targetWeight,
+                                            storageIdent: ingredient.storageIdent,
+                                            ProductId: ingredient.ProductId,
+                                            RecipeId: newRecipe.id,
+                                            productIdent: ingredient.productIdent,
+                                            isActive: ingredient.isActive
+                                        }).then(function (newIngredient) {
+                                            log.debug('newIngredient');
+                                            log.debug(newIngredient);
+                                            if (newIngredient) {
+                                                log.debug('created new ingredient');
+
+                                            }
+                                            else {
+                                                log.debug('ingredient is empty');
+                                            }
+                                        }));
+                                    });
+                                    return Promise.all(promises);
+
+                                });
+                            });
+                        } else {
+                            error = global.i18n.__('the recipe template is not defined');
+                            log.error(error);
+                            throw new Error(error);
+                        }
+
+                        // //console.log('Job addLine: ' + newJob.addLine);
+                        // console.log('Job setLine: ' + newJob.setLine);
+                        // console.log('Job getLine: ' + newJob.getLine);
+                        // console.log('new Job: ' + JSON.stringify(newJob));
+                        // var newJobStr = newJob.getTranslatedJobStr(i18n);
+                        // console.log('converted new Job: ' + newJobStr);
+                        // res.json({newJobStr: newJobStr});
+                    });
+                });
+
+            }).then(function (result) {
+                // Transaction has been committed
+                // result is whatever the result of the promise chain returned to the transaction callback
+            }).catch(function (err) {
+                // Transaction has been rolled back
+                // err is whatever rejected the promise chain returned to the transaction callback
+
+            });
+
 
         }
     }
@@ -66,6 +148,7 @@ function pad(num, size) {
     var s = "000000000" + num;
     return s.substr(s.length - size);
 }
+utils.inherits(Job.Instance.prototype, BusinessBase.prototype);
 // Job.Instance.prototype.DisplayState = getDisplayState(JobState, this.State);
 Job.Instance.prototype.setDisplayState = function () {
 
@@ -216,6 +299,6 @@ Job.Instance.prototype.start = function (controllerManager, i18n) {
 Job.belongsTo(Line, {as: 'Line'});
 
 
-utils.inherits(Job.Instance.prototype, BusinessBase.prototype);
+
 console.log('Job executed');
 module.exports = Job;

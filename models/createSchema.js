@@ -32,6 +32,8 @@ var AccessRight = require('./um/AccessRight');
 var LotLog = require('./pr/LotLog');
 var LayerLog = require('./pr/LayerLog');
 var TraceLog = require('./pr/TraceLog');
+var ProcessOrder = require('./pr/ProcessOrder');
+var OrderItem = require('./pr/OrderItem');
 
 UserGroup.sync().then(function () {
 
@@ -69,6 +71,9 @@ Line.sync().then(function () {
     Job.sync().then(function () {
         Recipe.sync().then(function () {
             IngredientComponent.sync();
+        });
+        ProcessOrder.sync().then(function () {
+            OrderItem.sync();
         });
     });
     Section.sync().then(function () {

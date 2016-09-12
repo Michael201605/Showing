@@ -38,10 +38,11 @@ var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
 var ControllerManager= require('./lib/controllers/controllerManager');
-// var nodeId = 'ns=1;s=PLC1.Element.SimpleMotor.=A-0006-MXZ01.Commands.CmdEnable';
-// var opcua = require("node-opcua");
-// var DataType = opcua.DataType;
+
+
+//global settings===============================================================
 require('enum').register();
+global.i18n = i18n;
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -141,22 +142,10 @@ app.use(function (req, res, next) {
     res.locals.showTests = app.get('env') !== 'production' &&
         req.query.test === '1';
     if (!res.locals.partials) res.locals.partials = {};
-    // for(var o in i18n)
-    // {
-    //     console.log("i18n property: " +o);
-    // }
-    //console.log("localed in i18n: " +i18n.getLocale(req));
     i18n.setLocale(i18n, req.locale);
     res.locals.partials.menus = menus(i18n);
     res.locals.partials.navigations = navs(res.locals.partials.menus);
     res.locals.partials.naviStr = JSON.stringify(res.locals.partials.navigations);
-    //console.log("Navigation's length: " +res.locals.partials.navigations.length );
-
-    //console.log("showTest: " +res.locals.showTests);
-    //console.log("locale: "+ res.locals.locale);
-    // console.log('warehouse from translate menu : ' + res.locals.partials.menus[0].name);
-    // console.log('warehouse: ' + i18n.__('Warehouse'));
-    // console.log('warehouse: ' + i18n.__('text to test'));
     console.log('processing request for "' + req.url + '"....');
 
     next();

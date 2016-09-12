@@ -10,7 +10,7 @@ var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 var labelPrintManager = require('../lib/labelPrintManager');
 
 module.exports = function (app, i18n) {
-    app.get('/warehouse/receiptList/:state', function (req, res) {
+    app.get('/order/receipt/receiptList/:state', function (req, res) {
         var state = req.params.state.substring(1);
 
         Receipt.findAll({
@@ -18,14 +18,14 @@ module.exports = function (app, i18n) {
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
             var receiptsStr = JSON.stringify(receipts);
-            res.render('warehouse/receiptList', {
+            res.render('order/receipt/receiptList', {
                 receipts: receiptsStr,
                 state: state
             });
         });
 
     });
-    app.get('/warehouse/createReceipt', function (req, res) {
+    app.get('/order/receipt/createReceipt', function (req, res) {
         var info = {
             ident: 'newReceipt',
             name: 'Raw',
@@ -38,7 +38,7 @@ module.exports = function (app, i18n) {
             res.json(newReceipt);
         });
     });
-    app.post('/warehouse/receiptList/deleteReceipt', function (req, res) {
+    app.post('/order/receipt/receiptList/deleteReceipt', function (req, res) {
         var toDeleteReceiptIdsStr = req.body.toDeleteReceiptIdsStr;
         console.log('toDeleteReceiptIdsStr:  ' + toDeleteReceiptIdsStr);
         var toDeleteReceiptIds = JSON.parse(toDeleteReceiptIdsStr);
@@ -52,7 +52,7 @@ module.exports = function (app, i18n) {
             res.json(message);
         });
     });
-    app.get('/warehouse/receiptDetail/:id', function (req, res) {
+    app.get('/order/receipt/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -68,7 +68,7 @@ module.exports = function (app, i18n) {
                 Company.findAll().then(function (companys) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
-                    res.render('warehouse/receiptDetail', {
+                    res.render('order/receipt/receiptDetail', {
                         receipt: receipt.getJsonObject(),
                         packingCategory: packingCategoryStr,
                         products: productsStr,
@@ -82,7 +82,7 @@ module.exports = function (app, i18n) {
 
     });
 
-    app.post('/warehouse/receiptDetail/:id', function (req, res) {
+    app.post('/receipt/receiptDetail/:id', function (req, res) {
         // for(var p in req){
         //     console.log('property of req: '+ p);
         // }
@@ -107,21 +107,21 @@ module.exports = function (app, i18n) {
 
 
     });
-    app.get('/warehouse/station/receiptList', function (req, res) {
+    app.get('/station/receipt/receiptList', function (req, res) {
 
         Receipt.findAll({
             where: {State: 10}
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
             var receiptsStr = JSON.stringify(receipts);
-            res.render('warehouse/station/receiptList', {
+            res.render('station/receipt/receiptList', {
                 receipts: receiptsStr,
                 state: 10
             });
         });
 
     });
-    app.get('/warehouse/station/receiptDetail/:id', function (req, res) {
+    app.get('/station/receipt/receiptDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
 
@@ -137,7 +137,7 @@ module.exports = function (app, i18n) {
                 Company.findAll().then(function (companys) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
-                    res.render('warehouse/station/receiptDetail', {
+                    res.render('station/receipt/receiptDetail', {
                         receipt: receipt.getJsonObject(),
                         packingCategory: packingCategoryStr,
                         products: productsStr,
@@ -150,7 +150,7 @@ module.exports = function (app, i18n) {
         });
 
     });
-    app.get('/warehouse/confirmReceipt/:id', function (req, res) {
+    app.get('/receipt/confirmReceipt/:id', function (req, res) {
         var id = req.params.id.substring(1);
 
         Receipt.findOne({

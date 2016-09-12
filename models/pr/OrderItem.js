@@ -6,7 +6,6 @@
  */
 var modelBase = require('../ModelBase');
 var Product = require('./Product');
-var Storage = require('../eq/Storage');
 var BusinessBase = require('../BusinessBase');
 var utils = require('../../lib/utils');
 
@@ -15,7 +14,6 @@ var OrderItem = modelBase.define('OrderItem',{
     category : modelBase.Sequelize.INTEGER,
     targetPercentage: modelBase.Sequelize.DECIMAL,
     targetWeight: modelBase.Sequelize.DECIMAL,
-    storageIdent : modelBase.Sequelize.STRING,
     productIdent : modelBase.Sequelize.STRING,
     isActive: modelBase.Sequelize.BOOLEAN
 });
