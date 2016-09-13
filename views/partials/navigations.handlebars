@@ -25,7 +25,7 @@
 </div>
 <div id="GCObject-form" title="Create new user">
     <label id="Category" class="GCObject type">GCObject</label>
-    <fieldset>
+    <fieldset id="modeField">
         <legend class="title">{{{__ "Mode"}}}</legend>
         <div class="controlgroup">
             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
@@ -49,9 +49,21 @@
                     <circle id="status" cx="15" cy="15" r="15" stroke="black" stroke-width="3" fill="none"/>
                 </svg>
             </div>
-            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 btn-group dialog" role="group" aria-label="Operation">
-                <button id="close" type="button" class="btn btn-primary">{{{__ "Close"}}}</button>
-                <button id="Open" type="button" class="btn btn-primary">{{{__ "Open"}}}</button>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 btn-group dialog hidden" id="openClose" role="group" aria-label="Operation">
+                <button id="closeGc" type="button" class="btn btn-primary">{{{__ "Close"}}}</button>
+                <button id="OpenGc" type="button" class="btn btn-primary">{{{__ "Open"}}}</button>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 btn-group dialog hidden" id="startStop" role="group" aria-label="Operation">
+                <button id="stopGc" type="button" class="btn btn-primary">{{{__ "Stop"}}}</button>
+                <button id="startGc" type="button" class="btn btn-primary">{{{__ "Start"}}}</button>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 btn-group dialog hidden" id="healtyUnhealty" role="group" aria-label="Operation">
+                <button id="unhealtyGc" type="button" class="btn btn-primary">{{{__ "unhealty"}}}</button>
+                <button id="healtyGc" type="button" class="btn btn-primary">{{{__ "healty"}}}</button>
+            </div>
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 btn-group dialog hidden" id="coverUncover" role="group" aria-label="Operation">
+                <button id="uncoverGc" type="button" class="btn btn-primary">{{{__ "uncover"}}}</button>
+                <button id="coverGc" type="button" class="btn btn-primary">{{{__ "cover"}}}</button>
             </div>
         </div>
     </fieldset>

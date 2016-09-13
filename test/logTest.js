@@ -2,8 +2,10 @@
  * Created by pi on 9/10/16.
  */
 var theTime = new Date();
+var theYear = theTime.getFullYear();
 var log = require('../lib/log');
 // var theHour = theTime.getHours();
+console.log('theYear: ' + theYear);
 // console.log('theHour: ' + theHour);
 // console.log('toDateString: ' + theTime.toDateString());
 // console.log('toISOString: ' + theTime.toISOString());
@@ -17,9 +19,9 @@ var log = require('../lib/log');
 // console.log('toFixed: ' + Date.now().toFixed());
 // console.log('toPrecision: ' + Date.now().toPrecision());
 // console.log('toPrecision: ' + Date.now().toString());
-log.debug({error:'test error'});
-log.info(function () {
-    var test =1;
-    var test2 = '';
-});
-log.warn([1,2,3]);
+// log.debug({error:'test error'});
+// log.info(function () {
+//     var test =1;
+//     var test2 = '';
+// });
+// log.warn([1,2,3]);

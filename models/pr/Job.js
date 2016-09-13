@@ -210,9 +210,9 @@ Job.Instance.prototype.registerAssemblyToStorage = function (theLayer, i18n) {
                                 theLayerLog.save().then(function () {
                                     theLayer.destroy();
 
-                                    Storage.findOne({where:{ident: storageIdent}}).then(function (theStorage) {
-                                        if(theStorage){
-                                            theStorage.currentWeight +=theLayer.actualWeight;
+                                    Storage.findOne({where: {ident: storageIdent}}).then(function (theStorage) {
+                                        if (theStorage) {
+                                            theStorage.currentWeight += theLayer.actualWeight;
                                             theStorage.save();
                                             resolve(theLayerLog.remainWeight);
                                         }
@@ -248,17 +248,19 @@ Job.Instance.prototype.finishRegisterAssembly = function (source) {
             jobIdent: me.ident
         }
     }).then(function (theLayerLog) {
-        TraceLog.create({
-            source: source,
-            destination: theLayerLog.storageIdent,
-            jobLogIdent: me.ident,
-            lot: theLayerLog.lot,
-            productIdent: theLayerLog.productIdent,
-            productName: theLayerLog.productName,
-            transferWeight: theLayerLog.remainWeight
-        }).then(function (newTraceLog) {
+        if (theLayerLog) {
+            TraceLog.create({
+                source: source,
+                destination: theLayerLog.storageIdent,
+                jobLogIdent: me.ident,
+                lot: theLayerLog.lot,
+                productIdent: theLayerLog.productIdent,
+                productName: theLayerLog.productName,
+                transferWeight: theLayerLog.remainWeight
+            }).then(function (newTraceLog) {
 
-        });
+            });
+        }
     })
 };
 Job.Instance.prototype.start = function (controllerManager, i18n) {
@@ -297,7 +299,6 @@ Job.Instance.prototype.start = function (controllerManager, i18n) {
 };
 
 Job.belongsTo(Line, {as: 'Line'});
-
 
 
 console.log('Job executed');

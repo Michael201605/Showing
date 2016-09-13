@@ -34,7 +34,7 @@ var opcua = require("node-opcua");
 var _ = require("underscore");
 var path = require("path");
 var assert = require("assert");
-
+var log = require('./lib/log');
 var OPCUAServer = opcua.OPCUAServer;
 var Variant = opcua.Variant;
 var DataType = opcua.DataType;
@@ -125,15 +125,15 @@ var fs = require('fs');
 var logfile = 'OPCUAlog.txt';
 var wstream = fs.createWriteStream(logfile);
 
-function log(logType, data) {
-    var time = new Date().toLocaleString();
-    //     new Date().toISOString().
-    // replace(/T/, ' ').      // replace T with a space
-    // replace(/\..+/, '');
-    wstream.write(time
-        + ': [' + logType +']: ' + data + '\n');
-    console.log(data);
-}
+// function log(logType, data) {
+//     var time = new Date().toLocaleString();
+//     //     new Date().toISOString().
+//     // replace(/T/, ' ').      // replace T with a space
+//     // replace(/\..+/, '');
+//     wstream.write(time
+//         + ': [' + logType +']: ' + data + '\n');
+//     console.log(data);
+// }
 function getType(typeFromCsv) {
     var theType = {
         typeName: '',
@@ -187,7 +187,7 @@ function importOPCCompatiableStructure(addressSpace, parentNode) {
             nodeId= 'ns=1;s=PLC1';
             elements.forEach(function (element) {
                 infos= [];
-                log.debug('element: ' + element);
+                log.debug('element: ' + element, 'OPCUA');
 
                 if (element) {
                     //first info is path; second info is type
@@ -203,19 +203,19 @@ function importOPCCompatiableStructure(addressSpace, parentNode) {
                     paths.forEach(function (path, i) {
                         parentNode = addressSpace.findNode(nodeId);
                         if(!parentNode){
-                            log.warn('parentNode not found! ' + nodeId);
+                            log.warn('parentNode not found! ' + nodeId, 'OPCUA');
                         }
                         nodeId += '.' + path;
                         if (addressSpace.findNode(nodeId)) {
-                            log.debug('find node: ' + nodeId);
+                            log.debug('find node: ' + nodeId, 'OPCUA');
                         } else {
-                            log.debug('not find node: ' + nodeId);
+                            log.debug('not find node: ' + nodeId, 'OPCUA');
                             //create new node
                             if (i === paths.length - 1) {
                                 //it is variable
                                 if(parentNode) {
-                                    log.debug('create variable: ' + nodeId + ', parentNode: ' + parentNode.browseName);
-                                    log.debug('variable typename: ' + oPCUAType.typeName);
+                                    log.debug('create variable: ' + nodeId + ', parentNode: ' + parentNode.browseName, 'OPCUA');
+                                    log.debug('variable typename: ' + oPCUAType.typeName, 'OPCUA');
                                     addressSpace.addVariable({
                                         organizedBy: parentNode,
                                         browseName: path,
@@ -224,25 +224,25 @@ function importOPCCompatiableStructure(addressSpace, parentNode) {
                                         value: new Variant({dataType: oPCUAType.DataType, value: oPCUAType.value})
                                     });
                                 }else {
-                                    log.error('parentNode is empty ');
+                                    log.error('parentNode is empty ', 'OPCUA');
                                 }
                                 nodeId = 'ns=1;s=PLC1';
                             }
                             else {
-                                log.debug('try to create folder: ' + nodeId + ' ... i: ' + i);
+                                log.debug('try to create folder: ' + nodeId + ' ... i: ' + i, 'OPCUA');
                                 try {
                                     if(parentNode){
-                                        log.debug('create folder: ' + nodeId +  ' ,parentNode: ' + parentNode.browseName);
+                                        log.debug('create folder: ' + nodeId +  ' ,parentNode: ' + parentNode.browseName, 'OPCUA');
                                         addressSpace.addFolder(parentNode, {
                                             nodeId: nodeId,
                                             browseName: path
                                         });
                                     }
                                     else {
-                                        log.error('parentNode is empty ');
+                                        log.error('parentNode is empty ', 'OPCUA');
                                     }
                                 }catch (ex){
-                                    log.error(ex);
+                                    log.error(ex, 'OPCUA');
                                 }
 
                             }
@@ -307,18 +307,18 @@ function importOPCUAStructure(addressSpace) {
     var lineNode = null;
     fs.readFile('PLC.csv', 'utf8', function (err, data) {
         if (err) {
-            log.error( err);
+            log.error( err, 'OPCUA');
         }
         else {
             lines = data.split('\n');
             nodeId= 'ns=1;s=PLC1';
             //remove header
             lines.splice(0, 1);
-            log.debug('lines length: ' + lines.length);
+            log.debug('lines length: ' + lines.length, 'OPCUA');
             lines.forEach(function (line) {
 
                 infos= [];
-                log.debug('line: ' + line);
+                log.debug('line: ' + line, 'OPCUA');
 
                 if (line) {
                     //first info is path; second info is type
@@ -331,7 +331,7 @@ function importOPCUAStructure(addressSpace) {
                     type = infos[2];
                     //remove double quotes
                     pathInfo = pathInfo.substring(1, pathInfo.length-1);
-                    log.debug('pathInfo: ' + pathInfo);
+                    // log.debug('pathInfo: ' + pathInfo, 'OPCUA');
                     segments = pathInfo.split('.');
                     oPCUAType = getType(type);
                     if(segments[0] === 'Element'){
@@ -340,16 +340,16 @@ function importOPCUAStructure(addressSpace) {
                         elementNodeId = prefix + '.Element.' + segments[1] + '.' +segments[2];
                         if(index>-1){
                             unitName = elementName.substring(0,index);
-                            log.debug('unit in element: ' + unitName);
+                            // log.debug('unit in element: ' + unitName, 'OPCUA');
                             elements[unitName] = elements[unitName] || [];
                             if(!isInArray(elements[unitName], elementNodeId)){
                                 elements[unitName].push(elementNodeId);
                             }
-                            log.debug('Element array for unit: ' + unitName);
+                            // log.debug('Element array for unit: ' + unitName, 'OPCUA');
                             elements[unitName].forEach(function (element) {
-                                log.debug( 'Element nodeid: ' + element );
+                                // log.debug( 'Element nodeid: ' + element , 'OPCUA');
                             });
-                            log.debug('--------------------------------');
+
                         }
 
                         parentNode = addressSpace.findNode(prefix + '.Element.' + segments[1]);
@@ -370,7 +370,7 @@ function importOPCUAStructure(addressSpace) {
                                     browseName: segments[3]
                                 });
                             }
-                            log.debug( 'variable name: ' + segments[4]);
+                            // log.debug( 'variable name: ' + segments[4], 'OPCUA');
                             addressSpace.addVariable({
                                 organizedBy: categoryNode,
                                 browseName: segments[4],
@@ -386,7 +386,7 @@ function importOPCUAStructure(addressSpace) {
                         unitNode =addressSpace.findNode(unitNodeId);
                         parentNode =addressSpace.findNode(prefix + '.Unit.' + segments[1]);
                         if(!unitNode){
-                            log.debug( 'Create unit node: ' + unitNodeId);
+                            // log.debug( 'Create unit node: ' + unitNodeId, 'OPCUA');
                             unitNode = addressSpace.addFolder(parentNode, {
                                 nodeId: unitNodeId,
                                 browseName: segments[2]
@@ -406,10 +406,10 @@ function importOPCUAStructure(addressSpace) {
                                 unitToCreateElements = unitName;
                                 elements[unitName].forEach(function (elementNodeId) {
                                     elementNode = addressSpace.findNode(elementNodeId);
-                                    log.debug( 'Be referenced element' + elementNodeId);
+                                    log.debug( 'Be referenced element' + elementNodeId, 'OPCUA');
                                     var referenceNode = addressSpace.findNode(unitNodeId + '.Elements.' + elementNode.browseName);
                                     if(referenceNode){
-                                        log.debug( 'reference at source node is existed: ' + referenceNode.nodeId);
+                                        log.debug( 'reference at source node is existed: ' + referenceNode.nodeId, 'OPCUA');
                                     }else {
                                         try{
                                             reference ={
@@ -420,7 +420,7 @@ function importOPCUAStructure(addressSpace) {
                                             categoryNode.addReference(reference);
                                         }
                                         catch (ex){
-                                            log.error( ex);
+                                            log.error( ex, 'OPCUA');
                                         }
 
 
@@ -445,7 +445,7 @@ function importOPCUAStructure(addressSpace) {
                         sectionNode =addressSpace.findNode(sectionNodeId);
                         parentNode =addressSpace.findNode(prefix + '.Section');
                         if(!sectionNode){
-                            log.debug( 'Create section node: ' + sectionNodeId);
+                            // log.debug( 'Create section node: ' + sectionNodeId, 'OPCUA');
                             sectionNode = addressSpace.addFolder(parentNode, {
                                 nodeId: sectionNodeId,
                                 browseName: segments[1]
@@ -478,7 +478,7 @@ function importOPCUAStructure(addressSpace) {
                         lineNode =addressSpace.findNode(lineNodeId);
                         parentNode =addressSpace.findNode(prefix + '.Line.' + segments[1]);
                         if(!lineNode){
-                            log.debug( 'Create line node: ' + lineNodeId);
+                            // log.debug( 'Create line node: ' + lineNodeId, 'OPCUA');
                             lineNode = addressSpace.addFolder(parentNode, {
                                 nodeId: lineNodeId,
                                 browseName: segments[2]

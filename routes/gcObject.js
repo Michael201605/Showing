@@ -69,9 +69,9 @@ module.exports = function (app, gcObjectAd, i18n,io) {
         });
     });
     io.on('connection', function (socket) {
-        log('D','io has connected');
+        log.debug('io has connected');
         eventEmitter.addListener('nodeChanged', function (nodeData) {
-            log('D', 'Event: nodeChanged');
+            log.debug( 'Event: nodeChanged');
             socket.emit('GCObjectUpdate', nodeData);
 
         });
@@ -83,17 +83,17 @@ module.exports = function (app, gcObjectAd, i18n,io) {
 function readParameter(gcObjectAd, nodeId, gcObjectParameter, promises) {
     var promise = new Promise(function (resolve, reject) {
         gcObjectAd.getItemsValue(nodeId, function (err, theNodeId, data) {
-            log('D', 'nodeId: ' + nodeId);
-            log('D', 'theNodeId: ' + theNodeId);
+            log.debug( 'nodeId: ' + nodeId);
+            log.debug( 'theNodeId: ' + theNodeId);
             if (!err) {
-                log('D', 'value: ' + data.value.value);
+                log.debug( 'value: ' + data.value.value);
                 var pro = theNodeId.substring(theNodeId.lastIndexOf('.') + 1, theNodeId.length);
-                log('D', 'pro: ' + pro);
+                log.debug( 'pro: ' + pro);
                 gcObjectParameter[pro] = data.value.value;
                 resolve(gcObjectParameter[pro]);
             }
             else {
-                log('D', 'error: ' + err);
+                log.debug( 'error: ' + err);
                 reject(err);
             }
 
@@ -118,9 +118,9 @@ function getType(para, DataType) {
 function readGcObject(gcObjectAd, gcObjectParameter, parentNodeId, elementNodeId, promises) {
     var nodeId = '';
     for (var p in gcObjectParameter) {
-        log('D', 'Property  of gcObject: ' + p);
+        log.debug( 'Property  of gcObject: ' + p);
         if (gcObjectParameter.hasOwnProperty(p)) {
-            log('D', p + ' type: ' + typeof (gcObjectParameter[p]));
+            log.debug( p + ' type: ' + typeof (gcObjectParameter[p]));
             if (!(typeof (gcObjectParameter[p]) === 'object') || Array.isArray(gcObjectParameter[p])) {
 
                 nodeId = parentNodeId + '.' + p;
@@ -134,7 +134,7 @@ function readGcObject(gcObjectAd, gcObjectParameter, parentNodeId, elementNodeId
                 });
             } else {
                 parentNodeId = elementNodeId + '.' + p;
-                log('D', 'parentNodeId: ' + parentNodeId);
+                log.debug( 'parentNodeId: ' + parentNodeId);
                 readGcObject(gcObjectAd, gcObjectParameter[p], parentNodeId, elementNodeId, promises);
             }
         }

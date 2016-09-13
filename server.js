@@ -37,8 +37,8 @@ var server = require('http').createServer(app),
 var menus = require('./lib/tools/menu');
 var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
-var ControllerManager= require('./lib/controllers/controllerManager');
-
+var ControllerManager = require('./lib/controllers/controllerManager');
+var log = require('./lib/log');
 
 //global settings===============================================================
 require('enum').register();
@@ -156,37 +156,41 @@ require('./routes/receipt')(app, i18n);
 require('./routes/recipe')(app, i18n);
 require('./routes/jobLog')(app, i18n);
 require('./routes/product')(app, i18n);
-
+var hasMonitored = false;
 new GcObjectAdapter(io).then(function (gcObjectAd) {
-    console.log('gcobjectAdapter created success!');
+    log.debug('gcobjectAdapter created success!');
 
     io.on('connection', function (socket) {
-        gcObjectAd.socket = socket;
-        gcObjectAd.MonitorAllGcObjects();
+        if(!hasMonitored){
+            log.debug('io connected!');
+            gcObjectAd.socket = socket;
+            gcObjectAd.MonitorAllGcObjects();
+            hasMonitored = true;
+        }
+
     })
 
-    new ControllerManager(gcObjectAd,i18n,io).then(function (controllerManager) {
-        console.log('controllerManager created success!');
-        require('./routes/job')(app,controllerManager, i18n,io);
+    new ControllerManager(gcObjectAd, i18n, io).then(function (controllerManager) {
+        log.debug('controllerManager created success!');
+        require('./routes/job')(app, controllerManager, i18n, io);
     });
-    require('./routes/line')(app,gcObjectAd, i18n,io);
-    require('./routes/storage')(app,gcObjectAd, i18n,io);
-    require('./routes/gcObject')(app,gcObjectAd, i18n,io);
+    require('./routes/line')(app, gcObjectAd, i18n, io);
+    require('./routes/storage')(app, gcObjectAd, i18n, io);
+    require('./routes/gcObject')(app, gcObjectAd, i18n, io);
+
 });
 
-
-// 定制404 页面
-// app.use(function(req, res, next){
+// // 定制404 页面
+// app.use(function (req, res, next) {
 //     res.status(404);
 //     res.render('404');
 // });
 // // 500 错误处理器（中间件）
-// app.use(function(err, req, res, next){
+// app.use(function (err, req, res, next) {
 //     console.error(err.stack);
 //     res.status(500);
 //     res.render('500');
 // });
-
 // io.on('connection', function (socket) {
 //     console.log('io socket connection success!');
 //     new GcObjectAdapter(socket).then(function (gcObjectAd) {
@@ -239,8 +243,6 @@ new GcObjectAdapter(io).then(function (gcObjectAd) {
 //     //     console.log(data);
 //     // });
 // });
-
-
 
 
 // io.on('connection', function (socket) {

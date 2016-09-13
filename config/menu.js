@@ -141,17 +141,46 @@ var ConfigureMenus = [
 
             },
             {
+                name: 'Product',
+                url: '/product/productList'
+
+            },
+            {
                 name: 'Equipments',
                 SubMenus: [
                     {
                         name: 'Line',
                         url: '/line/lineList'
 
+                    },
+                    {
+                        name: 'Section',
+                        url: '/section/sectionList'
+
+                    },
+                    {
+                        name: 'Scale',
+                        url: '/scale/scaleList'
+
+                    },
+                    {
+                        name: 'Discharger',
+                        url: '/discharger/dischargerList'
+
+                    },
+                    {
+                        name: 'Filler',
+                        url: '/filler/fillerList'
+
                     }
                 ],
                 url: '#'
 
             },
+            {
+                name: 'EventLog',
+                url: '/eventLog/eventLogList'
+            }
 
         ],
         url: '#'

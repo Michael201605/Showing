@@ -140,7 +140,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
-    app.post('/job/jobList/deleteJob', isLoggedIn, function (req, res) {
+    app.post('/job/jobList/deleteJob', function (req, res) {
         var toDeleteJobIdsStr = req.body.toDeleteJobIdsStr;
         console.log('toDeleteJobIdsStr:  ' + toDeleteJobIdsStr);
         var toDeleteJobIds = JSON.parse(toDeleteJobIdsStr);
@@ -151,6 +151,8 @@ module.exports = function (app, controllerManager, i18n, io) {
                 }
             }
         }).then(function (message) {
+            log.debug('message of delete');
+            log.debug(message);
             res.json(message);
         });
     });
@@ -287,15 +289,15 @@ module.exports = function (app, controllerManager, i18n, io) {
                         controller.startJob(theJob).then(function (Pres) {
                             theJob.update({
                                 state: JobState.Loading
-                            }).then(function (theJob) {
-                                console.log("save successfully");
+                            }).then(function (updatedJob) {
+                                console.log("job save successfully");
 
                             });
-                            res.json({
-                                update: {
-                                    state: getDisplayState(JobState, JobState.Loading)
-                                }
-                            });
+                            Pres.update = {
+                                displayState: i18n.__(getDisplayState(JobState, JobState.Loading)),
+                                state: JobState.Loading
+                            };
+                            res.json(Pres);
                         }, function (Perr) {
                             res.json({
                                 error: Perr
@@ -323,6 +325,7 @@ module.exports = function (app, controllerManager, i18n, io) {
     });
     app.get('/job/jobDetail/doneJob/:id', function (req, res) {
         var id = req.params.id.substring(1);
+        console.log('id: ' + id);
         var error = '';
         var controller = null;
         Job.findOne({
@@ -330,18 +333,14 @@ module.exports = function (app, controllerManager, i18n, io) {
         }).then(function (theJob) {
             if (theJob) {
                 theJob.getLine().then(function (theLine) {
-                    console.log('TheLine:');
-                    console.dir(theLine);
+                    // console.log('TheLine:');
+                    // console.dir(theLine);
                     if (theLine) {
                         controller = controllerManager.getController(theLine.controllerName);
                         controller.stopJob(theJob).then(function (Pres) {
 
                             res.json({
-                                update: {
-                                    displayState: getDisplayState(JobState, JobState.Done),
-                                    state: JobState.Done
-                                },
-                                info: i18n.__('The job has done.')
+                                info: i18n.__('The job is stopping.')
                             });
 
                         }, function (Perr) {
@@ -546,7 +545,7 @@ module.exports = function (app, controllerManager, i18n, io) {
 
     io.on('connection', function (socket) {
         eventEmitter.on('checkJobOk', function (nodeData) {
-            log('D', 'Event: newJob');
+            log.debug('Event: newJob');
             socket.emit('newJob');
 
         });

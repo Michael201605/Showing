@@ -14,6 +14,10 @@ $(function () {
     var lineIdent = $('#lineIdent').val();
     var recipe = JSON.parse($('#recipe').val());
     var product = {};
+    var server = location.href;
+    var header = server.indexOf('//');
+    var index = server.indexOf('/', header + 2);
+
     console.log('senders: ');
     console.log(recipe.senders);
     $('#sender').val(recipe.senders[0].storageIdent);
@@ -79,9 +83,11 @@ $(function () {
                             getProduct(recipe.receivers[0].StorageId).then(function (productId) {
                                 recipe.receivers[0].ProductId = productId;
                                 console.log('receiver productid: ' + recipe.receivers[0].ProductId);
-                                $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (message) {
-                                    console.log(message);
-                                    $('#infos').append('<li>' + message + '</li>');
+                                $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (data) {
+                                    console.dir(data);
+                                    if (data.info) {
+                                        $('#infos').append('<li>' + data.info + '</li>');
+                                    }
                                 });
 
                             });
@@ -113,8 +119,10 @@ $(function () {
         $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
             if (data.error) {
                 $('#error').val(data.error);
-            } else if (data.update && data.update.state) {
+            } else if (data.update) {
+                $('#displayState').val(data.update.displayState);
                 $('#state').val(data.update.state);
+                setBKColor(data.update.state);
             }
 
         });
@@ -131,7 +139,7 @@ $(function () {
                 $('#state').val(data.update.state);
                 setBKColor(data.update.state);
             }
-            if(data.info){
+            if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
             }
 
@@ -200,6 +208,25 @@ $(function () {
 
     }
 
+    console.log('server whole: ' + server);
+
+    console.log('header: ' + header);
+
+    console.log('index: ' + index);
+    if (index > -1) {
+        server = server.substring(0, index);
+        console.log('server: ' + server);
+        socket = io(server);
+        socket.on('jobStateChanged', function (options) {
+            if (options) {
+                if (options.jobId && options.jobId === $('#jobId').val()) {
+                    $('#displayState').val(options.displayState);
+                    $('#state').val(options.newState);
+                    setBKColor(options.newState);
+                }
+            }
+        });
+    }
 
 });
 
@@ -221,6 +248,10 @@ function setBKColor(state) {
         case 50:
             //Suspended
             color = 'Pink';
+            break;
+        case 80:
+            //Suspended
+            color = 'Silver';
             break;
 
     }

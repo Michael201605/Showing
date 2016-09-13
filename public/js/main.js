@@ -175,7 +175,7 @@ function GcObject(gcIdent) {
         GcObjectDialog.data('gcObject', gcObject).dialog('open');
         $('#Category').html(gcObject.category);
         setGcObjectButtons(gcObject);
-
+        showTypeButtons(gcObject.category)
         $('#Mannual').click(function () {
             var command = {
                 nodeId: gcObject.nodeId + '.Commands.CmdManual',
@@ -260,34 +260,93 @@ function sendCommandToServer(command) {
         }
     });
 }
+function showTypeButtons(category) {
+    switch (category) {
+        case 'BeltMonitor':
+        case 'SpeedMonitor':
+            $('#healtyUnhealty').removeClass('hidden');
+            break;
+        case 'FilterControl':
+        case 'SimpleMotor':
+            $('#startStop').removeClass('hidden');
+            break;
+        case 'HighLevel':
+        case 'LowLevel':
+            $('#coverUncover').removeClass('hidden');
+            break;
+        case 'ValveOpenClose':
+            $('#openClose').removeClass('hidden');
+            break;
+    }
+}
 //status lamp
 //light green : starting
 //green: started
 //blue: stopping
 //grey: stopped
 function setGcObjectButtons(gcObject) {
-
-    if (!gcObject.gcObjectParameter.Commands.CmdManual) {
+    $('#modeField').removeClass("hidden");
+    if (gcObject.gcObjectParameter.Commands.CmdManual === false) {
         $('#Mannual').attr("disabled", false);
         $('#Aumatic').attr("disabled", true);
-        $('#close').attr("disabled", true);
-        $('#Open').attr("disabled", true);
+        //
+        $('#closeGc').attr("disabled", true);
+        $('#OpenGc').attr("disabled", true);
+        //
+        $('#stopGc').attr("disabled", true);
+        $('#startGc').attr("disabled", true);
+
         $('#mode').attr('fill', 'green');
-    } else {
+    } else if (gcObject.gcObjectParameter.Commands.CmdManual === true) {
         $('#mode').attr('fill', 'grey');
         $('#Mannual').attr("disabled", true);
         $('#Aumatic').attr("disabled", false);
         if (gcObject.gcObjectParameter.States.StaStarted) {
-            $('#close').attr("disabled", false);
-            $('#Open').attr("disabled", true);
+            $('#closeGc').attr("disabled", false);
+            $('#OpenGc').attr("disabled", true);
+            //
+            $('#stopGc').attr("disabled", false);
+            $('#startGc').attr("disabled", true);
         } else if (gcObject.gcObjectParameter.States.StaStopped) {
-            $('#close').attr("disabled", true);
-            $('#Open').attr("disabled", false);
+            $('#closeGc').attr("disabled", true);
+            $('#OpenGc').attr("disabled", false);
+            //
+            $('#stopGc').attr("disabled", true);
+            $('#startGc').attr("disabled", false);
         } else {
-            $('#close').attr("disabled", false);
-            $('#Open').attr("disabled", false);
+            $('#closeGc').attr("disabled", true);
+            $('#OpenGc').attr("disabled", true);
+            //
+            $('#stopGc').attr("disabled", true);
+            $('#startGc').attr("disabled", true);
+        }
+
+    } else {
+        $('#modeField').addClass("hidden");
+        if (gcObject.gcObjectParameter.States.StaHealty === true) {
+            $('#unhealtyGc').attr("disabled", false);
+            $('#healtyGc').attr("disabled", true);
+        } else if (gcObject.gcObjectParameter.States.StaHealty === false) {
+            $('#unhealtyGc').attr("disabled", true);
+            $('#healtyGc').attr("disabled", false);
+        } else {
+            $('#unhealtyGc').attr("disabled", true);
+            $('#healtyGc').attr("disabled", true);
+        }
+        if (gcObject.gcObjectParameter.States.StaCovered) {
+            $('#uncoverGc').attr("disabled", false);
+            $('#coverGc').attr("disabled", true);
+        } else if (gcObject.gcObjectParameter.States.StaUncovered) {
+            $('#uncoverGc').attr("disabled", true);
+            $('#coverGc').attr("disabled", false);
+        } else {
+            $('#uncoverGc').attr("disabled", true);
+            $('#coverGc').attr("disabled", true);
         }
     }
+
+
+    //simpleMotor filterControl
     if (gcObject.gcObjectParameter.States.StaStarting) {
         $('#status').attr('fill', 'LightGreen');
     }
@@ -299,10 +358,40 @@ function setGcObjectButtons(gcObject) {
         $('#status').attr('fill', 'Grey');
     } else if (gcObject.gcObjectParameter.States.StaFault) {
         $('#status').attr('fill', 'Red');
-    } else {
-        $('#status').attr('fill', 'DimGrey ');
     }
-
+    //highLevel or lowlevel
+    if (gcObject.gcObjectParameter.States.StaCover) {
+        $('#status').attr('fill', 'LightGreen');
+    }
+    else if (gcObject.gcObjectParameter.States.StaCovered) {
+        $('#status').attr('fill', 'Green');
+    } else if (gcObject.gcObjectParameter.States.StaUncover) {
+        $('#status').attr('fill', 'Blue');
+    } else if (gcObject.gcObjectParameter.States.StaUncovered) {
+        $('#status').attr('fill', 'Grey');
+    } else if (gcObject.gcObjectParameter.States.StaFaulted) {
+        $('#status').attr('fill', 'Red');
+    }
+    //BeltMonitor
+    if (gcObject.gcObjectParameter.States.StaHealty === true) {
+        $('#status').attr('fill', 'Green');
+    }
+    else if (gcObject.gcObjectParameter.States.StaHealty === false) {
+        $('#status').attr('fill', 'Grey');
+    }
+    //highlevel
+    if (gcObject.gcObjectParameter.States.StaOpening) {
+        $('#status').attr('fill', 'LightGreen');
+    }
+    else if (gcObject.gcObjectParameter.States.StaOpened) {
+        $('#status').attr('fill', 'Green');
+    } else if (gcObject.gcObjectParameter.States.StaClosing) {
+        $('#status').attr('fill', 'Blue');
+    } else if (gcObject.gcObjectParameter.States.StaClosed) {
+        $('#status').attr('fill', 'Grey');
+    } else if (gcObject.gcObjectParameter.States.StaFault) {
+        $('#status').attr('fill', 'Red');
+    }
 
 }
 function updateStatus(GCObject) {
@@ -379,7 +468,7 @@ function setBeltMonitorColorByState(ident, state, value) {
             if (value) {
                 color = 'Green';
             }
-            else{
+            else {
                 color = '#c0c0c0';
             }
             break;
@@ -527,6 +616,9 @@ function setSpeedMonitorColorByState(ident, state, value) {
             //running
             if (value) {
                 color = 'Green';
+            }
+            else {
+                color = 'Grey';
             }
             break;
         default:

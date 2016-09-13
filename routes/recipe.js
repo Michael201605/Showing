@@ -172,7 +172,7 @@ module.exports = function (app, i18n) {
 
                 theIngredient.update(ingredientFromClient).then(function () {
                     console.log("save successfully");
-                    res.json("save successfully");
+                    res.json({info:i18n.__("save successfully")});
                 });
             }else {
                 console.log("ingredient not found");

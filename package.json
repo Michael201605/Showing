@@ -37,6 +37,7 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "express3-handlebars": "^0.5.2",
+    "filequeue": "^0.5.0",
     "hbs": "^4.0.0",
     "html-to-pdf": "^0.1.11",
     "i18n": "^0.8.3",
