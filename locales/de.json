@@ -24,5 +24,8 @@
 	"English": "English",
 	"Chinese": "Chinese",
 	"text to test": "text to test",
-	"Commands": "Commands"
+	"Commands": "Commands",
+	"theSection is not found.": "theSection is not found.",
+	"theSection is not found.%s": "theSection is not found.%s",
+	"Passive": "Passive"
 }

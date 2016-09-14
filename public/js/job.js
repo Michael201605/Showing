@@ -17,7 +17,7 @@ $(function () {
     var server = location.href;
     var header = server.indexOf('//');
     var index = server.indexOf('/', header + 2);
-
+    var jobId = $('#jobId').val();
     console.log('senders: ');
     console.log(recipe.senders);
     $('#sender').val(recipe.senders[0].storageIdent);
@@ -214,12 +214,17 @@ $(function () {
 
     console.log('index: ' + index);
     if (index > -1) {
+
         server = server.substring(0, index);
         console.log('server: ' + server);
         socket = io(server);
         socket.on('jobStateChanged', function (options) {
+            console.log('jobStateChanged event callbacked');
+            console.log('options: ');
+            console.dir(options);
+            console.log('jobId: ' + jobId);
             if (options) {
-                if (options.jobId && options.jobId === $('#jobId').val()) {
+                if (options.jobId && options.jobId == jobId) {
                     $('#displayState').val(options.displayState);
                     $('#state').val(options.newState);
                     setBKColor(options.newState);

@@ -3,9 +3,14 @@
  */
 var theTime = new Date();
 var theYear = theTime.getFullYear();
+var theMonth = theTime.getMonth() + 1;
+var theDay = theTime.getDate();
 var log = require('../lib/log');
 // var theHour = theTime.getHours();
 console.log('theYear: ' + theYear);
+console.log('theMonth: ' + theMonth);
+console.log('theDay: ' + theDay);
+
 // console.log('theHour: ' + theHour);
 // console.log('toDateString: ' + theTime.toDateString());
 // console.log('toISOString: ' + theTime.toISOString());

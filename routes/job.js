@@ -29,7 +29,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         Job.findAll({
             where: {
                 LineIdent: lineIdent,
-                state : {$notIn: [JobState.Done]}
+                state: {$notIn: [JobState.Done]}
             }
         }).then(function (jobs) {
 
@@ -246,7 +246,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                                 eventEmitter.emit('checkJobOk');
                             });
                             res.json({
-                                update: {locked:false},
+                                update: {locked: false},
                                 info: i18n.__('check job is OK:')
                             });
                         }, function (errors) {
@@ -287,24 +287,25 @@ module.exports = function (app, controllerManager, i18n, io) {
                     if (theLine) {
                         controller = controllerManager.getController(theLine.controllerName);
                         controller.startJob(theJob).then(function (Pres) {
+                            console.log("routes: startJob: callback");
                             theJob.update({
                                 state: JobState.Loading
                             }).then(function (updatedJob) {
-                                console.log("job save successfully");
-
+                                console.log("routes: startJob: job save successfully");
+                                res.json({
+                                    update: {
+                                        displayState: i18n.__(getDisplayState(JobState, JobState.Loading)),
+                                        state: JobState.Loading
+                                    }
+                                });
                             });
-                            Pres.update = {
-                                displayState: i18n.__(getDisplayState(JobState, JobState.Loading)),
-                                state: JobState.Loading
-                            };
-                            res.json(Pres);
                         }, function (Perr) {
                             res.json({
                                 error: Perr
                             });
                         });
                     } else {
-                        error = i18n.__('the line: %s is not found', theJob.LineId);
+                        error = i18n.__('routes: startJob: the line: %s is not found', theJob.LineId);
                         console.log(error);
                         res.json({
                             error: error
@@ -313,7 +314,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                 });
             }
             else {
-                error = i18n.__('the job: %s is not found', id);
+                error = i18n.__('routes: startJob: the job: %s is not found', id);
                 console.log(error);
                 res.json({
                     error: error
@@ -337,8 +338,9 @@ module.exports = function (app, controllerManager, i18n, io) {
                     // console.dir(theLine);
                     if (theLine) {
                         controller = controllerManager.getController(theLine.controllerName);
+                        console.log('controller: ' + controller);
                         controller.stopJob(theJob).then(function (Pres) {
-
+                            console.log("routes: doneJob: callback");
                             res.json({
                                 info: i18n.__('The job is stopping.')
                             });
@@ -379,16 +381,16 @@ module.exports = function (app, controllerManager, i18n, io) {
         var productName = req.body.productName;
         var info = '';
         var updateInfo = {};
-        if(targetWeight){
+        if (targetWeight) {
             updateInfo.targetWeight = targetWeight;
         }
-        if(locked){
+        if (locked) {
             updateInfo.locked = locked;
         }
-        if(productIdent){
+        if (productIdent) {
             updateInfo.productIdent = productIdent;
         }
-        if(productName){
+        if (productName) {
             updateInfo.productName = productName;
         }
         console.log('TargetWeight: ' + targetWeight);
@@ -416,7 +418,7 @@ module.exports = function (app, controllerManager, i18n, io) {
             where: {
                 LineIdent: lineIdent,
                 locked: false,
-                state : {$notIn: [JobState.Done]}
+                state: {$notIn: [JobState.Done]}
             }
         }).then(function (jobs) {
 
@@ -478,21 +480,21 @@ module.exports = function (app, controllerManager, i18n, io) {
         var segments = barcode.split('_');
         var productIdent = '';
         var lotIdent = '';
-        if(segments.length && segments.length>1){
+        if (segments.length && segments.length > 1) {
             productIdent = segments[0];
             lotIdent = segments[1];
             Job.findOne({
                 where: {id: id}
             }).then(function (theJob) {
                 if (theJob) {
-                    if(productIdent === theJob.productIdent){
-                        if(segments.length === 3){
+                    if (productIdent === theJob.productIdent) {
+                        if (segments.length === 3) {
                             console.log('barcode: ' + barcode);
-                            Layer.findOne({where:{sscc: barcode}}).then(function (theLayer) {
-                                if(theLayer){
+                            Layer.findOne({where: {sscc: barcode}}).then(function (theLayer) {
+                                if (theLayer) {
 
-                                    if(theJob.state === JobState.Created){
-                                        theJob.start(controllerManager,i18n).then(function () {
+                                    if (theJob.state === JobState.Created) {
+                                        theJob.start(controllerManager, i18n).then(function () {
                                             theJob.registerAssemblyToStorage(theLayer, i18n).then(function (remainWeight) {
                                                 theJob.update({actualWeight: remainWeight});
                                                 res.json({
@@ -503,13 +505,13 @@ module.exports = function (app, controllerManager, i18n, io) {
                                                     },
                                                     info: i18n.__('Job is loading, Please scan next barcode.')
                                                 });
-                                            },function (pError1) {
+                                            }, function (pError1) {
                                                 res.json(pError1);
                                             });
                                         }, function (pError) {
                                             res.json(pError);
                                         });
-                                    }else {
+                                    } else {
                                         theJob.registerAssemblyToStorage(theLayer).then(function () {
                                             res.json({
                                                 info: i18n.__('Please scan next barcode.')
@@ -519,15 +521,15 @@ module.exports = function (app, controllerManager, i18n, io) {
                                         });
 
                                     }
-                                }else{
+                                } else {
                                     res.json({error: i18n.__('Layer is not found.')});
                                 }
                             });
-                        }else {
+                        } else {
                             res.json({error: i18n.__('barcode length is invalid')});
                         }
 
-                    }else{
+                    } else {
                         res.json({error: i18n.__('take wrong product')});
                     }
                 }
@@ -536,7 +538,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                 }
 
             });
-        }else{
+        } else {
             res.json({error: i18n.__('barcode is invalid')});
         }
 

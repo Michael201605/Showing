@@ -157,5 +157,9 @@
 	"EventLog": "事件日志",
 	"Commands": "命令",
 	"The job is stopping.": "The job is stopping.",
-	"section is not found. or job has done": "section is not found. or job has done"
+	"section is not found. or job has done": "section is not found. or job has done",
+	"theSection is not found.%s": "theSection is not found.%s",
+	"Active": "Active",
+	"Passive": "Passive",
+	"Emptying": "Emptying"
 }

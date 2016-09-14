@@ -15,6 +15,7 @@ var port = process.env.PORT || 3000;
 var i18n = require('i18n');
 var passport = require('passport');
 var flash = require('connect-flash');
+var EventEmitter = require("events").EventEmitter;
 var handlebars = require('express3-handlebars')
     .create({
         defaultLayout: 'main',
@@ -39,10 +40,12 @@ var navs = require('./lib/tools/navigation');
 var GcObjectAdapter = require('./lib/adapters/gcObjectAdapter');
 var ControllerManager = require('./lib/controllers/controllerManager');
 var log = require('./lib/log');
-
+// log.debug('io is equal to ioJob: ' + (io ===ioJob));
 //global settings===============================================================
 require('enum').register();
 global.i18n = i18n;
+global.myEventEmitter = new EventEmitter();
+global.myEventEmitter.setMaxListeners(10000);
 // configuration ===============================================================
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -161,15 +164,19 @@ new GcObjectAdapter(io).then(function (gcObjectAd) {
     log.debug('gcobjectAdapter created success!');
 
     io.on('connection', function (socket) {
-        if(!hasMonitored){
-            log.debug('io connected!');
-            gcObjectAd.socket = socket;
-            gcObjectAd.MonitorAllGcObjects();
-            hasMonitored = true;
-        }
+        log.debug('io connected!');
+        gcObjectAd.socket = socket;
+        //global.mySocket = socket;
+        gcObjectAd.MonitorAllGcObjects();
+        hasMonitored = true;
 
-    })
+    });
+    io.on('connection', function (socket) {
+        log.debug('ioJob connected!');
+        global.mySocket = socket;
 
+
+    });
     new ControllerManager(gcObjectAd, i18n, io).then(function (controllerManager) {
         log.debug('controllerManager created success!');
         require('./routes/job')(app, controllerManager, i18n, io);
