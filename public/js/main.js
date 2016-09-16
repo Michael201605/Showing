@@ -1,7 +1,7 @@
 /**
  * Created by pi on 8/17/16.
  */
-var GcObjectDialog, jobListDialog, StorageDialog, ScaleDialog, socket;
+var GcObjectDialog, jobListDialog, jobDetailDialog, StorageDialog, ScaleDialog, socket;
 $(function () {
     //modal dialog------
 
@@ -33,6 +33,22 @@ $(function () {
         autoOpen: false,
         height: 800,
         width: 1000,
+        modal: false,
+        buttons: {
+            Cancel: function () {
+                jobListDialog.dialog("close");
+            }
+        },
+        close: function () {
+
+        }
+    });
+
+    jobDetailDialog = $("#jobDetailDialog").dialog({
+        title: 'GcObject',
+        autoOpen: false,
+        height: 900,
+        width: 1200,
         modal: false,
         buttons: {
             Cancel: function () {
@@ -180,26 +196,75 @@ function Scale(Ident) {
 
 }
 function jobList(lineIdent) {
+    var jobListDataTable;
+    var selected = [];
+    var clickMethod = '';
     if (lineIdent) {
         var url = '/job/getJobList/:' + lineIdent;
         $.get('/job/getJobList/:' + lineIdent, function (data) {
             console.log('jobListStr: ' + data.jobs);
+            $('#lineIdent').val(data.lineIdent);
             jobListDialog.dialog('option', 'title', 'JobList: ' + lineIdent);
             jobListDialog.dialog('open');
-            var jobList =  JSON.parse(data.jobs);
-            var jobListDataTable = $('#jobListTable').DataTable();
+            var jobList = JSON.parse(data.jobs);
+            jobListDataTable = $('#jobListTable').DataTable();
             jobList.forEach(function (theJob) {
-                var clickMethod = 'jobDetail(' + theJob.id + ')';
-                jobListDataTable.row.add([
-                        '<a href="javascript:void(0);" onclick=' + clickMethod + '>' +theJob.ident + '</a>',
-                        theJob.lineIdent,
-                        theJob.displayState
-                    ]).draw(false);
+                clickMethod = 'jobDetail(' + theJob.id + ')';
+                var rowNode = jobListDataTable.row.add([
+                    '<a href="javascript:void(0);" onclick=' + clickMethod + '>' + theJob.ident + '</a>',
+                    theJob.lineIdent,
+                    theJob.displayState
+                ]).draw(false).node();
+                $(rowNode).attr('id', theJob.id);
 
-            })
+            });
             // jobListDataTable.row.draw();
 
 
+        });
+        $('#jobListTable tbody').on('click', 'tr', function () {
+            var id = this.id;
+            var index = $.inArray(id, selected);
+
+            if (index === -1) {
+                selected.push(id);
+            } else {
+                selected.splice(index, 1);
+            }
+            console.log('id: ');
+            console.log(selected);
+            $(this).toggleClass('selected');
+        });
+        $('#newJob').click(function () {
+            $.get('/job/jobList/createJob/:' + lineIdent, function (data) {
+                var newJob = null;
+                console.log('data: ' + data);
+                if (!data.error) {
+                    newJob = data.job;
+                    console.log('newJob: ' + newJob);
+                    console.log('newJob id: ' + newJob.id);
+                    console.log('newJob State: ' + newJob.displayState);
+                    clickMethod = 'jobDetail(' + newJob.id + ')';
+                    jobListDataTable.row.add([
+                        '<a href="javascript:void(0);" onclick=' + clickMethod + '>' + newJob.ident + '</a>',
+                        newJob.lineIdent,
+                        newJob.displayState
+                    ]).draw(false);
+
+                } else {
+                    $('#jobsErrors').append('<li>' + data.error + '</li>');
+                }
+
+            });
+        });
+        $('#deleteJob').click(function () {
+            var toDeleteJobIdsStr = JSON.stringify(selected);
+            console.log('toDeleteJobIdsStr: ' + toDeleteJobIdsStr);
+            jobListDataTable.row('.selected').remove().draw(false);
+            $.post('/job/jobList/deleteJob', {toDeleteJobIdsStr: toDeleteJobIdsStr}, function (data) {
+                console.log(data);
+
+            });
         });
     } else {
         alert('line Ident is empty');
@@ -207,6 +272,216 @@ function jobList(lineIdent) {
 
 }
 function jobDetail(jobId) {
+    var jobDetailDataTable;
+    var selected = [];
+    var clickMethod = '';
+    var options = [];
+    var gateStorages = [];
+    var bulkStorages = [];
+    var senderStorages = [];
+    var receiverStorages = [];
+    $.get('/job/getJobDetail/:' + jobId, function (data) {
+        var theJob;
+        var theRecipe;
+        if(!data.error){
+            theJob = data.job;
+            theRecipe = data.recipe;
+            jobDetailDialog.dialog('option', 'title', 'JobDetail: ' + jobId);
+            jobDetailDialog.dialog('open');
+            $.get('/storage/getStorageList/:' + 1, function (storagesOfGate) {
+                console.log('storagesOfGate');
+                console.log(storagesOfGate);
+                gateStorages = storagesOfGate;
+
+                $.get('/storage/getStorageList/:' + 10, function (storagesOfBulk) {
+                    console.log('storagesOfBulk');
+                    console.log(storagesOfBulk);
+                    bulkStorages = storagesOfBulk;
+
+
+                    $.get(' /line/getLine/:' + theJob.lineIdent, function (data) {
+                        console.log('line data');
+                        console.dir(data);
+                        if (!data.error) {
+                            line = data.line;
+                            if (line.category === 1) {
+                                senderStorages = gateStorages;
+                                receiverStorages = bulkStorages;
+                            }
+                            else {
+                                senderStorages = bulkStorages;
+                                receiverStorages = gateStorages;
+                            }
+                        }
+
+                        senderStorages.forEach(function (senderStorage) {
+                            options.push("<option value='" + senderStorage.id + "'>" + senderStorage.ident + "</option>");
+                        });
+                        $('#senderStorages')
+                            .append(options.join(""))
+                            .selectmenu({
+                                change: function (event, ui) {
+                                    $('#sender').val(ui.item.label);
+                                    recipe.senders[0].StorageId = ui.item.value;
+                                    recipe.senders[0].storageIdent = ui.item.label;
+                                    $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
+                                        console.log(message);
+                                    });
+
+                                }
+                            });
+                        options = [];
+                        receiverStorages.forEach(function (receiverStorage) {
+                            options.push("<option value='" + receiverStorage.id + "'>" + receiverStorage.ident + "</option>");
+                        });
+                        $('#receiverStorages')
+                            .append(options.join(""))
+                            .selectmenu({
+                                change: function (event, ui) {
+                                    recipe.receivers[0].StorageId = ui.item.value;
+                                    recipe.receivers[0].storageIdent = ui.item.label;
+                                    $('#receiver').val(ui.item.label);
+                                    getProduct(recipe.receivers[0].StorageId).then(function (productId) {
+                                        recipe.receivers[0].ProductId = productId;
+                                        console.log('receiver productid: ' + recipe.receivers[0].ProductId);
+                                        $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (data) {
+                                            console.dir(data);
+                                            if (data.info) {
+                                                $('#infos').append('<li>' + data.info + '</li>');
+                                            }
+                                        });
+
+                                    });
+
+                                }
+                            });
+                    });
+                });
+            });
+            $('#jobIdent').val(theJob.ident);
+            $('#lineIdent').val(theJob.lineIdent);
+            $('#displayJobState').val(theJob.displayState);
+            $('#jobState').val(theJob.state);
+            $('#locked').val(theJob.locked);
+            $('#productIdent').val(theJob.productIdent);
+            $('#targetWeight').val(theJob.targetWeight);
+            $('#actualWeight').val(theJob.actualWeight);
+
+
+
+        }else{
+            $('#jobsErrors').append('<li>' + data.error + '</li>');
+        }
+    });
+    $('#checkJob').click(function () {
+        $('#error').val('');
+        $('#errors').empty();
+        var jobId = $('#jobId').val();
+        $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
+            if (data.errors) {
+                data.errors.forEach(function (error) {
+                    $('#jobErrors').append('<li>' + error + '</li>');
+                });
+            }
+            if (data.info) {
+                $('#jobInfos').append('<li>' + data.info + '</li>');
+            }
+        });
+    });
+    $('#startJob').click(function () {
+        $('#jobErrors').val('');
+        var jobId = $('#jobId').val();
+        $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#jobErrors').append('<li>' + data.error + '</li>');
+            } else if (data.update) {
+                $('#displayState').val(data.update.displayState);
+                $('#state').val(data.update.state);
+                setJobBKColor(data.update.state);
+            }
+
+        });
+    });
+    $('#doneJob').click(function () {
+        $('#error').val('');
+        var jobId = $('#jobId').val();
+        $.get('/job/jobDetail/doneJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#error').val(data.error);
+            }
+            if (data.update) {
+                $('#displayState').val(data.update.displayState);
+                $('#state').val(data.update.state);
+                setJobBKColor(data.update.state);
+            }
+            if (data.info) {
+                $('#jobInfos').append('<li>' + data.info + '</li>');
+            }
+
+        });
+    });
+    $("form").submit(function (event) {
+        console.log('prevent event');
+        event.preventDefault();
+        var jobInfo = {
+            targetWeight: parseFloat($('#targetWeight').val()).toFixed(2),
+            locked: $('#locked').prop('checked')
+        };
+        console.log('Job info: ');
+        console.dir(jobInfo);
+        $.post('/job/jobDetail/:' + $('#jobId').val(), jobInfo, function (data) {
+            console.log(data);
+            $('#jobInfos').empty();
+            if (!data.error) {
+                $('#jobInfos').append('<li>' + data.info + '</li>');
+            } else {
+                $('#jobErrors').append('<li>' + data.error + '</li>');
+            }
+        });
+    });
+}
+function getProduct(storageId) {
+    var product = {};
+    console.log("storageId: " + storageId);
+    return new Promise(function (resolve, reject) {
+        if (storageId) {
+            $.get('/storage/getStorage/:' + storageId, function (data) {
+                if (!data.error) {
+                    var productId = data.storage.ProductId;
+                    console.log("productId: " + productId);
+                    resolve(productId);
+                    if (productId) {
+                        $.get('/product/getProduct/:' + productId, function (data) {
+                            if (!data.error) {
+                                product = data.product;
+                                console.log("product: ");
+                                console.dir(product);
+                                $('#productIdent').val(product.ident);
+                                $('#productName').val(product.name);
+                                $.post('/job/jobDetail/:' + $('#jobId').val(), {
+                                    productIdent: product.ident,
+                                    productName: product.name
+                                }, function (data) {
+                                });
+
+
+                            } else {
+                                $('#error').html(data.error);
+
+                            }
+                        });
+                    }
+
+                }
+                else {
+                    console.log("error: " + data.error);
+                    reject(data.error);
+                }
+
+            });
+        }
+    });
+
 
 }
 function GcObject(gcIdent) {
@@ -758,5 +1033,31 @@ function setPathBKColor($node, color) {
     $node.find('rect').attr('fill', color);
     $node.attr('stroke', color);
 }
+function setJobBKColor(state) {
+    var color;
+    switch (state) {
+        case 15:
+            //Error
+            color = 'Red';
+            break;
+        case 30:
+            //Loading
+            color = 'LightGreen';
+            break;
+        case 40:
+            //Active
+            color = 'Green';
+            break;
+        case 50:
+            //Suspended
+            color = 'Pink';
+            break;
+        case 80:
+            //Suspended
+            color = 'Silver';
+            break;
 
+    }
+    $('#displayState').css({'background-color': color});
+}
 
