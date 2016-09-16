@@ -1,5 +1,5 @@
 {{#section 'head'}}
-
+    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet">
 {{/section}}
 <!--<span id="text">{{{__ "text to test"}}}</span>-->
 <!--<br>-->
@@ -60,7 +60,7 @@
             <!--showing message-->
             <div class="form-group">
                 <label class="col-md-1 control-label">{{{__ "ErrorList"}}}</label>
-                <select class="col-md-11 has-error" name="ErrorList" id="errors" >
+                <select class="col-md-11 has-error" name="ErrorList" id="errors">
                     <option></option>
                 </select>
             </div>
@@ -78,7 +78,86 @@
         {{> navigations}}
     </div>
 </div>
+
+//dialog
+<div id="jobListDialog" class="container main">
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="row">
+                <fieldset>
+                    <legend class="title">{{{__ "Informations: "}}}</legend>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+
+                        <br>
+                        <br>
+                        <ul id="infos" class="info">
+
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="row">
+                <fieldset>
+                    <legend class="title">{{{__ "Errors"}}}</legend>
+                    <div class="col-lg-12">
+
+                        <br>
+                        <br>
+                        <ul id="errors" class="error">
+
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+        </div>
+        <div class="col-lg-6">
+            <input id="jobs" type="text" class="hidden" value="{{jobs}}"/>
+            <input id="lineIdent" type="text" class="hidden" value="{{lineIdent}}"/>
+            <table id="jobListTable" class="table table-bordered table-hover">
+                <caption>{{{__ "Job Management"}}}</caption>
+                <thead>
+                <tr>
+                    <th>{{{__ "Ident"}}}</th>
+                    <th>{{{__ "LineIdent"}}}</th>
+                    <th>{{{__ "State"}}}</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>{{{__ "Ident"}}}</th>
+                    <th>{{{__ "LineIdent"}}}</th>
+                    <th>{{{__ "State"}}}</th>
+                </tr>
+                </tfoot>
+                <!--<tr ng-repeat="job in jobs">-->
+                <!--<td>-->
+                <!--<input type="checkbox" ng-model="job.selected"/>-->
+                <!--</td>-->
+                <!--<td><a href="/job/jobDetail/:{[{job.id}]}">{[{job.ident}]}</a></td>-->
+                <!--<td>{[{job.lineIdent}]}</td>-->
+                <!--<td>{[{job.displayState}]}</td>-->
+                <!--</tr>-->
+            </table>
+        </div>
+        <div class="col-lg-3">
+            <form class="form-horizontal" role="form" ng-submit="createJob()">
+
+                <button type="submit" class="btn btn-primary">{{{__ "New"}}}</button>
+                <!--<button type="submit" class="btn btn-primary addnew pull-right" ng-click="copyRecipe">{{{__ "Copy"}}}</button>-->
+
+            </form>
+            <button id='deleteJob' class="btn btn-danger" ng-click="remove()">{{{__ "Delete"}}}</button>
+        </div>
+    </div>
+</div>
 {{#section 'jquery'}}
     <script src="/js/gcsState.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/vendor/jquery.dataTables.min.js"></script>
 {{/section}}

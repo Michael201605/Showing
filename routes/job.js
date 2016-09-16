@@ -552,6 +552,28 @@ module.exports = function (app, controllerManager, i18n, io) {
 
         });
     })
+    app.get('/job/getJobList/:lineIdent', function (req, res) {
+        var lineIdent = req.params.lineIdent.substring(1);
+        console.log('lineIdent: ' + lineIdent);
+
+        console.log('isAuthenticated: ' + req.isAuthenticated());
+        // var jobs =[];
+        Job.findAll({
+            where: {
+                LineIdent: lineIdent,
+                state: {$notIn: [JobState.Done]}
+            }
+        }).then(function (jobs) {
+
+            console.log('jobs: ' + jobs);
+
+            res.json({
+                    jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
+                    lineIdent: lineIdent
+                });
+        });
+
+    });
 };
 
 function isLoggedIn(req, res, next) {

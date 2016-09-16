@@ -1,7 +1,7 @@
 /**
  * Created by pi on 8/17/16.
  */
-var GcObjectDialog, StorageDialog, ScaleDialog, socket;
+var GcObjectDialog, jobListDialog, StorageDialog, ScaleDialog, socket;
 $(function () {
     //modal dialog------
 
@@ -28,6 +28,22 @@ $(function () {
 
         }
     });
+    jobListDialog = $("#jobListDialog").dialog({
+        title: 'GcObject',
+        autoOpen: false,
+        height: 800,
+        width: 1000,
+        modal: false,
+        buttons: {
+            Cancel: function () {
+                jobListDialog.dialog("close");
+            }
+        },
+        close: function () {
+
+        }
+    });
+
     var server = location.href;
     console.log(server);
     socket = io(server);
@@ -163,6 +179,36 @@ function Scale(Ident) {
     }
 
 }
+function jobList(lineIdent) {
+    if (lineIdent) {
+        var url = '/job/getJobList/:' + lineIdent;
+        $.get('/job/getJobList/:' + lineIdent, function (data) {
+            console.log('jobListStr: ' + data.jobs);
+            jobListDialog.dialog('option', 'title', 'JobList: ' + lineIdent);
+            jobListDialog.dialog('open');
+            var jobList =  JSON.parse(data.jobs);
+            var jobListDataTable = $('#jobListTable').DataTable();
+            jobList.forEach(function (theJob) {
+                var clickMethod = 'jobDetail(' + theJob.id + ')';
+                jobListDataTable.row.add([
+                        '<a href="javascript:void(0);" onclick=' + clickMethod + '>' +theJob.ident + '</a>',
+                        theJob.lineIdent,
+                        theJob.displayState
+                    ]).draw(false);
+
+            })
+            // jobListDataTable.row.draw();
+
+
+        });
+    } else {
+        alert('line Ident is empty');
+    }
+
+}
+function jobDetail(jobId) {
+
+}
 function GcObject(gcIdent) {
     console.log('ident: ' + gcIdent);
 
@@ -175,7 +221,7 @@ function GcObject(gcIdent) {
         GcObjectDialog.data('gcObject', gcObject).dialog('open');
         $('#Category').html(gcObject.category);
         setGcObjectButtons(gcObject);
-        showTypeButtons(gcObject.category)
+        showTypeButtons(gcObject.category);
         $('#Mannual').click(function () {
             var command = {
                 nodeId: gcObject.nodeId + '.Commands.CmdManual',

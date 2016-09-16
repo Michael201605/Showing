@@ -17,7 +17,12 @@
                                 {{#each SubMenus}}
                                     <!-- Third level-->
                                     <li>
-                                        <div><a target="_blank" href="{{url}}">{{name}}</a></div>
+                                        {{#if clickMethod}}
+                                            <a href="{{url}}" onclick="{{clickMethod}}">{{name}}</a>
+                                        {{else}}
+                                            <a target="_blank" href="{{url}}">{{name}}</a>
+                                        {{/if}}
+                                        <!--<div><a target="_blank" href="{{url}}">{{name}}</a></div>-->
                                     </li>
                                 {{/each}}
                             </ul>

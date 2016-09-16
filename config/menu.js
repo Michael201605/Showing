@@ -34,7 +34,8 @@ var ConfigureMenus = [
                 SubMenus: [
                     {
                         name: 'Jobs',
-                        url: 'job/jobList/:INT1'
+                        url: 'javascript:void(0);',
+                        clickMethod:"jobList('INT1')"
                     },
                     {
                         name: 'JobLog',
@@ -104,11 +105,11 @@ var ConfigureMenus = [
                 SubMenus: [
                     {
                         name: 'PendingReceipt',
-                        url: '/warehouse/receiptList/:10'
+                        url: '/order/receipt/receiptList/:10'
                     },
                     {
                         name: 'DoneReceipt',
-                        url: '/warehouse/receiptList/:80'
+                        url: '/order/receipt/receiptList/:80'
                     }
                 ],
                 url: '#'
