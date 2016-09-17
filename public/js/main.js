@@ -282,10 +282,12 @@ function jobDetail(jobId) {
     var receiverStorages = [];
     $.get('/job/getJobDetail/:' + jobId, function (data) {
         var theJob;
-        var theRecipe;
+        var recipe;
         if(!data.error){
             theJob = data.job;
-            theRecipe = data.recipe;
+            recipe = theJob.recipe;
+            console.log('recipe: ');
+            console.dir(recipe);
             jobDetailDialog.dialog('option', 'title', 'JobDetail: ' + jobId);
             jobDetailDialog.dialog('open');
             $.get('/storage/getStorageList/:' + 1, function (storagesOfGate) {
@@ -324,8 +326,11 @@ function jobDetail(jobId) {
                                     $('#sender').val(ui.item.label);
                                     recipe.senders[0].StorageId = ui.item.value;
                                     recipe.senders[0].storageIdent = ui.item.label;
-                                    $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
-                                        console.log(message);
+                                    $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (data) {
+                                        console.dir(data);
+                                        if (data.info) {
+                                            $('#jobInfos').append('<li>' + data.info + '</li>');
+                                        }
                                     });
 
                                 }
@@ -347,7 +352,7 @@ function jobDetail(jobId) {
                                         $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.receivers[0])}, function (data) {
                                             console.dir(data);
                                             if (data.info) {
-                                                $('#infos').append('<li>' + data.info + '</li>');
+                                                $('#jobInfos').append('<li>' + data.info + '</li>');
                                             }
                                         });
 
@@ -366,7 +371,7 @@ function jobDetail(jobId) {
             $('#productIdent').val(theJob.productIdent);
             $('#targetWeight').val(theJob.targetWeight);
             $('#actualWeight').val(theJob.actualWeight);
-
+            setJobBKColor(theJob.state);
 
 
         }else{
@@ -374,9 +379,7 @@ function jobDetail(jobId) {
         }
     });
     $('#checkJob').click(function () {
-        $('#error').val('');
-        $('#errors').empty();
-        var jobId = $('#jobId').val();
+        $('#jobErrors').empty();
         $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
             if (data.errors) {
                 data.errors.forEach(function (error) {
@@ -390,13 +393,12 @@ function jobDetail(jobId) {
     });
     $('#startJob').click(function () {
         $('#jobErrors').val('');
-        var jobId = $('#jobId').val();
         $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
             if (data.error) {
                 $('#jobErrors').append('<li>' + data.error + '</li>');
             } else if (data.update) {
-                $('#displayState').val(data.update.displayState);
-                $('#state').val(data.update.state);
+                $('#displayJobState').val(data.update.displayState);
+                $('#jobState').val(data.update.state);
                 setJobBKColor(data.update.state);
             }
 
@@ -404,14 +406,13 @@ function jobDetail(jobId) {
     });
     $('#doneJob').click(function () {
         $('#error').val('');
-        var jobId = $('#jobId').val();
         $.get('/job/jobDetail/doneJob/:' + jobId, function (data) {
             if (data.error) {
                 $('#error').val(data.error);
             }
             if (data.update) {
-                $('#displayState').val(data.update.displayState);
-                $('#state').val(data.update.state);
+                $('#displayJobState').val(data.update.displayState);
+                $('#jobState').val(data.update.state);
                 setJobBKColor(data.update.state);
             }
             if (data.info) {
@@ -429,7 +430,7 @@ function jobDetail(jobId) {
         };
         console.log('Job info: ');
         console.dir(jobInfo);
-        $.post('/job/jobDetail/:' + $('#jobId').val(), jobInfo, function (data) {
+        $.post('/job/jobDetail/:' + jobId, jobInfo, function (data) {
             console.log(data);
             $('#jobInfos').empty();
             if (!data.error) {
@@ -438,6 +439,19 @@ function jobDetail(jobId) {
                 $('#jobErrors').append('<li>' + data.error + '</li>');
             }
         });
+    });
+    socket.on('jobStateChanged', function (options) {
+        console.log('jobStateChanged event callbacked');
+        console.log('options: ');
+        console.dir(options);
+        console.log('jobId: ' + jobId);
+        if (options) {
+            if (options.jobId && options.jobId == jobId) {
+                $('#displayJobState').val(options.displayState);
+                $('#jobState').val(options.newState);
+                setJobBKColor(options.newState);
+            }
+        }
     });
 }
 function getProduct(storageId) {
@@ -1058,6 +1072,6 @@ function setJobBKColor(state) {
             break;
 
     }
-    $('#displayState').css({'background-color': color});
+    $('#displayJobState').css({'background-color': color});
 }
 
