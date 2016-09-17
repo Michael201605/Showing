@@ -5,12 +5,12 @@ $(function () {
     var job = {};
 
     var options = [];
-
+    var processOrderId = $('#processOrderId').val();
     var lineIdent = $('#lineIdent').val();
     //var receipt = JSON.parse($('#receipt').val());
     var packingCategory = JSON.parse($('#packingCategory').val());
     var products = JSON.parse($('#products').val());
-    var companyList = JSON.parse($('#companys').val());
+    // var companyList = JSON.parse($('#companys').val());
 
 
     var supplierId = parseInt($('#supplierId').val());
@@ -23,54 +23,50 @@ $(function () {
     console.log('supplierId: ' + supplierId);
     console.log('productId: ' + productId);
     console.log('packagingType: ' + packagingType);
+    //
+    // companyList.forEach(function (company) {
+    //     if (supplierId && supplierId === company.id) {
+    //         console.log('supplierName: ' + company.name);
+    //         $('#supplierName').val(company.name);
+    //     }
+    //     options.push("<option value='" + company.id + "'>" + company.name + "</option>");
+    // });
+    // $('#suppliers')
+    //     .append(options.join(""))
+    //     .selectmenu({
+    //         change: function (event, ui) {
+    //             $('#supplierName').val(ui.item.label);
+    //             $('#supplierId').val(ui.item.value);
+    //             // $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
+    //             //     console.log(message);
+    //             // });
+    //
+    //         }
+    //     });
 
-    companyList.forEach(function (company) {
-        if (supplierId && supplierId === company.id) {
-            console.log('supplierName: ' + company.name);
-            $('#supplierName').val(company.name);
-        }
-        options.push("<option value='" + company.id + "'>" + company.name + "</option>");
-    });
-    $('#suppliers')
-        .append(options.join(""))
-        .selectmenu({
-            change: function (event, ui) {
-                $('#supplierName').val(ui.item.label);
-                $('#supplierId').val(ui.item.value);
-                // $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
-                //     console.log(message);
-                // });
 
-            }
-        });
-
-
-    options = [];
-    packingCategory.forEach(function (category) {
-        if (packagingType && packagingType === category.value) {
-            console.log('packagingType: ' + category.name);
-            $('#packagingTypeName').val(category.name);
-        }
-        options.push("<option value='" + category.value + "'>" + category.name + "</option>");
-    });
-    $('#packagingTypes')
-        .append(options.join(""))
-        .selectmenu({
-            change: function (event, ui) {
-                $('#packagingTypeName').val(ui.item.label);
-                $('#packagingType').val(ui.item.value);
-                // $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
-                //     console.log(message);
-                // });
-
-            }
-        });
+    // options = [];
+    // packingCategory.forEach(function (category) {
+    //     if (packagingType && packagingType === category.value) {
+    //         console.log('packagingType: ' + category.name);
+    //         $('#packagingTypeName').val(category.name);
+    //     }
+    //     options.push("<option value='" + category.value + "'>" + category.name + "</option>");
+    // });
+    // $('#packagingTypes')
+    //     .append(options.join(""))
+    //     .selectmenu({
+    //         change: function (event, ui) {
+    //             $('#packagingTypeName').val(ui.item.label);
+    //             $('#packagingType').val(ui.item.value);
+    //             // $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
+    //             //     console.log(message);
+    //             // });
+    //
+    //         }
+    //     });
     options = [];
     products.forEach(function (product) {
-        if (productId && productId === product.id) {
-            console.log('productName: ' + product.name);
-            $('#productName').val(product.name);
-        }
         options.push("<option value='" + product.id + "'>" + product.ident + "</option>");
     });
     $('#productsSelect')

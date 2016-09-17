@@ -19,7 +19,7 @@ module.exports = function (app, i18n) {
             console.log('processOrders: ' + processOrders);
             var processOrdersStr = JSON.stringify(processOrders);
             res.render('order/process/processOrderList', {
-                processOrders: processOrdersStr,
+                processOrders: processOrders,
                 state: state
             });
         });
@@ -27,15 +27,23 @@ module.exports = function (app, i18n) {
     });
     app.get('/order/process/createProcessOrder', function (req, res) {
         var info = {
-            ident: 'newProcessOrder',
-            name: 'Raw',
-            visible: true,
+            ident: 'TODO',
+            erpIdent: '',
+            name: 'processOrder',
+            isTemplate: false,
             state: 10,
+            targetWeight: 0,
+            packSize: 0,
+            productIdent: '',
+            mixerIdent: '',
+            lineIdent: '',
+            mixingTime: 0,
+            isMedicatedOrder: false
         };
         console.log('try to create new ProcessOrder.... ');
         ProcessOrder.create(info).then(function (newProcessOrder) {
             console.log('newProcessOrder: ' + newProcessOrder);
-            res.json(newProcessOrder);
+            res.json({processOrder: newProcessOrder});
         });
     });
     app.post('/order/process/processOrderList/deleteProcessOrder', function (req, res) {
@@ -59,21 +67,14 @@ module.exports = function (app, i18n) {
         ProcessOrder.findOne({
             where: {id: id}
         }).then(function (processOrder) {
-            var processOrderStr = JSON.stringify(processOrder);
+
             var packingCategoryStr = JSON.stringify(getTranslateOptions(WarehousePackingType, i18n));
             console.log('packingCategoryStr: ' + packingCategoryStr);
-            Product.findAll().then(function (products) {
+            Product.findAll({where:{category: 1}}).then(function (products) {
                 var productsStr = JSON.stringify(products);
-                console.log('productsStr: ' + productsStr);
-                Company.findAll().then(function (companys) {
-                    var companysStr = JSON.stringify(companys);
-                    console.log('companysStr: ' + companysStr);
-                    res.render('order/process/processOrderDetail', {
-                        processOrder: processOrder.getJsonObject(),
-                        packingCategory: packingCategoryStr,
-                        products: productsStr,
-                        companys: companysStr
-                    });
+                res.render('order/process/processOrderDetail', {
+                    processOrder: processOrder.getJsonObject(),
+                    product: productsStr
                 });
             });
 

@@ -207,31 +207,31 @@ $(function () {
 
 
     }
-
-    console.log('server whole: ' + server);
-
-    console.log('header: ' + header);
-
-    console.log('index: ' + index);
-    if (index > -1) {
-
-        server = server.substring(0, index);
-        console.log('server: ' + server);
-        socket = io(server);
-        socket.on('jobStateChanged', function (options) {
-            console.log('jobStateChanged event callbacked');
-            console.log('options: ');
-            console.dir(options);
-            console.log('jobId: ' + jobId);
-            if (options) {
-                if (options.jobId && options.jobId == jobId) {
-                    $('#displayState').val(options.displayState);
-                    $('#state').val(options.newState);
-                    setBKColor(options.newState);
-                }
-            }
-        });
-    }
+    //it will conflict with main page
+    // console.log('server whole: ' + server);
+    //
+    // console.log('header: ' + header);
+    //
+    // console.log('index: ' + index);
+    // if (index > -1) {
+    //
+    //     server = server.substring(0, index);
+    //     console.log('server: ' + server);
+    //     socket = io(server);
+    //     socket.on('jobStateChanged', function (options) {
+    //         console.log('jobStateChanged event callbacked');
+    //         console.log('options: ');
+    //         console.dir(options);
+    //         console.log('jobId: ' + jobId);
+    //         if (options) {
+    //             if (options.jobId && options.jobId == jobId) {
+    //                 $('#displayState').val(options.displayState);
+    //                 $('#state').val(options.newState);
+    //                 setBKColor(options.newState);
+    //             }
+    //         }
+    //     });
+    // }
 
 });
 

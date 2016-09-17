@@ -62,7 +62,7 @@ module.exports = function (app, i18n) {
             var receiptStr = JSON.stringify(receipt);
             var packingCategoryStr = JSON.stringify(getTranslateOptions(WarehousePackingType, i18n));
             console.log('packingCategoryStr: ' + packingCategoryStr);
-            Product.findAll().then(function (products) {
+            Product.findAll({where:{category: 0}}).then(function (products) {
                 var productsStr = JSON.stringify(products);
                 console.log('productsStr: ' + productsStr);
                 Company.findAll().then(function (companys) {

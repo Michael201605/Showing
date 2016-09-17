@@ -10,6 +10,8 @@ var JobState = require('../../lib/stateAndCategory/jobState');
 var OrderItem = require('./OrderItem');
 var Promise = require('promise');
 var utils = require('../../lib/utils');
+var BusinessBase = require('../BusinessBase');
+
 var ProcessOrder = modelBase.define('ProcessOrder', {
     ident: modelBase.Sequelize.STRING,
     erpIdent: modelBase.Sequelize.STRING,
@@ -25,7 +27,7 @@ var ProcessOrder = modelBase.define('ProcessOrder', {
     isMedicatedOrder: modelBase.Sequelize.BOOLEAN
 });
 
-
+utils.inherits(ProcessOrder.Instance.prototype, BusinessBase.prototype);
 ProcessOrder.Instance.prototype.checkOrder = function (i18n) {
     var me = this;
     var errors = [];

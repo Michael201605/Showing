@@ -398,11 +398,14 @@ module.exports = function (app, controllerManager, i18n, io) {
         Job.findOne({
             where: {id: id}
         }).then(function (theJob) {
-            theJob.update(updateInfo).then(function (theJob) {
-                info = i18n.__("save successfully");
+            if(theJob){
+                theJob.update(updateInfo).then(function (theJob) {
+                    info = i18n.__("save successfully");
 
-                res.json({info: info});
-            });
+                    res.json({info: info});
+                });
+            }
+
         });
 
     });

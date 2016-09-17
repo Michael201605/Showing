@@ -42,70 +42,85 @@ var segments = [];
 var elements = [];
 
 
-
-fs.readFile('PLC.csv', 'utf8', function (err, data) {
-    if (err) {
-        console.log( err);
+Product.bulkCreate([
+    {
+        ident: 'f1001',
+        name: 'f1001' ,
+        category: 1
+    },
+    {
+        ident: 'f1002',
+        name: 'f1002' ,
+        category: 1
     }
-    else {
-        lines = data.split('\n');
-        nodeId= 'ns=1;s=PLC1';
-        //remove header
-        lines.splice(0, 1);
-        console.log('PLC.csv , lines length: ' + lines.length);
-        lines.forEach(function (line) {
-
-            infos= [];
-            // log('D','line: ' + line);
-
-            if (line) {
-                //first info is path; second info is type
-                infos = line.split(',');
-            }
-
-            if (infos.length >= 2) {
-
-                pathInfo = infos[0];
-                type = infos[2];
-                //remove double quotes
-                pathInfo = pathInfo.substring(1, pathInfo.length-1);
-                segments = pathInfo.split('.');
-                // log('D','pathInfo: ' + pathInfo);
-                if(segments[0] === 'Element'){
-                    var category = segments[1];
-                    var ident = segments[2].substring(1);
-                    var nodeId = prefix + '.' + segments.slice(0,3).join('.');
-                    console.log('nodeId: ' + nodeId);
-                    console.log(elements[ident]);
-                    if(!elements[ident]){
-                        elements[ident] =ident;
-                        GcObject.create({
-                            ident:ident,
-                            nodeId: nodeId,
-                            category: category
-                        }).then(function (newGcObject) {
-                            console.log('newGcObject: ');
-                            // console.dir(newGcObject);
-                        })
-                    }
-
-
-                }else if(segments[0] === 'Unit'){
-
-
-                }else if(segments[0] === 'Section'){
-
-
-                }else if(segments[0] === 'Line'){
-
-                }
-
-
-            }
-        });
-    }
-
+]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+    return Product.findAll();
+}).then(function(products) {
+    console.log(products); // ... in order to get the array of user objects
 });
+// fs.readFile('PLC.csv', 'utf8', function (err, data) {
+//     if (err) {
+//         console.log( err);
+//     }
+//     else {
+//         lines = data.split('\n');
+//         nodeId= 'ns=1;s=PLC1';
+//         //remove header
+//         lines.splice(0, 1);
+//         console.log('PLC.csv , lines length: ' + lines.length);
+//         lines.forEach(function (line) {
+//
+//             infos= [];
+//             // log('D','line: ' + line);
+//
+//             if (line) {
+//                 //first info is path; second info is type
+//                 infos = line.split(',');
+//             }
+//
+//             if (infos.length >= 2) {
+//
+//                 pathInfo = infos[0];
+//                 type = infos[2];
+//                 //remove double quotes
+//                 pathInfo = pathInfo.substring(1, pathInfo.length-1);
+//                 segments = pathInfo.split('.');
+//                 // log('D','pathInfo: ' + pathInfo);
+//                 if(segments[0] === 'Element'){
+//                     var category = segments[1];
+//                     var ident = segments[2].substring(1);
+//                     var nodeId = prefix + '.' + segments.slice(0,3).join('.');
+//                     console.log('nodeId: ' + nodeId);
+//                     console.log(elements[ident]);
+//                     if(!elements[ident]){
+//                         elements[ident] =ident;
+//                         GcObject.create({
+//                             ident:ident,
+//                             nodeId: nodeId,
+//                             category: category
+//                         }).then(function (newGcObject) {
+//                             console.log('newGcObject: ');
+//                             // console.dir(newGcObject);
+//                         })
+//                     }
+//
+//
+//                 }else if(segments[0] === 'Unit'){
+//
+//
+//                 }else if(segments[0] === 'Section'){
+//
+//
+//                 }else if(segments[0] === 'Line'){
+//
+//                 }
+//
+//
+//             }
+//         });
+//     }
+//
+// });
 
 // GcObject.bulkCreate([
 //     {

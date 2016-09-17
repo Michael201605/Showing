@@ -290,6 +290,8 @@ function jobDetail(jobId) {
             console.dir(recipe);
             jobDetailDialog.dialog('option', 'title', 'JobDetail: ' + jobId);
             jobDetailDialog.dialog('open');
+            $('#sender').val(recipe.senders[0].storageIdent);
+            $('#receiver').val(recipe.receivers[0].storageIdent);
             $.get('/storage/getStorageList/:' + 1, function (storagesOfGate) {
                 console.log('storagesOfGate');
                 console.log(storagesOfGate);
@@ -369,6 +371,7 @@ function jobDetail(jobId) {
             $('#jobState').val(theJob.state);
             $('#locked').val(theJob.locked);
             $('#productIdent').val(theJob.productIdent);
+            $('#productName').val(theJob.productName);
             $('#targetWeight').val(theJob.targetWeight);
             $('#actualWeight').val(theJob.actualWeight);
             setJobBKColor(theJob.state);
@@ -453,51 +456,58 @@ function jobDetail(jobId) {
             }
         }
     });
-}
-function getProduct(storageId) {
-    var product = {};
-    console.log("storageId: " + storageId);
-    return new Promise(function (resolve, reject) {
-        if (storageId) {
-            $.get('/storage/getStorage/:' + storageId, function (data) {
-                if (!data.error) {
-                    var productId = data.storage.ProductId;
-                    console.log("productId: " + productId);
-                    resolve(productId);
-                    if (productId) {
-                        $.get('/product/getProduct/:' + productId, function (data) {
-                            if (!data.error) {
-                                product = data.product;
-                                console.log("product: ");
-                                console.dir(product);
-                                $('#productIdent').val(product.ident);
-                                $('#productName').val(product.name);
-                                $.post('/job/jobDetail/:' + $('#jobId').val(), {
-                                    productIdent: product.ident,
-                                    productName: product.name
-                                }, function (data) {
-                                });
+    function getProduct(storageId) {
+        var product = {};
+        console.log("storageId: " + storageId);
+        return new Promise(function (resolve, reject) {
+            if (storageId) {
+                $.get('/storage/getStorage/:' + storageId, function (data) {
+                    if (!data.error) {
+                        var productId = data.storage.ProductId;
+                        console.log("productId: " + productId);
+                        resolve(productId);
+                        if (productId) {
+                            $.get('/product/getProduct/:' + productId, function (data) {
+                                if (!data.error) {
+                                    product = data.product;
+                                    console.log("product: ");
+                                    console.dir(product);
+                                    $('#productIdent').val(product.ident);
+                                    $('#productName').val(product.name);
+                                    $.post('/job/jobDetail/:' + jobId, {
+                                        productIdent: product.ident,
+                                        productName: product.name
+                                    }, function (data) {
+                                        if(data.error){
+                                            $('#jobErrors').append('<li>' + data.error + '</li>');
+                                        }
+                                        if(data.info){
+                                            $('#jobInfos').append('<li>' + data.info + '</li>');
+                                        }
+                                    });
 
 
-                            } else {
-                                $('#error').html(data.error);
+                                } else {
+                                    $('#error').html(data.error);
 
-                            }
-                        });
+                                }
+                            });
+                        }
+
+                    }
+                    else {
+                        console.log("error: " + data.error);
+                        reject(data.error);
                     }
 
-                }
-                else {
-                    console.log("error: " + data.error);
-                    reject(data.error);
-                }
-
-            });
-        }
-    });
+                });
+            }
+        });
 
 
+    }
 }
+
 function GcObject(gcIdent) {
     console.log('ident: ' + gcIdent);
 

@@ -161,5 +161,8 @@
 	"theSection is not found.%s": "theSection is not found.%s",
 	"Active": "Active",
 	"Passive": "Passive",
-	"Emptying": "Emptying"
+	"Emptying": "Emptying",
+	"MixerIdent": "MixerIdent",
+	"PrcoessOrder Management": "PrcoessOrder Management",
+	"Infomations: ": "Infomations: "
 }

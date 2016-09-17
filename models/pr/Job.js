@@ -132,12 +132,13 @@ var Job = modelBase.define('Job', properties, {
                 });
 
             }).then(function (result) {
+                log.debug('Job: createJob: result: ' + result);
                 // Transaction has been committed
                 // result is whatever the result of the promise chain returned to the transaction callback
             }).catch(function (err) {
                 // Transaction has been rolled back
                 // err is whatever rejected the promise chain returned to the transaction callback
-
+                log.debug('Job: createJob: err: ' + err);
             });
 
 
