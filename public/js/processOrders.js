@@ -3,7 +3,7 @@
  */
 $(function () {
     var processOrdersDataTable = $('#processOrdersTable').DataTable();
-    var selected= [];
+    var selected = [];
     $('#newProcessOrder').click(function () {
         $.get('/order/process/createProcessOrder', function (data) {
             var newProcessOrder = null;
@@ -13,12 +13,13 @@ $(function () {
                 console.log('newProcessOrder: ' + newProcessOrder);
                 console.log('newProcessOrder id: ' + newProcessOrder.id);
                 console.log('newProcessOrder State: ' + newProcessOrder.displayState);
-                processOrdersDataTable.row.add([
+                var rowNode = processOrdersDataTable.row.add([
                     '<a href="/order/process/processOrderDetail/:"' + newProcessOrder.id + '>' + newProcessOrder.ident + '</a>',
                     newProcessOrder.productIdent,
                     newProcessOrder.targetWeight,
                     newProcessOrder.mixerIdent
-                ]).draw(false);
+                ]).draw(false).node();
+                $(rowNode).attr('id', newProcessOrder.id);
 
             } else {
                 $('#errors').append('<li>' + data.error + '</li>');
@@ -40,14 +41,25 @@ $(function () {
         $(this).toggleClass('selected');
     });
     $('#deleteProcessOrder').click(function () {
-        var toDeleteJobIdsStr = JSON.stringify(selected);
-        console.log('toDeleteJobIdsStr: ' + toDeleteJobIdsStr);
-        processOrdersDataTable.row('.selected').remove().draw(false);
-        $.post('/order/process/processOrderList/deleteProcessOrder', {toDeleteJobIdsStr: toDeleteJobIdsStr}, function (data) {
-            console.log(data);
-            if (data.error) {
-                $('#errors').append('<li>' + data.error + '</li>');
-            }
-        });
+        $('#errors').empty();
+        $('#infos').empty();
+        if (selected.length > 0) {
+            var toDeleteProcessOrderIdsStr = JSON.stringify(selected);
+            console.log('toDeleteProcessOrderIdsStr: ' + toDeleteProcessOrderIdsStr);
+            processOrdersDataTable.row('.selected').remove().draw(false);
+            $.post('/order/process/processOrderList/deleteProcessOrder', {toDeleteProcessOrderIdsStr: toDeleteProcessOrderIdsStr}, function (data) {
+                console.log(data);
+                if (data.error) {
+                    $('#errors').append('<li>' + data.error + '</li>');
+                }
+                if (data.info) {
+                    $('#infos').append('<li>' + data.info + '</li>');
+                }
+            });
+        } else {
+            $('#errors').append('<li>No row selected</li>');
+        }
+
     });
+
 });

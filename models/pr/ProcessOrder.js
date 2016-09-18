@@ -25,6 +25,28 @@ var ProcessOrder = modelBase.define('ProcessOrder', {
     lineIdent: modelBase.Sequelize.STRING,
     mixingTime: modelBase.Sequelize.INTEGER,
     isMedicatedOrder: modelBase.Sequelize.BOOLEAN
+}, {
+    classMethods: {
+        getMaxId: function () {
+            return new Promise(function (resolve, reject) {
+                modelBase.query('select max(id) from ProcessOrders', {type: modelBase.QueryTypes.SELECT}).then(function (data) {
+                    console.log('max ' + data);
+                    console.dir(data);
+                    var max = data[0]['max(id)'];
+                    if (!max) {
+                        max = 0;
+                    }
+                    max++;
+                    resolve(utils.pad(max, 6));
+                });
+                // Job.max('id').then(function (max) {
+                //     console.log('max ' + max);
+                //     resolve(max);
+                // });
+            });
+
+        }
+    }
 });
 
 utils.inherits(ProcessOrder.Instance.prototype, BusinessBase.prototype);

@@ -42,21 +42,20 @@ var segments = [];
 var elements = [];
 
 
-Product.bulkCreate([
+Mixer.bulkCreate([
     {
-        ident: 'f1001',
-        name: 'f1001' ,
-        category: 1
-    },
-    {
-        ident: 'f1002',
-        name: 'f1002' ,
-        category: 1
+        ident: 'mixer001',
+        name: 'mixer001',
+        state: 10,
+        weightMax: 1000,
+        weightMin: 200,
+        SectionId: 12
     }
+
 ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
-    return Product.findAll();
-}).then(function(products) {
-    console.log(products); // ... in order to get the array of user objects
+    return Mixer.findAll();
+}).then(function(mixers) {
+    console.log(mixers); // ... in order to get the array of user objects
 });
 // fs.readFile('PLC.csv', 'utf8', function (err, data) {
 //     if (err) {
@@ -237,8 +236,18 @@ Product.bulkCreate([
 //     },
 //     {
 //         ident: 'r1002',
-//         name: 'Buhler' ,
+//         name: 'Salt' ,
 //         category: 0
+//     },
+//     {
+//         ident: 'f1001',
+//         name: 'f1001' ,
+//         category: 1
+//     },
+//     {
+//         ident: 'f1002',
+//         name: 'f1002' ,
+//         category: 1
 //     }
 // ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
 //     return Product.findAll();

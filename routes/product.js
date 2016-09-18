@@ -71,6 +71,17 @@ module.exports = function (app, i18n) {
 
         });
     });
+    app.get('/product/getProductList/:category', function (req, res) {
+        var category = req.params.category.substring(1);
+        Product.findAll({where:{category:category}}).then(function (products) {
+            console.log('products: ' + products);
+            res.json(
+                {
+                    products: products
+                });
+        });
+    });
+
     app.get('/product/getProduct/:id', function (req, res) {
         var id = req.params.id.substring(1);
         var storageStr='';

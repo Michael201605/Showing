@@ -164,5 +164,21 @@
 	"Emptying": "Emptying",
 	"MixerIdent": "MixerIdent",
 	"PrcoessOrder Management": "PrcoessOrder Management",
-	"Infomations: ": "Infomations: "
+	"Infomations: ": "Infomations: ",
+	"Pack Size": "Pack Size",
+	"General": "General",
+	"BOM": "BOM",
+	"ProcessOrder Detail": "ProcessOrder Detail",
+	"BOM list": "BOM list",
+	"Remove": "Remove",
+	"ProcessOrder List": "ProcessOrder List",
+	"delete successfully.": "delete successfully.",
+	"Check order": "Check order",
+	"Release order": "Release order",
+	"product is not set.": "product is not set.",
+	"Line is not set.": "Line is not set.",
+	"mixerIdent is not set.": "mixerIdent is not set.",
+	"lineIdent is not set.": "lineIdent is not set.",
+	"mixingTime is not set.": "mixingTime is not set.",
+	"Mixer": "Mixer"
 }
