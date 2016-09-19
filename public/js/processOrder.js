@@ -16,6 +16,7 @@ $(function () {
     var supplierName = '';
     var selected = [];
     var orderItemsDataTable = $('#bomTable').DataTable();
+    setBKColor($('#state').val());
     options = [];
     products.forEach(function (product) {
         options.push("<option value='" + product.id + "'>" + product.ident + "</option>");
@@ -40,15 +41,22 @@ $(function () {
             change: function (event, ui) {
                 var selectedMixerIdent = ui.item.label;
                 $('#mixerIdent').val(selectedMixerIdent);
-                if(selectedMixerIdent)
-                $.get('/mixer/getLine/:' + ui.item.label, function (data) {
-                    if(data.error){
-                        $('#errors').append('<li>' + data.error + '</li>');
-                    }
-                    if(data.line){
-                        $('#lineIdent').val(data.line.ident);
-                    }
-                });
+                if (selectedMixerIdent) {
+                    $.get('/mixer/getLine/:' + selectedMixerIdent, function (data) {
+                        if (data.error) {
+                            $('#errors').append('<li>' + data.error + '</li>');
+                        }
+                        if (data.line) {
+                            $('#lineIdent').val(data.line.ident);
+                            $('#lineId').val(data.line.id);
+                        }
+                    });
+                }else {
+                    $('#lineIdent').val('');
+                    $('#lineId').val('');
+
+                }
+
 
             }
         });
@@ -126,7 +134,7 @@ $(function () {
                 .selectmenu({
                     change: function (event, ui) {
                         //TODO: save product to orderItem
-                        if(selected.length>0){
+                        if (selected.length > 0) {
                             var itemId = selected[0];
                             $('#' + itemId).find('label').html(ui.item.label);
                             var orderItemInfo = {
@@ -143,7 +151,7 @@ $(function () {
 
                                 }
                             });
-                        }else{
+                        } else {
                             $('#errors').append('<li>Please select item.</li>');
                         }
                         // $.post('/admin/recipe/updateIngredient', {ingredientStr: JSON.stringify(recipe.senders[0])}, function (message) {
@@ -166,16 +174,23 @@ $(function () {
         event.preventDefault();
         var productId = parseInt(getValidNumber($('#productId').val()));
         var productIdent = $('#productIdent').val();
+        var lineId = parseInt(getValidNumber($('#lineId').val()));
+        var lineIdent = $('#lineIdent').val();
+        var mixerIdent = $('#mixerIdent').val();
         var processOrderInfo = {
             name: $('#name').val(),
-            mixerIdent: $('#mixerIdent').val(),
-            lineIdent: $('#lineIdent').val(),
             targetWeight: parseFloat(getValidNumber($('#targetWeight').val())).toFixed(2),
-            packSize: parseFloat(getValidNumber($('#packSize').val())).toFixed(2)
+            packSize: parseFloat(getValidNumber($('#packSize').val())).toFixed(2),
+            mixingTime: parseFloat(getValidNumber($('#mixingTime').val())).toFixed(2)
         };
-        if (productId > 0) {
-            processOrderInfo.productId = productId;
+        if (productId && productId > 0) {
+            processOrderInfo.ProductId = productId;
             processOrderInfo.productIdent = productIdent;
+        }
+        if (lineId > 0) {
+            processOrderInfo.LineId = lineId;
+            processOrderInfo.lineIdent = lineIdent;
+            processOrderInfo.mixerIdent = mixerIdent;
         }
         console.log('processOrder info: ');
         console.dir(processOrderInfo);
@@ -235,26 +250,63 @@ $(function () {
             if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
             }
-            if(data.errors){
-                data.errors.forEach((function (error) {
-                    $('#errors').append('<li>' + data.error + '</li>');
-                }));
+            if (data.errors) {
+                data.errors.forEach(function (error) {
+                    $('#errors').append('<li>' + error + '</li>');
+                });
             }
         });
     });
     $('#releaseProcessOrder').click(function () {
-        $.get('/order/process/checkProcessOrder/:' + processOrderId, function (data) {
+        $.get('/order/process/releaseProcessOrder/:' + processOrderId, function (data) {
             console.log(data);
             $('#errors').empty();
             $('#infos').empty();
-            if (!data.errors) {
+            if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
-            } else {
+            }
+            if (data.error) {
+                $('#infos').append('<li>' + data.error + '</li>');
+            }
+            if (data.errors) {
                 data.errors.forEach((function (error) {
-                    $('#errors').append('<li>' + data.error + '</li>');
+                    $('#errors').append('<li>' + error + '</li>');
                 }));
+            }
+            if (data.update) {
+                $('#displayState').val(data.update.displayState);
+                $('#state').val(data.update.state);
+                setBKColor(data.update.state);
             }
         });
     });
 });
+
+function setBKColor(state) {
+    var color;
+    switch (state) {
+        case 10:
+        case '10':
+            //Error
+            color = 'LightGreen';
+            break;
+        case 15:
+        case '15':
+            //Error
+            color = 'Red';
+            break;
+        case 20:
+        case '20':
+            //Loading
+            color = 'Green';
+            break;
+        case 80:
+        case '80':
+            //Suspended
+            color = 'Silver';
+            break;
+
+    }
+    $('#displayState').css({'background-color': color});
+}
 

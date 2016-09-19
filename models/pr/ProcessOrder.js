@@ -6,11 +6,15 @@ var Product = require('./Product');
 var Line = require('../eq/Line');
 var Mixer = require('../eq/Mixer');
 var Job = require('./Job');
+var OrderState = require('../../lib/stateAndCategory/orderState');
 var JobState = require('../../lib/stateAndCategory/jobState');
 var OrderItem = require('./OrderItem');
 var Promise = require('promise');
 var utils = require('../../lib/utils');
 var BusinessBase = require('../BusinessBase');
+var Recipe = require('./Recipe');
+var IngredientComponent = require('./IngredientComponent');
+var log = require('../../lib/log');
 
 var ProcessOrder = modelBase.define('ProcessOrder', {
     ident: modelBase.Sequelize.STRING,
@@ -96,12 +100,18 @@ ProcessOrder.Instance.prototype.checkOrder = function (i18n) {
                 reject(errors);
             }
             else {
+                var totalTargetPer = 0.0;
                 orderItems.forEach(function (orderItem) {
                     if (!orderItem.ProductId) {
                         error = i18n.__('product of item is not set.');
                         errors.push(error);
                     }
+                    totalTargetPer += orderItem.targetPercentage;
                 });
+                if (totalTargetPer != 100.0) {
+                    error = i18n.__('recipe percentage should be 100.');
+                    errors.push(error);
+                }
                 if (errors.length > 0) {
                     reject(errors);
                 } else {
@@ -114,6 +124,141 @@ ProcessOrder.Instance.prototype.checkOrder = function (i18n) {
 
 
 };
+ProcessOrder.Instance.prototype.createOrUpdateJob = function (jobInfo) {
+    var me = this;
+    return new Promise(function (resolve, reject) {
+        Job.create(jobInfo).then(function (newJob) {
+            // for(var p in newJob){
+            //     console.log('Job property: ' + p);
+            // }
+            log.debug('newJob');
+            log.debug(newJob);
+
+            Recipe.findOne({
+                where: {
+                    LineId: newJob.LineId,
+                    isTemplate: true
+                }
+            }).then(function (RecipeTemplate) {
+                log.debug('RecipeTemplate: ');
+                log.debug(RecipeTemplate);
+                if (RecipeTemplate) {
+                    Recipe.create({
+                        Ident: newJob.Ident,
+                        Name: newJob.Ident,
+                        isTemplate: false,
+                        State: JobState.Created,
+                        JobId: newJob.id
+                    }).then(function (newRecipe) {
+                        log.debug('newRecipe');
+                        log.debug(newRecipe);
+                        if (newRecipe) {
+                            var promises = [];
+
+                            var promise1 = new Promise(function (resolve1, reject1) {
+                                me.getOrderItems().then(function (orderItems) {
+                                    var promises1 = [];
+                                    orderItems.forEach(function (orderItem) {
+                                        var ingredientInfo = {
+                                            category: 0,
+                                            targetPercentage: orderItem.targetPercentage,
+                                            targetWeight: orderItem.targetPercentage * newJob.targetWeight,
+                                            ProductId: orderItem.ProductId,
+                                            RecipeId: newRecipe.id,
+                                            productIdent: orderItem.productIdent,
+                                            isActive: false
+                                        };
+                                        promises1.push(new Promise(function (resolve2, reject2) {
+                                            IngredientComponent.create(ingredientInfo).then(function (newIngred) {
+                                                if (newIngred) {
+                                                    resolve2();
+                                                } else {
+                                                    reject2('new ingre is failed');
+                                                }
+                                            });
+                                        }));
+
+                                    });
+                                    Promise.all(promises1).then(function (res) {
+                                        resolve1(res);
+
+                                    }, function (err) {
+                                        log.debug('ProcessOrder: createOrUpdateJob: promises1: reject: ' + err);
+                                        reject1(err);
+                                    });
+
+                                });
+                            });
+                            promises.push(promise1);
+                            var promise2 = new Promise(function (resolve1, reject1) {
+                                RecipeTemplate.getReceivers({where: {category: 1}}).then(function (ingredients) {
+                                    var promises2 = [];
+                                    ingredients.forEach(function (ingredient) {
+                                        promises2.push(
+                                            new Promise(function (resolve2, reject2) {
+                                                IngredientComponent.create({
+                                                    category: ingredient.category,
+                                                    targetPercentage: ingredient.targetPercentage,
+                                                    targetWeight: ingredient.targetWeight,
+                                                    storageIdent: ingredient.storageIdent,
+                                                    ProductId: ingredient.ProductId,
+                                                    RecipeId: newRecipe.id,
+                                                    productIdent: me.productIdent,
+                                                    isActive: ingredient.isActive
+                                                }).then(function (newIngredient) {
+                                                    log.debug('newIngredient');
+                                                    log.debug(newIngredient);
+                                                    if (newIngredient) {
+                                                        log.debug('created new ingredient');
+                                                        resolve2();
+                                                    }
+                                                    else {
+                                                        log.debug('ingredient is empty');
+                                                        reject2('ingredient is empty');
+                                                    }
+                                                });
+                                            })
+                                        );
+                                    });
+                                    Promise.all(promises2).then(function (res) {
+                                        resolve1(res);
+
+                                    }, function (err) {
+                                        log.debug('ProcessOrder: createOrUpdateJob: promise1_3: reject: ' + err);
+                                        reject1(err);
+                                    });
+
+                                });
+                            });
+                            promises.push(promise2);
+                            Promise.all(promises).then(function (res) {
+                                resolve(res);
+
+                            }, function (err) {
+                                log.debug('ProcessOrder: createOrUpdateJob: promises: reject: ' + err);
+                                reject(err);
+                            });
+                        }
+
+                    });
+                } else {
+                    error = global.i18n.__('the recipe template is not defined');
+                    log.error(error);
+                    reject(error);
+                }
+
+                // //console.log('Job addLine: ' + newJob.addLine);
+                // console.log('Job setLine: ' + newJob.setLine);
+                // console.log('Job getLine: ' + newJob.getLine);
+                // console.log('new Job: ' + JSON.stringify(newJob));
+                // var newJobStr = newJob.getTranslatedJobStr(i18n);
+                // console.log('converted new Job: ' + newJobStr);
+                // res.json({newJobStr: newJobStr});
+            });
+        });
+    });
+
+};
 
 ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
     var me = this;
@@ -123,11 +268,14 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                 if (theMixer) {
                     var remainWeight = 0;
                     var theMaxWeight = theMixer.weightMax;
+                    var promises = [];
                     if (me.targetWeight > theMaxWeight) {
                         var count = me.targetWeight / theMaxWeight;
                         var i = 0;
+
                         for (i = 1; i <= count; i++) {
-                            Job.createJob({
+
+                            promises.push(me.createOrUpdateJob({
                                 ident: me.ident + ':' + utils.pad(i, 6),
                                 name: me.lineIdent,
                                 lineIdent: me.lineIdent,
@@ -137,14 +285,14 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 targetWeight: theMaxWeight,
                                 actualWeight: 0.0,
                                 state: JobState.Created,
-                                LineId: me.LineId
-                            }).then(function (data) {
-                                console.log('transaction info: ' + data);
-                            })
+                                LineId: me.LineId,
+                                processOrderIdent: me.ident
+                            }));
+
                         }
                         remainWeight = me.targetWeight - count * theMaxWeight;
                         if (remainWeight > 0) {
-                            Job.createJob({
+                            promises.push(me.createOrUpdateJob({
                                 ident: me.ident + ':' + utils.pad(i + 1, 6),
                                 name: me.lineIdent,
                                 lineIdent: me.lineIdent,
@@ -154,31 +302,47 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 targetWeight: remainWeight,
                                 actualWeight: 0.0,
                                 state: JobState.Created,
-                                LineId: me.LineId
-                            }).then(function (data) {
-                                console.log('transaction info: ' + data);
-                            });
+                                LineId: me.LineId,
+                                processOrderIdent: me.ident
+                            }));
                         }
                     } else {
                         if (me.targetWeight < theMixer.weightMin) {
                             reject({error: global.i18n.__('target weight is too small.')});
                         } else {
-                            Job.createJob({
-                                ident: me.ident + ':' + utils.pad(i + 1, 6),
-                                name: me.lineIdent,
-                                lineIdent: me.lineIdent,
-                                visible: true,
-                                isTemplate: false,
-                                locked: true,
-                                targetWeight: me.targetWeight,
-                                actualWeight: 0.0,
-                                state: JobState.Created,
-                                LineId: me.LineId
-                            }).then(function (data) {
-                                console.log('transaction info: ' + data);
+                            var promise1 = new Promise(function (resolve1, reject1) {
+                                me.createOrUpdateJob({
+                                    ident: me.ident,
+                                    name: me.lineIdent,
+                                    lineIdent: me.lineIdent,
+                                    visible: true,
+                                    isTemplate: false,
+                                    locked: true,
+                                    targetWeight: me.targetWeight,
+                                    actualWeight: 0.0,
+                                    state: JobState.Created,
+                                    LineId: me.LineId,
+                                    processOrderIdent: me.ident
+                                }).then(function (res) {
+                                    log.debug('ProcessOrder: releaseOrder: res: ' + res);
+                                    resolve1();
+                                },function (err) {
+                                    log.debug('ProcessOrder: releaseOrder: promises: reject: ' + err);
+                                    reject1(err);
+                                });
                             });
+                            promises.push(promise1);
+
+
                         }
                     }
+                    Promise.all(promises).then(function (res) {
+                        resolve(res);
+
+                    }, function (err) {
+                        log.debug('ProcessOrder: releaseOrder: promises: reject: ' + err);
+                        reject(err);
+                    });
                 }
                 else {
                     reject({error: global.i18n.__('theMixer is not found.')});

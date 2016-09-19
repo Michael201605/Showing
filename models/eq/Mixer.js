@@ -3,7 +3,8 @@
  */
 var modelBase = require('../ModelBase');
 var Section = require('./Section');
-
+var utils = require('../../lib/utils');
+var BusinessBase = require('../BusinessBase');
 var Mixer = modelBase.define('Mixer',{
     ident : modelBase.Sequelize.STRING,
     name : modelBase.Sequelize.STRING,
@@ -13,4 +14,5 @@ var Mixer = modelBase.define('Mixer',{
     weightMin: modelBase.Sequelize.DECIMAL
 });
 Mixer.belongsTo(Section);
+utils.inherits(Mixer.Instance.prototype, BusinessBase.prototype);
 module.exports = Mixer;

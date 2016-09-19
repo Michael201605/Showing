@@ -6,22 +6,42 @@ var Product = require('../models/pr/Product');
 var Company = require('../models/eq/Company');
 var Mixer = require('../models/eq/Mixer');
 var OrderItem = require('../models/pr/OrderItem');
-var WarehousePackingType = require('../lib/stateAndCategory/warehousePackingType');
+var OrderState = require('../lib/stateAndCategory/orderState');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
-var labelPrintManager = require('../lib/labelPrintManager');
+var Job = require('../models/pr/Job');
+var utils = require('../lib/utils');
+var log = require('../lib/log');
 
 module.exports = function (app, i18n) {
+    app.get('/order/process/ProcessOrderList', function (req, res) {
+        var state;
+        var filter;
+        if (req.params.state) {
+            state = req.params.state.substring(1);
+            filter = {state: state};
+        }
+
+
+        ProcessOrder.findAll({
+            where: {State: {$notIn: [OrderState.Done]}}
+        }).then(function (processOrders) {
+            console.log('processOrders: ' + processOrders);
+            var processOrdersStr = JSON.stringify(processOrders);
+            res.render('order/process/processOrderList', {
+                processOrders: processOrders
+            });
+        });
+
+    });
     app.get('/order/process/ProcessOrderList/:state', function (req, res) {
         var state = req.params.state.substring(1);
-        console.log('global.i18n: ' + global.i18n);
         ProcessOrder.findAll({
             where: {State: state}
         }).then(function (processOrders) {
             console.log('processOrders: ' + processOrders);
             var processOrdersStr = JSON.stringify(processOrders);
             res.render('order/process/processOrderList', {
-                processOrders: processOrders,
-                state: state
+                processOrders: processOrders
             });
         });
 
@@ -84,9 +104,7 @@ module.exports = function (app, i18n) {
             where: {id: id}
         }).then(function (theProcessOrder) {
             if (theProcessOrder) {
-                var packingCategoryStr = JSON.stringify(getTranslateOptions(WarehousePackingType, i18n));
-                console.log('packingCategoryStr: ' + packingCategoryStr);
-                var processOrderJson = theProcessOrder.getJsonObject();
+                var processOrderJson = theProcessOrder.getTranslatedObject(OrderState);
                 theProcessOrder.getOrderItems().then(function (orderItems) {
                     processOrderJson.orderItems = orderItems;
                     Product.findAll({where: {category: 1}}).then(function (products) {
@@ -226,11 +244,22 @@ module.exports = function (app, i18n) {
             where: {id: id}
         }).then(function (theProcessOrder) {
             theProcessOrder.releaseOrder(i18n).then(function (info) {
+                theProcessOrder.state = OrderState.Released;
+                theProcessOrder.save();
+                Job.findAll({where: {processOrderIdent: theProcessOrder.ident}}).then(function (jobs) {
+                    jobs.forEach(function (theJob) {
+                        theJob.updateIngredients();
+                    });
+                });
                 res.json({
-                    update: {state: 80},
+                    update: {
+                        state: OrderState.Released,
+                        displayState: i18n.__(utils.getDisplayState(OrderState, OrderState.Released))
+                    },
                     info: i18n.__('release successfully.')
                 });
             }, function (errInfo) {
+                log.error(errInfo);
                 if (Array.isArray(errInfo)) {
                     res.json({
                         errors: errInfo

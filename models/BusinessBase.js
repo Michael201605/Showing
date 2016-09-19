@@ -14,6 +14,19 @@ BusinessBase.prototype = {
         var jobStr = JSON.stringify(this);
         return JSON.parse(jobStr);
     },
+    getTranslatedObject: function (stateEnum) {
+        var JSONObject = this.getJsonObject();
+        if(JSONObject.state){
+            if(stateEnum){
+                JSONObject.displayState = global.i18n.__(utils.getDisplayState(stateEnum, JSONObject.state));
+            }else {
+                JSONObject.displayState = JSONObject.state;
+            }
+
+        }
+
+        return JSONObject;
+    },
     getGcObjectParameter: function () {
 
         var ElemGcObjectParameter = null;

@@ -240,7 +240,7 @@ recipeApp.controller('RecipeDetailCtrl', function ($scope, $http, $filter) {
     function setStorages() {
         var isProduce = $scope.isProduce;
         if (isProduce) {
-            $.get('/storage/getStorageList/:' + 1, function (storages) {
+            $.get('/storage/getStorageList/:' + 3, function (storages) {
                 console.log('storages');
                 console.log(storages);
                 $scope.receiverStorages = storages;
