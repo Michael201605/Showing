@@ -157,37 +157,43 @@ Job.Instance.prototype.updateIngredients = function () {
     me.getRecipe().then(function (theRecipe) {
         theRecipe.getSenders().then(function (ingredients) {
             ingredients.forEach(function (ingredient) {
-                if(ingredient.ProductId && ingredient.ProductId>0){
-                    if(ingredient.category === 0){
-                        Storage.findAll({where:{
-                            ProductId: ingredient.ProductId,
-                            category: 10
-                        }}).then(function (storages) {
+                if (ingredient.ProductId && ingredient.ProductId > 0) {
+                    if (ingredient.category === 0) {
+                        Storage.findAll({
+                            where: {
+                                ProductId: ingredient.ProductId,
+                                category: 10
+                            }
+                        }).then(function (storages) {
                             storages.every(function (theStorage) {
-                                if(theStorage.currentWeight >= ingredient.targetWeight){
+                                if (theStorage.currentWeight >= ingredient.targetWeight) {
                                     ingredient.StorageId = theStorage.id;
                                     ingredient.storageIdent = theStorage.ident;
                                     ingredient.save();
                                     return false;
-                                }else {
+                                } else {
                                     return true;
                                 }
                             })
                         });
-                        if(!ingredient.StorageId || ingredient.StorageId<=0){
-                            Storage.findOne({where:{
-                                category: 2
-                            }}).then(function (theStorage) {
+                        if (!ingredient.StorageId || ingredient.StorageId <= 0) {
+                            Storage.findOne({
+                                where: {
+                                    category: 2
+                                }
+                            }).then(function (theStorage) {
                                 ingredient.StorageId = theStorage.id;
                                 ingredient.storageIdent = theStorage.ident;
                                 ingredient.save();
                             });
                         }
                     }
-                    if(ingredient.category === 1){
-                        Storage.findOne({where:{
-                            category: 3
-                        }}).then(function (theStorage) {
+                    if (ingredient.category === 1) {
+                        Storage.findOne({
+                            where: {
+                                category: 3
+                            }
+                        }).then(function (theStorage) {
                             ingredient.StorageId = theStorage.id;
                             ingredient.storageIdent = theStorage.ident;
                             ingredient.save();

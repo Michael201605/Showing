@@ -17,6 +17,7 @@ $(function () {
     var selected = [];
     var orderItemsDataTable = $('#bomTable').DataTable();
     setBKColor($('#state').val());
+    $('#15').html('the text is 15');
     options = [];
     products.forEach(function (product) {
         options.push("<option value='" + product.id + "'>" + product.ident + "</option>");
@@ -74,8 +75,8 @@ $(function () {
             selected.push(this.id);
             console.log('selected');
             console.dir(selected);
-            console.dir(this);
-            console.dir($(this).find('input[type="number"]'));
+            // console.dir(this);
+            // console.dir($(this).find('input[type="number"]'));
             $(this).find('input[type="number"]').attr('disabled', false);
         }
     });
@@ -137,6 +138,10 @@ $(function () {
                         if (selected.length > 0) {
                             var itemId = selected[0];
                             $('#' + itemId).find('label').html(ui.item.label);
+                            console.log('label: ');
+                            console.dir($('#' + itemId).find('label'));
+                            console.log('text: ');
+                            console.dir($('#' + itemId).find('input[type="text"]'));
                             var orderItemInfo = {
                                 productIdent: ui.item.label,
                                 ProductId: ui.item.value

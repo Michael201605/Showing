@@ -1,7 +1,7 @@
 /**
  * Created by pi on 8/17/16.
  */
-var GcObjectDialog, jobListDialog, jobDetailDialog, StorageDialog, ScaleDialog, socket;
+var GcObjectDialog, jobListDialog, jobDetailDialog, jobQueueDialog, StorageDialog, ScaleDialog, socket;
 $(function () {
     //modal dialog------
 
@@ -53,6 +53,22 @@ $(function () {
         buttons: {
             Cancel: function () {
                 jobListDialog.dialog("close");
+            }
+        },
+        close: function () {
+
+        }
+    });
+
+    jobQueueDialog = $("#jobQueueDialog").dialog({
+        title: 'GcObject',
+        autoOpen: false,
+        height: 900,
+        width: 1200,
+        modal: false,
+        buttons: {
+            Cancel: function () {
+                jobQueueDialog.dialog("close");
             }
         },
         close: function () {
@@ -283,7 +299,7 @@ function jobDetail(jobId) {
     $.get('/job/getJobDetail/:' + jobId, function (data) {
         var theJob;
         var recipe;
-        if(!data.error){
+        if (!data.error) {
             theJob = data.job;
             recipe = theJob.recipe;
             console.log('recipe: ');
@@ -377,7 +393,7 @@ function jobDetail(jobId) {
             setJobBKColor(theJob.state);
 
 
-        }else{
+        } else {
             $('#jobsErrors').append('<li>' + data.error + '</li>');
         }
     });
@@ -478,10 +494,10 @@ function jobDetail(jobId) {
                                         productIdent: product.ident,
                                         productName: product.name
                                     }, function (data) {
-                                        if(data.error){
+                                        if (data.error) {
                                             $('#jobErrors').append('<li>' + data.error + '</li>');
                                         }
-                                        if(data.info){
+                                        if (data.info) {
                                             $('#jobInfos').append('<li>' + data.info + '</li>');
                                         }
                                     });
@@ -507,7 +523,110 @@ function jobDetail(jobId) {
 
     }
 }
+function jobQueue(lineIdent) {
+    var activeJobsDataTable;
+    var clickMethod = '';
+    jobQueueDialog.dialog('option', 'title', 'JobQueue: ' + lineIdent);
+    jobQueueDialog.dialog('open');
+    $("#scheduleJobs").sortable({
+        connectWith: ".connectedSortable",
+        receive: function (event, ui) {
+            console.log('receive');
+            console.log("pendingJobs New position: " + ui.item.index());
+            console.dir(ui);
+        },
+        stop: function (event, ui) {
+            console.log('stop');
+            console.log("scheduleJobs: New position: " + ui.item.index());
+            console.dir(ui);
 
+        },
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+
+            // POST to server using $.post or $.ajax
+            console.log('data when update');
+            console.dir(data);
+        }
+    }).disableSelection();
+    $("#pendingJobs").sortable({
+        connectWith: ".connectedSortable",
+        receive: function (event, ui) {
+            console.log('receive');
+            console.log("pendingJobs New position: " + ui.item.index());
+            console.dir(ui);
+        },
+        stop: function (event, ui) {
+            console.log('stop');
+            console.log("pendingJobs New position: " + ui.item.index());
+            console.dir(ui);
+
+        },
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+
+            // POST to server using $.post or $.ajax
+            console.log('data when update');
+            console.dir(data);
+        }
+    }).disableSelection();
+
+    if (lineIdent) {
+        var url = '/job/getJobList/:' + lineIdent;
+        $.get('/job/getJobList/:' + lineIdent, function (data) {
+            console.log('jobListStr: ' + data.jobs);
+            $('#lineIdent').val(data.lineIdent);
+            var jobList = JSON.parse(data.jobs);
+            activeJobsDataTable = $('#activeJobs').DataTable();
+            jobList.forEach(function (theJob) {
+                clickMethod = 'jobDetail(' + theJob.id + ')';
+                if (theJob.state === 121 || theJob.state === 120) {
+
+                } else if (theJob.state === 122) {
+
+                } else if (theJob.state === 80) {
+                    //do nothing
+                } else {
+                    //active jobs
+                    var rowNode = activeJobsDataTable.row.add([
+                        '<a href="javascript:void(0);" onclick=' + clickMethod + '>' + theJob.ident + '</a>',
+                        theJob.lineIdent,
+                        theJob.displayState
+                    ]).draw(false).node();
+                    $(rowNode).attr('id', theJob.id);
+                }
+
+
+            });
+
+
+        });
+    } else {
+        alert('line Ident is empty');
+    }
+    var count = 0;
+    $('#scheduleJobs li').click(function (e) {
+        var jobId = $(this).attr('jobId');
+        if (jobId && jobId > 0) {
+            jobDetail(parseInt(jobId));
+        } else {
+            alert('job id is empty');
+        }
+        return false;
+    })
+
+
+}
+function updateScheduledJobs() {
+    $("#scheduleJobs li").each(function (i, el) {
+        var jobId = $(el).attr('jobId');
+        var info = jobId + ' : ' + $(el).index();
+        console.log(info);
+    });
+}
+function updatePendingJobs() {
+
+}
 function GcObject(gcIdent) {
     console.log('ident: ' + gcIdent);
 

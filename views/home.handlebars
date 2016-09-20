@@ -1,36 +1,68 @@
 {{#section 'head'}}
     <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet">
     <style>
-        table.dataTable tbody tr{
+        table.dataTable tbody tr {
             background-color: #323232;
         }
-        .title{
+
+        .title {
             padding-left: 25%;
             color: ghostwhite;
         }
-        header{
+
+        header {
             background-color: lightseagreen;
         }
-        .right-button{
+
+        .right-button {
             padding-top: 50%;
         }
-        .details{
+
+        .details {
             padding-top: 1%;
             background-color: #a7dbd8;
             padding-bottom: 15%;
         }
-        .info{
+
+        .info {
             color: green;
         }
-        .error{
+
+        .error {
             color: red;
         }
-        .leftSide{
+
+        .leftSide {
 
         }
-        .list{
+
+        .list {
             padding-top: 2%;
             color: white;
+        }
+
+        #scheduleJobs, #pendingJobs {
+            border: 1px solid #eee;
+            width: 100%;
+            min-height: 20px;
+            list-style-type: none;
+            margin: 0;
+            padding: 5px 0 0 0;
+            float: left;
+            margin-right: 10px;
+        }
+
+        #scheduleJobs li, #pendingJobs li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            width: 100%;
+        }
+        #scheduleJobs li a{
+            width: 50%;
+        }
+        #scheduleJobs li label{
+            width: 25%;
         }
     </style>
 {{/section}}
@@ -112,7 +144,7 @@
     </div>
 </div>
 
-//dialog
+<!--jobList dialog-->
 <div id="jobListDialog" class="container main">
 
     <div class="row">
@@ -124,7 +156,7 @@
 
                         <br>
                         <br>
-                        <ul id="infos" class="info">
+                        <ul id="jobsInfos" class="info">
 
                         </ul>
                     </div>
@@ -184,7 +216,7 @@
     </div>
 </div>
 
-//jobDetail dialog
+<!--jobDetail dialog-->
 <div id="jobDetailDialog" class="container main">
     <!--<input id="job" type="text" class="hidden" value="{{job}}"/>-->
     <!--<input id="lineId" type="text" class="hidden" value="{{job.LineId}}"/>-->
@@ -198,7 +230,7 @@
                 <h2 class="title">{{{__ "Job Detail"}}}</h2>
             </div>
             <!--<div class="col-lg-3 list">-->
-                <!--<a href="/job/jobList/:{{job.lineIdent}}" class="list">{{{__ "Job List"}}}</a>-->
+            <!--<a href="/job/jobList/:{{job.lineIdent}}" class="list">{{{__ "Job List"}}}</a>-->
             <!--</div>-->
         </div>
 
@@ -264,15 +296,17 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "Product"}}}</label>
                     <div class="col-md-4">
-                        <input type="text" class="form-control hidden" id="productIdent" name="productIdent" value="{{job.productIdent}}"/>
-                        <input type="text" class="form-control" id="productName" name="productName" value="{{job.productName}}" disabled
+                        <input type="text" class="form-control hidden" id="productIdent" name="productIdent"
+                               value="{{job.productIdent}}"/>
+                        <input type="text" class="form-control" id="productName" name="productName"
+                               value="{{job.productName}}" disabled
                         />
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "TargetWeight"}}}</label>
                     <div class="col-md-4">
-                        <input type="number" class="form-control" id ="targetWeight" name="targetWeight" step="any"
+                        <input type="number" class="form-control" id="targetWeight" name="targetWeight" step="any"
                                value="{{job.targetWeight}}"/>
                     </div>
 
@@ -280,7 +314,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{{__ "ActualWeight"}}}</label>
                     <div class="col-md-4">
-                        <input type="number" class="form-control" id="actualWeight" name="ActualWeight" step="any" disabled
+                        <input type="number" class="form-control" id="actualWeight" name="ActualWeight" step="any"
+                               disabled
                                value="{{job.actualWeight}}"/>
                     </div>
 
@@ -311,6 +346,148 @@
                     <button id='save' type="submit" class="btn btn-primary">{{{__ "save"}}}</button>
                 </div>
             </form>
+        </div>
+        <div class="col-lg-3">
+            <div class="btn-group right-button" role="group" aria-label="Basic example">
+                <button id="jobQueueCheckJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
+                <button id="jobQueueStartJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
+                <button id="jobQueueDoneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--jobQueue dialog-->
+<div id="jobQueueDialog" class="container main">
+    <header class="row">
+        <div class="col-lg-3">
+
+        </div>
+        <div class="col-lg-6">
+            <h2 class="title">{{{__ "Job Queue"}}}</h2>
+        </div>
+        <div class="col-lg-3">
+
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="row">
+                <fieldset>
+                    <legend class="title">{{{__ "Informations: "}}}</legend>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+
+                        <br>
+                        <br>
+                        <ul id="jobQueueInfos" class="info">
+
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="row">
+                <fieldset>
+                    <legend class="title">{{{__ "Errors"}}}</legend>
+                    <div class="col-lg-12">
+
+                        <br>
+                        <br>
+                        <ul id="jobQueueErrors" class="error">
+
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+        </div>
+        <div class="col-lg-6 details">
+            <div class="row">
+                <div class="col-lg-12">
+                    <table id="activeJobs" class="table table-bordered table-hover">
+                        <caption>{{{__ "Active Job"}}}</caption>
+                        <thead>
+                        <tr>
+                            <th>{{{__ "Ident"}}}</th>
+                            <th>{{{__ "LineIdent"}}}</th>
+                            <th>{{{__ "State"}}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th>{{{__ "Ident"}}}</th>
+                            <th>{{{__ "LineIdent"}}}</th>
+                            <th>{{{__ "State"}}}</th>
+                        </tr>
+                        </tfoot>
+                        <!--<tr ng-repeat="job in jobs">-->
+                        <!--<td>-->
+                        <!--<input type="checkbox" ng-model="job.selected"/>-->
+                        <!--</td>-->
+                        <!--<td><a href="/job/jobDetail/:{[{job.id}]}">{[{job.ident}]}</a></td>-->
+                        <!--<td>{[{job.lineIdent}]}</td>-->
+                        <!--<td>{[{job.displayState}]}</td>-->
+                        <!--</tr>-->
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <label class="">{{{__ "Scheduled Jobs"}}}</label>
+                    <ul id="scheduleJobs" class="connectedSortable">
+                        <li class="ui-state-default ui-state-disabled">
+                            <label>{{{__ "Ident"}}}</label>
+                            <label>{{{__ "State"}}}</label>
+                            <label>{{{__ "Receiver"}}}</label>
+                        </li>
+                        <li class="ui-state-default" jobId="46">
+                            <label><a href="javascript:void(0);">PO:000046</a></label>
+                            <label>Created</label>
+                            <label>901</label>
+                        </li>
+                        <li class="ui-state-default" jobId="45">
+                            <label><a href="javascript:void(0);" >PO:000045</a></label>
+                            <label>Created</label>
+                            <label>902</label>
+                        </li>
+                        <li class="ui-state-default" jobId="44">
+                            <label><a href="javascript:void(0);" >PO:000044</a></label>
+                            <label>Created</label>
+                            <label>901</label>
+                        </li>
+                        <li class="ui-state-default" jobId="43">
+                            <label><a href="javascript:void(0);" >PO:000043</a></label>
+                            <label>Created</label>
+                            <label>902</label>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <label class="">{{{__ "Pending Jobs"}}}</label>
+                    <ul id="pendingJobs" class="connectedSortable">
+                        <li class="ui-state-default ui-state-disabled">
+                            <label>{{{__ "Ident"}}}</label>
+                            <label>{{{__ "State"}}}</label>
+                            <label>{{{__ "Receiver"}}}</label>
+                        </li>
+                        <li class="ui-state-highlight">Item 1</li>
+                        <li class="ui-state-highlight">Item 2</li>
+                        <li class="ui-state-highlight">Item 3</li>
+                        <li class="ui-state-highlight">Item 4</li>
+                        <li class="ui-state-highlight">Item 5</li>
+                    </ul>
+                </div>
+
+            </div>
+
+
         </div>
         <div class="col-lg-3">
             <div class="btn-group right-button" role="group" aria-label="Basic example">

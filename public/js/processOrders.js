@@ -14,7 +14,7 @@ $(function () {
                 console.log('newProcessOrder id: ' + newProcessOrder.id);
                 console.log('newProcessOrder State: ' + newProcessOrder.displayState);
                 var rowNode = processOrdersDataTable.row.add([
-                    '<a href="/order/process/processOrderDetail/:"' + newProcessOrder.id + '>' + newProcessOrder.ident + '</a>',
+                    '<a href="/order/process/processOrderDetail/:' + newProcessOrder.id + '">' + newProcessOrder.ident + '</a>',
                     newProcessOrder.productIdent,
                     newProcessOrder.targetWeight,
                     newProcessOrder.mixerIdent

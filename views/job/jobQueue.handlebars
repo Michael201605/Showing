@@ -21,6 +21,22 @@
         .error{
             color: red;
         }
+        #activeJobs, #scheduleJobs, #pendingJobs {
+            border: 1px solid #eee;
+            width: 142px;
+            min-height: 20px;
+            list-style-type: none;
+            margin: 0;
+            padding: 5px 0 0 0;
+            float: left;
+            margin-right: 10px;
+        }
+        #activeJobs li, #activeJobs li, #pendingJobs li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            width: 120px;
+        }
     </style>
 {{/section}}
 <div class="container main">
@@ -64,86 +80,36 @@
 
         </div>
         <div class="col-lg-6 details">
-            <form class="form-horizontal" role="form" method="post">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "Ident"}}}</label>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" id="ident" name="ident" disabled
-                               value="{{job.ident}}"/>
-                        <input type="text" class="form-control hidden" id="jobId" name="id"
-                               value="{{job.id}}"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "Line Ident"}}}</label>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" id="lineIdent" name="lineIdent" disabled
-                               value="{{job.lineIdent}}"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "State"}}}</label>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" id="state" name="state" disabled
-                               value="{{job.displayState}}"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "Locked"}}}</label>
-                    <div class="col-md-4">
-                        <label><input type="checkbox" value="{{job.locked}}" id="locked" name="locked"></label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "Product"}}}</label>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control hidden" id="productIdent" name="productIdent" value="{{job.productIdent}}"/>
-                        <input type="text" class="form-control" id="productName" name="productName" value="{{job.productName}}" disabled
-                        />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "TargetWeight"}}}</label>
-                    <div class="col-md-4">
-                        <input type="number" class="form-control" id ="targetWeight" name="targetWeight" step="any"
-                               value="{{job.targetWeight}}"/>
-                    </div>
+            <div class="">
+                <ul id="activeJobs" class="connectedSortable">
+                    <li class="ui-state-default">Item 1</li>
+                    <li class="ui-state-default">Item 2</li>
+                    <li class="ui-state-default">Item 3</li>
+                    <li class="ui-state-default">Item 4</li>
+                    <li class="ui-state-default">Item 5</li>
+                </ul>
+            </div>
+            <div class="">
+                <ul id="scheduleJobs" class="connectedSortable">
+                    <li class="ui-state-default">Item 1</li>
+                    <li class="ui-state-default">Item 2</li>
+                    <li class="ui-state-default">Item 3</li>
+                    <li class="ui-state-default">Item 4</li>
+                    <li class="ui-state-default">Item 5</li>
+                </ul>
+            </div>
+            <div class="">
+                <ul id="pendingJobs" class="connectedSortable">
+                    <li class="ui-state-highlight">Item 1</li>
+                    <li class="ui-state-highlight">Item 2</li>
+                    <li class="ui-state-highlight">Item 3</li>
+                    <li class="ui-state-highlight">Item 4</li>
+                    <li class="ui-state-highlight">Item 5</li>
+                </ul>
+            </div>
 
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "ActualWeight"}}}</label>
-                    <div class="col-md-4">
-                        <input type="number" class="form-control" name="ActualWeight" step="any" disabled
-                               value="{{job.actualWeight}}"/>
-                    </div>
 
-                </div>
-                <div class="form-group">
 
-                    <label class="col-md-2 control-label">{{{__ "Sender"}}}</label>
-                    <div class="col-md-4">
-                        <select class="col-md-6" name="senderStorage" id="senderStorages">
-                            <option></option>
-                        </select>
-                        <input type="text" class="col-md-6 form-control" id="sender" disabled
-                        />
-                    </div>
-
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{{__ "Receiver"}}}</label>
-                    <div class="col-md-4">
-                        <select class="col-md-6" name="receiverStorages" id="receiverStorages">
-                            <option></option>
-                        </select>
-                        <input type="text" class="col-lg-6 col-md-6 form-control" id="receiver" disabled
-                        />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button id='save' type="submit" class="btn btn-primary">{{{__ "save"}}}</button>
-                </div>
-            </form>
         </div>
         <div class="col-lg-3">
             <div class="btn-group right-button" role="group" aria-label="Basic example">
@@ -155,6 +121,12 @@
     </div>
 </div>
 {{#section 'jquery'}}
-    <script src="/js/job.js"></script>
+    <script>
+        $( function() {
+            $( "#sortable1, #sortable2" ).sortable({
+                connectWith: ".connectedSortable"
+            }).disableSelection();
+        } );
+    </script>
 
 {{/section}}

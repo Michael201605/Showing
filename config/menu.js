@@ -79,8 +79,9 @@ var ConfigureMenus = [
                 navigation : true,
                 SubMenus: [
                     {
-                        name: 'Jobs',
-                        url: 'job/jobList/:MIX1'
+                        name: 'JobQueue',
+                        url: 'javascript:void(0);',
+                        clickMethod:"jobQueue('MIX1')"
                     },
                     {
                         name: 'JobLog',
