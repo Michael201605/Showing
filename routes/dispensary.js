@@ -41,7 +41,77 @@ module.exports = function (app, i18n) {
         });
 
     });
+    app.get('/station/dispensary/scanBarcode/:id/:barcode', function (req, res) {
+        var id = req.params.id.substring(1);
+        var barcode = req.params.barcode.substring(1);
+        var jobJson = {};
+        var segments = barcode.split('_');
+        var productIdent = '';
+        var lotIdent = '';
+        if (segments.length && segments.length > 1) {
+            productIdent = segments[0];
+            lotIdent = segments[1];
+            Job.findOne({
+                where: {id: id}
+            }).then(function (theJob) {
+                if (theJob) {
+                    if (productIdent === theJob.productIdent) {
+                        if (segments.length === 3) {
+                            console.log('barcode: ' + barcode);
+                            Layer.findOne({where: {sscc: barcode}}).then(function (theLayer) {
+                                if (theLayer) {
 
+                                    if (theJob.state === JobState.Created) {
+                                        theJob.start(controllerManager, i18n).then(function () {
+                                            theJob.registerAssemblyToStorage(theLayer, i18n).then(function (remainWeight) {
+                                                theJob.update({actualWeight: remainWeight});
+                                                res.json({
+                                                    update: {
+                                                        displayState: getDisplayState(JobState, JobState.Loading),
+                                                        state: JobState.Loading,
+                                                        actualWeight: remainWeight
+                                                    },
+                                                    info: i18n.__('Job is loading, Please scan next barcode.')
+                                                });
+                                            }, function (pError1) {
+                                                res.json(pError1);
+                                            });
+                                        }, function (pError) {
+                                            res.json(pError);
+                                        });
+                                    } else {
+                                        theJob.registerAssemblyToStorage(theLayer).then(function () {
+                                            res.json({
+                                                info: i18n.__('Please scan next barcode.')
+                                            });
+                                        }, function (pError1) {
+                                            res.json(pError1);
+                                        });
+
+                                    }
+                                } else {
+                                    res.json({error: i18n.__('Layer is not found.')});
+                                }
+                            });
+                        } else {
+                            res.json({error: i18n.__('barcode length is invalid')});
+                        }
+
+                    } else {
+                        res.json({error: i18n.__('take wrong product')});
+                    }
+                }
+                else {
+                    res.json({error: i18n.__('Job: %s is empty.', id)});
+                }
+
+            });
+        } else {
+            res.json({error: i18n.__('barcode is invalid')});
+        }
+
+
+    });
 };
 
 function isLoggedIn(req, res, next) {

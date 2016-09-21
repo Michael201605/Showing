@@ -854,17 +854,29 @@ function showTypeButtons(category) {
         case 'BeltMonitor':
         case 'SpeedMonitor':
             $('#healtyUnhealty').removeClass('hidden');
+            $('#startStop').addClass('hidden');
+            $('#coverUncover').addClass('hidden');
+            $('#openClose').addClass('hidden');
             break;
         case 'FilterControl':
         case 'SimpleMotor':
             $('#startStop').removeClass('hidden');
+            $('#coverUncover').addClass('hidden');
+            $('#openClose').addClass('hidden');
+            $('#healtyUnhealty').addClass('hidden');
             break;
         case 'HighLevel':
         case 'LowLevel':
             $('#coverUncover').removeClass('hidden');
+            $('#openClose').addClass('hidden');
+            $('#healtyUnhealty').addClass('hidden');
+            $('#startStop').addClass('hidden');
             break;
         case 'ValveOpenClose':
             $('#openClose').removeClass('hidden');
+            $('#healtyUnhealty').addClass('hidden');
+            $('#startStop').addClass('hidden');
+            $('#coverUncover').addClass('hidden');
             break;
     }
 }

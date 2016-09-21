@@ -112,47 +112,30 @@
                             </table>
                         </div>
                         <div class="row">
-                            <div class="col-lg-6">
-                                <table id="availableRawTable" class="table table-bordered table-hover">
-                                    <caption>{{{__ "Dispensary job Management"}}}</caption>
+                            <div class="col-lg-12">
+                                <table id="haveAssemblyedTable" class="table table-bordered table-hover">
+                                    <caption>{{{__ "have assemblyed"}}}</caption>
                                     <thead>
                                     <tr>
-                                        <th>{{{__ "Barcode"}}}</th>
                                         <th>{{{__ "ProductIdent"}}}</th>
-                                        <th>{{{__ "UnitSize"}}}</th>
+                                        <th>{{{__ "ActualWeight"}}}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {{#each availiablelayers}}
+                                    {{#each assemblyedLayers}}
                                         <tr id="{{id}}">
-                                            <td>{{sscc}}</td>
                                             <td>{{productIdent}}</td>
-                                            <td>{{unitSize}}</td>
+                                            <td>{{actualWeight}}</td>
                                         </tr>
                                     {{/each}}
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col-lg-6">
-                                <table id="haveAssemblyedTable" class="table table-bordered table-hover">
-                                    <caption>{{{__ "Dispensary job Management"}}}</caption>
-                                    <thead>
-                                    <tr>
-                                        <th>{{{__ "Ident"}}}</th>
-                                        <th>{{{__ "ProductIdent"}}}</th>
-                                        <th>{{{__ "TargetWeight"}}}</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {{#each dispensaryJobs}}
-                                        <tr id="{{id}}">
-                                            <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{ident}}</a></td>
-                                            <td>{{productIdent}}</td>
-                                            <td>{{targetWeight}}</td>
-                                        </tr>
-                                    {{/each}}
-                                    </tbody>
-                                </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label class="col-lg-6">{{{__ "Please scan barcode"}}}</label>
+                                <input id="barcode" class="col-lg-6">
                             </div>
                         </div>
                     </div>

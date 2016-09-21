@@ -527,7 +527,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
-    app.get('/job/station/scaneBarcode/:id/:barcode', function (req, res) {
+    app.get('/job/station/scanBarcode/:id/:barcode', function (req, res) {
         var id = req.params.id.substring(1);
         var barcode = req.params.barcode.substring(1);
         var jobJson = {};

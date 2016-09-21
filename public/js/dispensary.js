@@ -5,17 +5,17 @@ $(document).ready(function() {
     var pressed = false;
     var chars = [];
     $(window).keypress(function(e) {
-        if (e.which >= 48 && e.which <= 57) {
+        if ((e.which >= 48 && e.which <= 57)||(e.which >= 65 && e.which <= 90)||(e.which >= 97 && e.which <= 122)||e.which ==95) {
             chars.push(String.fromCharCode(e.which));
         }
         console.log(e.which + ":" + chars.join("|"));
         if (pressed == false) {
             setTimeout(function(){
                 if (chars.length >= 10) {
-                    var barcode = chars.join("");
-                    console.log("Barcode Scanned: " + barcode);
+                    barcodeText = chars.join("");
+                    console.log("Barcode Scanned: " + barcodeText);
                     // assign value to some input (or do whatever you want)
-                    $("#barcode").val(barcode);
+                    $("#barcode").val(barcodeText);
                 }
                 chars = [];
                 pressed = false;
@@ -24,12 +24,16 @@ $(document).ready(function() {
         pressed = true;
     });
 });
+var barcodeText;
 $("#barcode").keypress(function(e){
     if ( e.which === 13 ) {
-        console.log("Prevent form submit.");
-        e.preventDefault();
+        barcodeText = $(this).val();
+        console.log("Barcode input: " + barcodeText);
     }
 });
+function assemblyToJob(barcode) {
+    
+}
 function onGetDevices(ports) {
     for(var i=0;i<ports.length; i++){
         console.log(ports[i].path);

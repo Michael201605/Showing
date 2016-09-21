@@ -217,7 +217,7 @@ $(function () {
         var jobId = $('#jobId').val();
         $('#barcode').attr('disabled', true);
         if (barcode) {
-            $.get('/job/station/scaneBarcode/:' + jobId + '/:' + barcode, function (data) {
+            $.get('/job/station/scanBarcode/:' + jobId + '/:' + barcode, function (data) {
                 if (data) {
                     if (data.error) {
                         $('#errors').append('<li>' + data.error + '</li>');

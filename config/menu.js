@@ -84,6 +84,10 @@ var ConfigureMenus = [
                         clickMethod:"jobQueue('MIX1')"
                     },
                     {
+                        name: 'Jobs',
+                        url: 'job/jobList/:MIX1'
+                    },
+                    {
                         name: 'JobLog',
                         url: 'job/jobLogList/:MIX1'
                     },

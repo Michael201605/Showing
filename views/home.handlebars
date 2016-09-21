@@ -61,10 +61,11 @@
             background-color: slategrey;
         }
 
-        span label{
+        span label {
             padding-left: 2%;
             width: 25%;
         }
+
         #scheduleJobs li a {
             width: 50%;
         }
@@ -246,25 +247,33 @@
     <div class="row">
         <div class="col-lg-3 leftSide">
             <div class="row">
-                <div class="col-lg-12">
-                    <label class="col-md-2 control-label">{{{__ "Informations: "}}}</label>
-                    <br>
-                    <br>
-                    <ul id="jobInfos" class="info">
+                <fieldset>
+                    <legend class="title">{{{__ "Informations: "}}}</legend>
+                    <div class="col-lg-12">
 
-                    </ul>
-                </div>
+                        <br>
+                        <br>
+                        <ul id="jobInfos" class="info">
+
+                        </ul>
+                    </div>
+                </fieldset>
+
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-lg-12">
-                    <label class="col-md-2 control-label">{{{__ "Errors"}}}</label>
-                    <br>
-                    <br>
-                    <ul id="jobErrors" class="error">
 
-                    </ul>
-                </div>
+            <div class="row">
+                <fieldset>
+                    <legend class="title">{{{__ "Errors"}}}</legend>
+                    <div class="col-lg-12">
+
+                        <br>
+                        <br>
+                        <ul id="jobErrors" class="error">
+
+                        </ul>
+                    </div>
+                </fieldset>
+
             </div>
 
         </div>
@@ -357,9 +366,9 @@
         </div>
         <div class="col-lg-3">
             <div class="btn-group right-button" role="group" aria-label="Basic example">
-                <button id="jobQueueCheckJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
-                <button id="jobQueueStartJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
-                <button id="jobQueueDoneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
+                <button id="checkJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
+                <button id="startJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
+                <button id="doneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
             </div>
         </div>
     </div>
@@ -477,9 +486,9 @@
         </div>
         <div class="col-lg-3">
             <div class="btn-group right-button" role="group" aria-label="Basic example">
-                <button id="checkJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
-                <button id="startJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
-                <button id="doneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
+                <button id="jobQueueCheckJob" class="btn btn-primary">{{{__ "check Job"}}}</button>
+                <button id="jobQueueStartJob" class="btn btn-danger">{{{__ "Start Job"}}}</button>
+                <button id="jobQueueDoneJob" class="btn btn-danger">{{{__ "Done Job"}}}</button>
             </div>
         </div>
     </div>
