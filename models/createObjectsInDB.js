@@ -25,6 +25,7 @@ var GroupUser = require('./um/GroupUser');
 var UserGroup = require('./um/UserGroup');
 var User = require('./um/User');
 var AccessRight = require('./um/AccessRight');
+var Assembly = require('./pr/Assembly');
 var LineCategory = require('../lib/stateAndCategory/lineCategory');
 var GcsState = require('../lib/stateAndCategory/gcsState');
 var StorageCategory = require('../lib/stateAndCategory/storageCategory');
@@ -41,22 +42,36 @@ var type = '';
 var segments = [];
 var elements = [];
 
-
-Mixer.bulkCreate([
+Assembly.bulkCreate([
     {
-        ident: 'mixer001',
-        name: 'mixer001',
+        jobIdent: 'PO:000033',
+        name: 'PO:000033',
+        JobId: 46,
         state: 10,
-        weightMax: 1000,
-        weightMin: 200,
-        SectionId: 12
+        targetWeight: 65
     }
 
 ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
-    return Mixer.findAll();
-}).then(function(mixers) {
-    console.log(mixers); // ... in order to get the array of user objects
+    return Assembly.findAll();
+}).then(function(assemblys) {
+    console.log(assemblys); // ... in order to get the array of user objects
 });
+
+// Mixer.bulkCreate([
+//     {
+//         ident: 'mixer001',
+//         name: 'mixer001',
+//         state: 10,
+//         weightMax: 1000,
+//         weightMin: 200,
+//         SectionId: 12
+//     }
+//
+// ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+//     return Mixer.findAll();
+// }).then(function(mixers) {
+//     console.log(mixers); // ... in order to get the array of user objects
+// });
 // fs.readFile('PLC.csv', 'utf8', function (err, data) {
 //     if (err) {
 //         console.log( err);

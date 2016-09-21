@@ -27,6 +27,7 @@
     "body-parser": "^1.15.2",
     "bootstrap-combobox": "^1.0.2",
     "browser-serialport": "^2.0.3",
+    "chrome-manifest": "^0.2.9",
     "colors": "^1.1.2",
     "connect-flash": "^0.1.1",
     "continuation-local-storage": "^3.2.0",

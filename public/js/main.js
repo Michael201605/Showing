@@ -526,27 +526,33 @@ function jobDetail(jobId) {
 function jobQueue(lineIdent) {
     var activeJobsDataTable;
     var clickMethod = '';
+    var $li, $ident, $state, $receiver;
+    var selected = [];
     jobQueueDialog.dialog('option', 'title', 'JobQueue: ' + lineIdent);
     jobQueueDialog.dialog('open');
     $("#scheduleJobs").sortable({
         connectWith: ".connectedSortable",
         receive: function (event, ui) {
             console.log('receive');
-            console.log("pendingJobs New position: " + ui.item.index());
-            console.dir(ui);
+            console.log("scheduleJobs: " + ui.item.jobId + " New position: " + ui.item.index());
+            var jobId = $(ui.item).attr('jobId');
+            $.get('/job/scheduleJob/:' + jobId, function (data) {
+                if (data.error) {
+                    $('#jobQueueErrors').append('<li>' + data.error + '</li>');
+                }
+                if (data.info) {
+                    $('#jobQueueInfos').append('<li>' + data.info + '</li>');
+                }
+                if (data.update) {
+                    $(ui.item).find('label.state').html(data.update.displayState);
+                }
+            });
         },
         stop: function (event, ui) {
             console.log('stop');
-            console.log("scheduleJobs: New position: " + ui.item.index());
+            console.log("scheduleJobs:" + ui.item.jobId + " New position: " + ui.item.index());
             console.dir(ui);
 
-        },
-        update: function (event, ui) {
-            var data = $(this).sortable('serialize');
-
-            // POST to server using $.post or $.ajax
-            console.log('data when update');
-            console.dir(data);
         }
     }).disableSelection();
     $("#pendingJobs").sortable({
@@ -554,36 +560,69 @@ function jobQueue(lineIdent) {
         receive: function (event, ui) {
             console.log('receive');
             console.log("pendingJobs New position: " + ui.item.index());
-            console.dir(ui);
+            console.log('receive');
+            console.log("scheduleJobs: " + ui.item.jobId + " New position: " + ui.item.index());
+            var jobId = $(ui.item).attr('jobId');
+            $.get('/job/unscheduleJob/:' + jobId, function (data) {
+                if (data.error) {
+                    $('#jobQueueErrors').append('<li>' + data.error + '</li>');
+                }
+                if (data.info) {
+                    $('#jobQueueInfos').append('<li>' + data.info + '</li>');
+                }
+                if (data.update) {
+                    $(ui.item).find('label.state').html(data.update.displayState);
+                }
+            });
         },
         stop: function (event, ui) {
             console.log('stop');
-            console.log("pendingJobs New position: " + ui.item.index());
+            console.log("pendingJobs: " + ui.item.jobId + " New position: " + ui.item.index());
             console.dir(ui);
 
         },
-        update: function (event, ui) {
-            var data = $(this).sortable('serialize');
+        out: function (event, ui) {
+            console.log('out');
+            console.log("pendingJobs: " + $(ui.item).attr('jobId') + " New position: " + ui.item.index());
+            console.dir(ui);
 
-            // POST to server using $.post or $.ajax
-            console.log('data when update');
-            console.dir(data);
         }
     }).disableSelection();
+
 
     if (lineIdent) {
         var url = '/job/getJobList/:' + lineIdent;
         $.get('/job/getJobList/:' + lineIdent, function (data) {
             console.log('jobListStr: ' + data.jobs);
-            $('#lineIdent').val(data.lineIdent);
             var jobList = JSON.parse(data.jobs);
             activeJobsDataTable = $('#activeJobs').DataTable();
             jobList.forEach(function (theJob) {
                 clickMethod = 'jobDetail(' + theJob.id + ')';
                 if (theJob.state === 121 || theJob.state === 120) {
+                    $li = $("<li class='ui-state-default'/>");
+                    $ident = $("<label>" + theJob.ident + "</label>");
+                    $state = $("<label class='state'>" + theJob.displayState + "</label>");
+                    $receiver = $("<label>" + theJob.receiver + "</label>");
+                    $li.append($ident)
+                        .append($state)
+                        .append($receiver)
+                        .attr('jobId', theJob.id)
+                        .click(setSelected)
+                        .dblclick(showJobDetail);
 
+                    $("#pendingJobs").append($li);
                 } else if (theJob.state === 122) {
-
+                    $li = $("<li class='ui-state-default'/>");
+                    $ident = $("<label>" + theJob.ident + "</label>");
+                    $state = $("<label class='state'>" + theJob.displayState + "</label>");
+                    $receiver = $("<label>" + theJob.receiver + "</label>");
+                    $li.append($ident)
+                        .append($state)
+                        .append($receiver)
+                        .attr('jobId', theJob.id)
+                        .click(setSelected)
+                        .dblclick(showJobDetail);
+                    $("#scheduleJobs").append($li);
                 } else if (theJob.state === 80) {
                     //do nothing
                 } else {
@@ -591,7 +630,7 @@ function jobQueue(lineIdent) {
                     var rowNode = activeJobsDataTable.row.add([
                         '<a href="javascript:void(0);" onclick=' + clickMethod + '>' + theJob.ident + '</a>',
                         theJob.lineIdent,
-                        theJob.displayState
+                        '<input type="text" value="' + theJob.displayState + '">'
                     ]).draw(false).node();
                     $(rowNode).attr('id', theJob.id);
                 }
@@ -604,19 +643,105 @@ function jobQueue(lineIdent) {
     } else {
         alert('line Ident is empty');
     }
-    var count = 0;
-    $('#scheduleJobs li').click(function (e) {
-        var jobId = $(this).attr('jobId');
-        if (jobId && jobId > 0) {
-            jobDetail(parseInt(jobId));
-        } else {
-            alert('job id is empty');
-        }
-        return false;
-    })
+    $('jobQueueCheckJob').click(function () {
+        var jobId= selected[0];
+        $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
+            if (data.errors) {
+                data.errors.forEach(function (error) {
+                    $('#jobErrors').append('<li>' + error + '</li>');
+                });
+            }
+            if (data.info) {
+                $('#jobInfos').append('<li>' + data.info + '</li>');
+            }
+        });
+    });
+    $('jobQueueStartJob').click(function () {
+        var jobId= selected[0];
+        $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#jobErrors').append('<li>' + data.error + '</li>');
+            } else if (data.update) {
+                $('#displayJobState').val(data.update.displayState);
+                $('#jobState').val(data.update.state);
+                setJobBKColor(data.update.state);
+            }
 
+        });
+    });
+    $('jobQueueDoneJob').click(function () {
+        var jobId= selected[0];
+        $.get('/job/jobDetail/doneJob/:' + jobId, function (data) {
+            if (data.error) {
+                $('#error').val(data.error);
+            }
+            if (data.update) {
+                $('#displayJobState').val(data.update.displayState);
+                $('#jobState').val(data.update.state);
+                setJobBKColor(data.update.state);
+            }
+            if (data.info) {
+                $('#jobInfos').append('<li>' + data.info + '</li>');
+            }
+
+        });
+    });
+    socket.on('jobStateChanged', function (options) {
+        console.log('jobStateChanged event callbacked');
+        console.log('options: ');
+        console.dir(options);
+        console.log('lineIdent: ' + lineIdent);
+        if (options) {
+            if (options.lineIdent && options.lineIdent == lineIdent) {
+                var theRowNode = $('#' + options.id);
+                if (theRowNode.length == 0) {
+                    theRowNode = activeJobsDataTable.row.add([
+                        '<a href="javascript:void(0);" onclick=' + clickMethod + '>' + options.ident + '</a>',
+                        options.lineIdent,
+                        '<input type="text" value="' + options.displayState + '">'
+                    ]).draw(false).node();
+                    $(theRowNode).attr('id', options.id);
+                }
+                else {
+                    theRowNode.find('input[type="text"]').val(options.displayState);
+                    setJobBKColor(options.newState, theRowNode);
+                }
+
+            }
+        }
+    });
+    function setSelected() {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected')
+                .css('background-color', 'slategrey');
+            selected.pop();
+        }
+        else {
+            var jobId = $(this).attr('jobId');
+            $(this).parent().find('li').removeClass('selected')
+                .css('background-color', 'slategrey');
+            $(this).addClass('selected');
+            $(this).css('background-color', '#6c71c4');
+            console.log('jobId: ' + jobId);
+            selected.pop();
+            selected.push(jobId);
+            console.log('selected');
+            console.dir(selected);
+        }
+    }
 
 }
+function showJobDetail(e) {
+    var jobId = $(this).attr('jobId');
+    console.log('jobId: ' + jobId);
+    if (jobId && jobId > 0) {
+        jobDetail(parseInt(jobId));
+    } else {
+        alert('job id is empty');
+    }
+    return false;
+}
+
 function updateScheduledJobs() {
     $("#scheduleJobs li").each(function (i, el) {
         var jobId = $(el).attr('jobId');
@@ -1176,7 +1301,7 @@ function setPathBKColor($node, color) {
     $node.find('rect').attr('fill', color);
     $node.attr('stroke', color);
 }
-function setJobBKColor(state) {
+function setJobBKColor(state, $object) {
     var color;
     switch (state) {
         case 15:
@@ -1201,6 +1326,11 @@ function setJobBKColor(state) {
             break;
 
     }
-    $('#displayJobState').css({'background-color': color});
+    if ($object) {
+        $object.css({'background-color': color});
+    } else {
+        $('#displayJobState').css({'background-color': color});
+    }
+
 }
 

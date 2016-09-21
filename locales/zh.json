@@ -195,5 +195,9 @@
 	"Scheduled Jobs": "Scheduled Jobs",
 	"PendingJobs Jobs": "PendingJobs Jobs",
 	"JobQueue": "JobQueue",
-	"Pending Jobs": "Pending Jobs"
+	"Pending Jobs": "Pending Jobs",
+	"Dispensary job Management": "Dispensary job Management",
+	"Scheduled": "Scheduled",
+	"job has been scheduled.": "job has been scheduled.",
+	"job has been unscheduled.": "job has been unscheduled."
 }

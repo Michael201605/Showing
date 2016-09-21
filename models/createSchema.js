@@ -34,6 +34,8 @@ var LayerLog = require('./pr/LayerLog');
 var TraceLog = require('./pr/TraceLog');
 var ProcessOrder = require('./pr/ProcessOrder');
 var OrderItem = require('./pr/OrderItem');
+var Assembly = require('./pr/Assembly');
+var AssemblyItem = require('./pr/AssemblyItem');
 
 UserGroup.sync().then(function () {
 
@@ -74,6 +76,9 @@ Line.sync().then(function () {
         });
         ProcessOrder.sync().then(function () {
             OrderItem.sync();
+        });
+        Assembly.sync().then(function () {
+            AssemblyItem.sync();
         });
     });
     Section.sync().then(function () {

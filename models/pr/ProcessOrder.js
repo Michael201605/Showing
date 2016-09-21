@@ -162,7 +162,7 @@ ProcessOrder.Instance.prototype.createOrUpdateJob = function (jobInfo) {
                                         var ingredientInfo = {
                                             category: 0,
                                             targetPercentage: orderItem.targetPercentage,
-                                            targetWeight: orderItem.targetPercentage * newJob.targetWeight,
+                                            targetWeight: orderItem.targetPercentage * newJob.targetWeight *0.01,
                                             ProductId: orderItem.ProductId,
                                             RecipeId: newRecipe.id,
                                             productIdent: orderItem.productIdent,
@@ -284,7 +284,7 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 locked: true,
                                 targetWeight: theMaxWeight,
                                 actualWeight: 0.0,
-                                state: JobState.Created,
+                                state: JobState.Released,
                                 LineId: me.LineId,
                                 processOrderIdent: me.ident
                             }));
@@ -301,7 +301,7 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 locked: true,
                                 targetWeight: remainWeight,
                                 actualWeight: 0.0,
-                                state: JobState.Created,
+                                state: JobState.Released,
                                 LineId: me.LineId,
                                 processOrderIdent: me.ident
                             }));
@@ -320,7 +320,7 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                     locked: true,
                                     targetWeight: me.targetWeight,
                                     actualWeight: 0.0,
-                                    state: JobState.Created,
+                                    state: JobState.Released,
                                     LineId: me.LineId,
                                     processOrderIdent: me.ident
                                 }).then(function (res) {

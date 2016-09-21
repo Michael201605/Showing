@@ -5,6 +5,7 @@ var modelBase = require('../ModelBase');
 var Line = require('../eq/Line');
 var Storage = require('../eq/Storage');
 var LayerLog = require('./LayerLog');
+
 var TraceLog = require('./TraceLog');
 var utils = require('../../lib/utils');
 var log = require('../../lib/log');
@@ -27,7 +28,8 @@ var properties = {
     productName: modelBase.Sequelize.STRING,
     lineIdent: modelBase.Sequelize.STRING,
     targetWeight: modelBase.Sequelize.DECIMAL,
-    actualWeight: modelBase.Sequelize.DECIMAL
+    actualWeight: modelBase.Sequelize.DECIMAL,
+    receiver: modelBase.Sequelize.STRING
 };
 
 var Job = modelBase.define('Job', properties, {
@@ -154,8 +156,10 @@ utils.inherits(Job.Instance.prototype, BusinessBase.prototype);
 // Job.Instance.prototype.DisplayState = getDisplayState(JobState, this.State);
 Job.Instance.prototype.updateIngredients = function () {
     var me = this;
+    var Assembly = require('./Assembly');
     me.getRecipe().then(function (theRecipe) {
         theRecipe.getSenders().then(function (ingredients) {
+            var needToAssemblyIngrs = [];
             ingredients.forEach(function (ingredient) {
                 if (ingredient.ProductId && ingredient.ProductId > 0) {
                     if (ingredient.category === 0) {
@@ -186,6 +190,9 @@ Job.Instance.prototype.updateIngredients = function () {
                                 ingredient.storageIdent = theStorage.ident;
                                 ingredient.save();
                             });
+                            needToAssemblyIngrs.push(ingredient);
+                            assemblyTarWeight += ingredient.targetWeight;
+
                         }
                     }
                     if (ingredient.category === 1) {
@@ -202,6 +209,34 @@ Job.Instance.prototype.updateIngredients = function () {
                 }
 
             })
+            if (needToAssemblyIngrs.length > 0) {
+                var assemblyTarWeight = 0.0;
+                Assembly.findOrCreate({
+                    where: {
+                        jobIdent: me.ident
+                    }, defaults: {
+                        JobId: me.id
+                    }
+                }).spread(function (theAssembly, created) {
+                    if (theAssembly) {
+                        needToAssemblyIngrs.forEach(function (theIngr) {
+                            assemblyTarWeight += theIngr.targetWeight;
+                            AssemblyItem.findOrCreate({
+                                where: {
+                                    AssemblyId: theAssembly.id,
+                                    productIdent: theIngr.productIdent
+                                }
+                            }).spread(function (theAssemblyItem, created) {
+
+                            })
+                        })
+                    } else {
+                        reject({error: i18n.__('theAssembly not found')});
+                    }
+                });
+            }
+
+
         })
     })
 };
@@ -219,10 +254,30 @@ Job.Instance.prototype.getTranslatedJobStr = function (i18n) {
 };
 Job.Instance.prototype.getTranslatedJob = function (i18n) {
 
+    var me = this;
+    var JSONJob = me.getJsonObject();
 
-    var JSONJob = this.getJsonObject();
-    JSONJob.displayState = i18n.__(getDisplayState(JobState, this.state));
+    JSONJob.displayState = i18n.__(getDisplayState(JobState, me.state));
     return JSONJob;
+};
+
+Job.Instance.prototype.getReceiver = function () {
+    var me = this;
+    return new Promise(function (resolve, reject) {
+        me.getRecipe().then(function (theRecipe) {
+            theRecipe.getReceivers({where: {category: 1}}).then(function (receivers) {
+                if (receivers && receivers.length > 0) {
+                    me.receiver = receivers[0].storageIdent;
+                    me.save();
+                    resolve(receivers[0]);
+                }
+                else{
+                    var error = global.i18n.__('Job: getReceiver: receiver is not found');
+                    reject({error: error});
+                }
+            })
+        })
+    });
 };
 Job.Instance.prototype.getRecipe = function () {
     var Recipe = require('./Recipe');

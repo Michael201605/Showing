@@ -398,7 +398,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         Job.findOne({
             where: {id: id}
         }).then(function (theJob) {
-            if(theJob){
+            if (theJob) {
                 theJob.update(updateInfo).then(function (theJob) {
                     info = i18n.__("save successfully");
 
@@ -409,7 +409,58 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
+    app.get('/job/scheduleJob/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var jobJson = {};
 
+        Job.findOne({
+            where: {id: id}
+        }).then(function (theJob) {
+            if (theJob) {
+                theJob.state = JobState.Scheduled;
+                theJob.save();
+                theJob.updateIngredients();
+                res.json({
+                    update: {
+                        state: JobState.Scheduled,
+                        displayState: i18n.__(getDisplayState(JobState, JobState.Scheduled))
+                    },
+                    info: i18n.__('job has been scheduled.')
+                });
+            }
+            else {
+                res.json({error: i18n.__('Job: %s is empty.', id)});
+            }
+
+        });
+
+    });
+    app.get('/job/unscheduleJob/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var jobJson = {};
+
+        Job.findOne({
+            where: {id: id}
+        }).then(function (theJob) {
+            if (theJob) {
+                theJob.state = JobState.Released;
+                theJob.save();
+                theJob.updateIngredients();
+                res.json({
+                    update: {
+                        state: JobState.Released,
+                        displayState: i18n.__(getDisplayState(JobState, JobState.Released))
+                    },
+                    info: i18n.__('job has been unscheduled.')
+                });
+            }
+            else {
+                res.json({error: i18n.__('Job: %s is empty.', id)});
+            }
+
+        });
+
+    });
     //station
     app.get('/job/station/jobList/:lineIdent', function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
@@ -569,11 +620,17 @@ module.exports = function (app, controllerManager, i18n, io) {
         }).then(function (jobs) {
 
             console.log('jobs: ' + jobs);
+            jobs.forEach(function (theJob) {
+                // console.log('Job:' + theJob.ident+ ' receiver: ' + theJob.receiver);
+                // if(!theJob.receiver){
+                //     theJob.getReceiver();
+                // }
 
+            });
             res.json({
-                    jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
-                    lineIdent: lineIdent
-                });
+                jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
+                lineIdent: lineIdent
+            });
         });
 
     });

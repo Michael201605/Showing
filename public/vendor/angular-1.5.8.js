@@ -10061,7 +10061,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
       function recordChanges(key, currentValue, previousValue) {
         if (isFunction(destination.$onChanges) && currentValue !== previousValue) {
-          // If we have not already scheduled the top level onChangesQueue handler then do so now
+          // If we have not already Scheduled the top level onChangesQueue handler then do so now
           if (!onChangesQueue) {
             scope.$$postDigest(flushOnChangesQueue);
             onChangesQueue = [];
@@ -17474,8 +17474,8 @@ function $RootScopeProvider() {
         $browser.$$checkUrlChange();
 
         if (this === $rootScope && applyAsyncId !== null) {
-          // If this is the root scope, and $applyAsync has scheduled a deferred $apply(), then
-          // cancel the scheduled $apply and flush the queue of expressions to be evaluated.
+          // If this is the root scope, and $applyAsync has Scheduled a deferred $apply(), then
+          // cancel the Scheduled $apply and flush the queue of expressions to be evaluated.
           $browser.defer.cancel(applyAsyncId);
           flushApplyAsync();
         }
@@ -17693,7 +17693,7 @@ function $RootScopeProvider() {
        * The `$evalAsync` makes no guarantees as to when the `expression` will be executed, only
        * that:
        *
-       *   - it will execute after the function that scheduled the evaluation (preferably before DOM
+       *   - it will execute after the function that Scheduled the evaluation (preferably before DOM
        *     rendering).
        *   - at least one {@link ng.$rootScope.Scope#$digest $digest cycle} will be performed after
        *     `expression` execution.
@@ -17702,7 +17702,7 @@ function $RootScopeProvider() {
        * {@link ng.$exceptionHandler $exceptionHandler} service.
        *
        * __Note:__ if this function is called outside of a `$digest` cycle, a new `$digest` cycle
-       * will be scheduled. However, it is encouraged to always call code that changes the model
+       * will be Scheduled. However, it is encouraged to always call code that changes the model
        * from within an `$apply` call. That includes code evaluated via `$evalAsync`.
        *
        * @param {(string|function())=} expression An angular expression to be executed.
