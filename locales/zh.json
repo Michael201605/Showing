@@ -199,5 +199,16 @@
 	"Dispensary job Management": "Dispensary job Management",
 	"Scheduled": "Scheduled",
 	"job has been scheduled.": "job has been scheduled.",
-	"job has been unscheduled.": "job has been unscheduled."
+	"job has been unscheduled.": "job has been unscheduled.",
+	"have assemblyed": "have assemblyed",
+	"Please scan barcode": "Please scan barcode",
+	"Dispensary Detail": "Dispensary Detail",
+	"Dispensary Job List": "Dispensary Job List",
+	"Confirm": "Confirm",
+	"To Assembly ingredients": "To Assembly ingredients",
+	"Target weight": "Target weight",
+	"Actual weight": "Actual weight",
+	"Tare": "Tare",
+	"Stock": "Stock",
+	"Accept": "Accept"
 }

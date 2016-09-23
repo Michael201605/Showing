@@ -13,10 +13,12 @@ var AssemblyItem = modelBase.define('AssemblyItem',{
     ident : modelBase.Sequelize.STRING,
     category : modelBase.Sequelize.INTEGER,
     targetWeight: modelBase.Sequelize.DECIMAL,
+    actualWeight: modelBase.Sequelize.DECIMAL,
+    isFinished: modelBase.Sequelize.BOOLEAN,
     productIdent : modelBase.Sequelize.STRING
 });
 
-AssemblyItem.belongsTo(Assembly);
+
 
 utils.inherits(AssemblyItem.Instance.prototype, BusinessBase.prototype);
 

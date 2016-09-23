@@ -3,8 +3,8 @@
  */
 var modelBase = require('../ModelBase');
 var Job = require('./Job');
+var AssemblyItem = require('./AssemblyItem');
 var Layer = require('./Layer');
-
 var properties = {
     jobIdent: {type: modelBase.Sequelize.STRING},
     name: modelBase.Sequelize.STRING,
@@ -22,7 +22,7 @@ var properties = {
 };
 
 var Assembly = modelBase.define('Assembly', properties);
-Assembly.hasMany(Layer);
+Assembly.hasMany(AssemblyItem);
 
 Assembly.belongsTo(Job);
 

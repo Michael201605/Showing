@@ -27,6 +27,8 @@
         .error {
             color: red;
         }
+
+
     </style>
 {{/section}}
 
@@ -49,8 +51,8 @@
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail">{{{__ "ProcessOrder Detail"}}}</h2>
-            <a href="/order/process/ProcessOrderList">{{{__ "ProcessOrder List"}}}</a>
+            <h2 class="title-Detail">{{{__ "Dispensary Detail"}}}</h2>
+            <a href="/order/process/ProcessOrderList">{{{__ "Dispensary Job List"}}}</a>
         </div>
         <div class="col-lg-3">
 
@@ -85,31 +87,34 @@
             <div class="">
                 <ul class="nav nav-pills">
                     <li class="active"><a data-toggle="pill" href="#general">{{{__ "General"}}}</a></li>
-                    <li><a data-toggle="pill" href="#bom">{{{__ "BOM"}}}</a></li>
+                    <li><a data-toggle="pill" href="#scale">{{{__ "Scale"}}}</a></li>
+                    <li><a data-toggle="pill" href="#stock">{{{__ "Stock"}}}</a></li>
                 </ul>
 
                 <div class="tab-content">
                     <div id="general" class="tab-pane fade in active">
 
                         <div class="row">
-                            <table id="toAssemblyTable" class="table table-bordered table-hover">
-                                <caption>{{{__ "Dispensary job Management"}}}</caption>
-                                <thead>
-                                <tr>
-                                    <th>{{{__ "Ident"}}}</th>
-                                    <th>{{{__ "ProductIdent"}}}</th>
-                                    <th>{{{__ "TargetWeight"}}}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {{#each assembly.items}}
-                                    <tr id="{{id}}">
-                                        <td>{{productIdent}}</td>
-                                        <td>{{targetWeight}}</td>
+                            <div class="col-lg-12">
+                                <table id="toAssemblyTable" class="table table-bordered table-hover">
+                                    <caption>{{{__ "To Assembly ingredients"}}}</caption>
+                                    <thead>
+                                    <tr>
+                                        <th>{{{__ "ProductIdent"}}}</th>
+                                        <th>{{{__ "TargetWeight"}}}</th>
                                     </tr>
-                                {{/each}}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {{#each toAssemblyItems}}
+                                        <tr id="{{id}}">
+                                            <td>{{productIdent}}</td>
+                                            <td>{{targetWeight}}</td>
+                                        </tr>
+                                    {{/each}}
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
@@ -122,7 +127,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {{#each assemblyedLayers}}
+                                    {{#each assemblyedItems}}
                                         <tr id="{{id}}">
                                             <td>{{productIdent}}</td>
                                             <td>{{actualWeight}}</td>
@@ -134,56 +139,91 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
-                                <label class="col-lg-6">{{{__ "Please scan barcode"}}}</label>
+                                <label class="col-lg-3">{{{__ "Please scan barcode"}}}</label>
                                 <input id="barcode" class="col-lg-6">
+                                <button id="confirmBarcode" class="btn btn-primary">{{{__ "Confirm"}}}</button>
                             </div>
                         </div>
                     </div>
-                    <div id="bom" class="tab-pane fade">
-                        <div class="row">
-
-                            <div class="col-lg-3 col-md-3">
-
-                                <select class="col-lg-8" id="rawProducts">
-                                    <option></option>
-                                </select>
+                    <div id="scale" class="tab-pane fade">
+                        <div class="row weight">
+                            <div class="col-lg-12">
+                                <div id="progressbar"></div>
                             </div>
+                            <style>
+                                .ui-progressbar {
+                                    height: 100px;
+                                    background: transparent;
+                                    background-color: dimgray;
+                                }
 
-                            <div class="col-lg-9 col-md-9">
-                                <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
-                                <button id="removeItem"
-                                        class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
+                                #progressbar .ui-progressbar-value {
+                                    background: transparent;
+                                    background-color: #009926;
+                                }
+
+                                #actualWeight, #targetWeight, #tare, #scaleWeight, #acceptWeight {
+                                    height: 100px;
+                                }
+
+                                .weight {
+                                    padding-top: 2%;
+                                }
+                            </style>
+                        </div>
+                        <div class="row weight">
+                            <div class="col-lg-12">
+                                <label class="col-lg-2 col-sm-6">{{{__ "Target weight"}}}</label>
+                                <input id="targetWeight" class="col-lg-4" disabled>
+                                <label class="col-lg-2 col-sm-6">{{{__ "Actual weight"}}}</label>
+                                <input id="actualWeight" class="col-lg-4" disabled>
                             </div>
                         </div>
+                        <div class="row weight">
+                            <div class="col-lg-12">
+                                <button id="tare" class="col-lg-3">{{{__ "Tare"}}}</button>
+                                <button id="scaleWeight" class="col-lg-3">{{{__ "Scale"}}}</button>
+                                <button id="acceptWeight" class="col-lg-3">{{{__ "Accept"}}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="stock" class="tab-pane fade">
                         <div class="row">
-                            <table id="bomTable" class="table table-bordered table-hover">
-                                <caption>{{{__ "BOM list"}}}</caption>
-                                <thead>
-                                <tr>
-                                    <th>{{{__ "ProductIdent"}}}</th>
-                                    <th>{{{__ "TargetWeight"}}}</th>
-                                    <th>{{{__ "TargetPercentage"}}}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {{#each processOrder.orderItems}}
-                                    <tr id="{{id}}">
-                                        <td><label>{{productIdent}}</label></td>
-                                        <td><input type="text" value="{{targetWeight}}" disabled></td>
-                                        <td><input type="number" step="any" value="{{targetPercentage}}" disabled></td>
+                            <div class="col-lg-12">
+                                <table id="stockTable" class="table table-bordered table-hover">
+                                    <caption>{{{__ "Stock"}}}</caption>
+                                    <thead>
+                                    <tr>
+                                        <th>{{{__ "ProductIdent"}}}</th>
+                                        <th>{{{__ "UnitSize"}}}</th>
+                                        <th>{{{__ "ActualWeight"}}}</th>
                                     </tr>
-                                {{/each}}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {{#each assembly.items}}
+                                        <tr id="{{id}}">
+                                            <td>{{productIdent}}</td>
+                                            <td>{{unitSize}}</td>
+                                            <td>{{actualWeight}}</td>
+                                        </tr>
+                                    {{/each}}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label class="col-lg-3">{{{__ "Please scan barcode"}}}</label>
+                                <input id="transferBarcode" class="col-lg-6">
+                                <button id="confirmTransfer" class="btn btn-primary">{{{__ "Confirm"}}}</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3">
-            <button id="checkProcessOrder" class="btn btn-primary">{{{__ "Check order"}}}</button>
-            <button id='releaseProcessOrder' class="btn btn-danger">{{{__ "Release order"}}}</button>
+
         </div>
     </div>
 </div>

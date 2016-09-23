@@ -37,6 +37,7 @@ var OrderItem = require('./pr/OrderItem');
 var Assembly = require('./pr/Assembly');
 var AssemblyItem = require('./pr/AssemblyItem');
 
+
 UserGroup.sync().then(function () {
 
     User.sync().then(function () {
@@ -52,7 +53,7 @@ Company.sync().then(function () {
 
 });
 
-
+var promises = [];
 Product.sync().then(function () {
 
 
@@ -61,10 +62,13 @@ Product.sync().then(function () {
 
 
     });
-
-    LogisticUnit.sync().then(function () {
-        Layer.sync();
+    var promise1 = new Promise(function (resolve, reject) {
+        LogisticUnit.sync().then(function () {
+            resolve();
+        });
     });
+    promises.push(promise1);
+
     Receipt.sync();
 });
 
@@ -77,9 +81,14 @@ Line.sync().then(function () {
         ProcessOrder.sync().then(function () {
             OrderItem.sync();
         });
-        Assembly.sync().then(function () {
-            AssemblyItem.sync();
+        var promise2 = new Promise(function (resolve, reject) {
+            Assembly.sync().then(function () {
+                AssemblyItem.sync();
+                resolve();
+            });
         });
+        promises.push(promise2);
+
     });
     Section.sync().then(function () {
         Scale.sync().then(function () {
@@ -90,6 +99,13 @@ Line.sync().then(function () {
     });
 
 });
+
+Promise.all(promises).then(function (res) {
+    Layer.sync();
+}, function (err) {
+    
+});
+
 
 JobLog.sync();
 LotLog.sync();

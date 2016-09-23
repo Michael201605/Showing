@@ -15,6 +15,7 @@ var IngredientComponent = modelBase.define('IngredientComponent',{
     category : modelBase.Sequelize.INTEGER,
     targetPercentage: modelBase.Sequelize.DECIMAL,
     targetWeight: modelBase.Sequelize.DECIMAL,
+    actualWeight: modelBase.Sequelize.DECIMAL,
     storageIdent : modelBase.Sequelize.STRING,
     productIdent : modelBase.Sequelize.STRING,
     isActive: modelBase.Sequelize.BOOLEAN

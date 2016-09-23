@@ -7,6 +7,7 @@ var JobState = require('../lib/stateAndCategory/jobState');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 var Job = require('../models/pr/Job');
 var Assembly = require('../models/pr/Assembly');
+var LogisticUnit = require('../models/pr/LogisticUnit');
 var utils = require('../lib/utils');
 var log = require('../lib/log');
 
@@ -34,10 +35,30 @@ module.exports = function (app, i18n) {
                 JobId: jobId
             }
         }).then(function (theAssembly) {
+            theAssembly.getAssemblyItems().then(function (assemblyItems) {
+                var toAssemblyItems = [];
+                var assemblyedItems = [];
+                assemblyItems.forEach(function (item) {
+                    if (item.isFinished) {
+                        assemblyedItems.push(item);
+                    }
+                    else {
+                        toAssemblyItems.push(item);
+                    }
+                });
+                LogisticUnit.findAll({where:{location:theAssembly.location}}).then(function (stocks) {
+                    res.render('station/dispensary/dispensaryJobDetail', {
+                        assembly: theAssembly,
+                        toAssemblyItems: toAssemblyItems,
+                        assemblyedItems: assemblyedItems,
+                        stocks: stocks
+                    });
+                })
 
-            res.render('station/dispensary/dispensaryJobDetail', {
-                assembly: theAssembly
+
             });
+
+
         });
 
     });

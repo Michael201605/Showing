@@ -53,6 +53,7 @@
     "promise": "^7.1.1",
     "requirish": "^0.3.0",
     "sequelize": "^3.23.6",
+    "serialport": "^4.0.1",
     "socket.io": "^1.4.8",
     "stream-to-array": "^2.3.0",
     "treeify": "^1.0.1",
