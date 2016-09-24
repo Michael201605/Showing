@@ -2,6 +2,7 @@
  * Created by pi on 8/30/16.
  */
 var progressbarValue, barcodeText, progressbar, conn, cmd;
+var selected;
 $(function () {
     var pressed = false;
     var chars = [];
@@ -96,6 +97,12 @@ $("#barcode").keypress(function (e) {
 });
 function assemblyToJob(barcode) {
 
+}
+
+function barcodeScanned(barcode) {
+    if(barcode){
+
+    }
 }
 
 function showWeight(dataStr) {

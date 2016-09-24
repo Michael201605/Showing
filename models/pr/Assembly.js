@@ -8,17 +8,13 @@ var Layer = require('./Layer');
 var properties = {
     jobIdent: {type: modelBase.Sequelize.STRING},
     name: modelBase.Sequelize.STRING,
-    nbOfUnits: modelBase.Sequelize.DECIMAL,
-    packagingType: modelBase.Sequelize.INTEGER,
-    isUnitSizeUsed: modelBase.Sequelize.BOOLEAN,
     sscc: modelBase.Sequelize.STRING,
     deliveryDate: modelBase.Sequelize.DATE,
     state: modelBase.Sequelize.INTEGER,
-    lot:  modelBase.Sequelize.STRING,
-    supplierIdent: modelBase.Sequelize.STRING,
-    supplierName: modelBase.Sequelize.STRING,
-    location: modelBase.Sequelize.STRING,
-    targetWeight: modelBase.Sequelize.DECIMAL
+    targetWeight: modelBase.Sequelize.DECIMAL,
+    location:modelBase.Sequelize.STRING,
+    source:modelBase.Sequelize.STRING,
+    target:modelBase.Sequelize.STRING
 };
 
 var Assembly = modelBase.define('Assembly', properties);

@@ -210,5 +210,14 @@
 	"Actual weight": "Actual weight",
 	"Tare": "Tare",
 	"Stock": "Stock",
-	"Accept": "Accept"
+	"Accept": "Accept",
+	"WH": "WH",
+	"Stock Management": "Stock Management",
+	"Receipt Management": "Receipt Management",
+	"state": "state",
+	"SSCC": "SSCC",
+	"LogisticUnit List": "LogisticUnit List",
+	"Unit Size": "Unit Size",
+	"Nb Of Units": "Nb Of Units",
+	"OK": "OK"
 }

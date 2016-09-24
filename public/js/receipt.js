@@ -161,7 +161,7 @@ $(function () {
             $('#infos').empty();
             if (!data.errors) {
                 $('#infos').append('<li>' + data.info + '</li>');
-                window.location.replace("/warehouse/station/receiptList");
+                window.location.replace("/station/receipt/receiptList");
             } else {
                 data.errors.forEach((function (error) {
                     $('#errors').append('<li>' + data.error + '</li>');

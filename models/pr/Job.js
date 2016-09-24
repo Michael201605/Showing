@@ -5,12 +5,13 @@ var modelBase = require('../ModelBase');
 var Line = require('../eq/Line');
 var Storage = require('../eq/Storage');
 var LayerLog = require('./LayerLog');
-
+var Warehouse = require('../eq/Warehouse');
 var TraceLog = require('./TraceLog');
 var utils = require('../../lib/utils');
 var log = require('../../lib/log');
 var BusinessBase = require('../BusinessBase');
 var JobState = require('../../lib/stateAndCategory/jobState');
+var AssemblyState = require('../../lib/stateAndCategory/assemblyState');
 var getDisplayState = require('../../lib/tools/getDisplayState');
 var Promise = require('promise');
 var properties = {
@@ -27,9 +28,11 @@ var properties = {
     processOrderIdent: modelBase.Sequelize.STRING,
     productName: modelBase.Sequelize.STRING,
     lineIdent: modelBase.Sequelize.STRING,
+    mixerIdent: modelBase.Sequelize.STRING,
     targetWeight: modelBase.Sequelize.DECIMAL,
     actualWeight: modelBase.Sequelize.DECIMAL,
-    receiver: modelBase.Sequelize.STRING
+    receiver: modelBase.Sequelize.STRING,
+    dispensary: modelBase.Sequelize.STRING
 };
 
 var Job = modelBase.define('Job', properties, {
@@ -157,88 +160,153 @@ utils.inherits(Job.Instance.prototype, BusinessBase.prototype);
 Job.Instance.prototype.updateIngredients = function () {
     var me = this;
     var Assembly = require('./Assembly');
-    me.getRecipe().then(function (theRecipe) {
-        theRecipe.getSenders().then(function (ingredients) {
-            var needToAssemblyIngrs = [];
-            ingredients.forEach(function (ingredient) {
-                if (ingredient.ProductId && ingredient.ProductId > 0) {
-                    if (ingredient.category === 0) {
-                        Storage.findAll({
-                            where: {
-                                ProductId: ingredient.ProductId,
-                                category: 10
-                            }
-                        }).then(function (storages) {
-                            storages.every(function (theStorage) {
-                                if (theStorage.currentWeight >= ingredient.targetWeight) {
+    return new Promise(function (resolve, reject) {
+        me.getRecipe().then(function (theRecipe) {
+            theRecipe.getSenders().then(function (ingredients) {
+                var needToAssemblyIngrs = [];
+                ingredients.forEach(function (ingredient) {
+                    if (ingredient.ProductId && ingredient.ProductId > 0) {
+                        if (ingredient.category === 0) {
+                            Storage.findAll({
+                                where: {
+                                    ProductId: ingredient.ProductId,
+                                    category: 10
+                                }
+                            }).then(function (storages) {
+                                storages.every(function (theStorage) {
+                                    if (theStorage.currentWeight >= ingredient.targetWeight) {
+                                        ingredient.StorageId = theStorage.id;
+                                        ingredient.storageIdent = theStorage.ident;
+                                        ingredient.save();
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                })
+                            });
+                            if (!ingredient.StorageId || ingredient.StorageId <= 0) {
+                                Storage.findOne({
+                                    where: {
+                                        category: 2
+                                    }
+                                }).then(function (theStorage) {
                                     ingredient.StorageId = theStorage.id;
                                     ingredient.storageIdent = theStorage.ident;
                                     ingredient.save();
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            })
-                        });
-                        if (!ingredient.StorageId || ingredient.StorageId <= 0) {
+                                });
+                                needToAssemblyIngrs.push(ingredient);
+                                assemblyTarWeight += ingredient.targetWeight;
+
+                            }
+                        }
+                        if (ingredient.category === 1) {
                             Storage.findOne({
                                 where: {
-                                    category: 2
+                                    category: 3
                                 }
-                            }).then(function (theStorage) {
-                                ingredient.StorageId = theStorage.id;
-                                ingredient.storageIdent = theStorage.ident;
+                            }).then(function (thePacker) {
+                                ingredient.StorageId = thePacker.id;
+                                ingredient.storageIdent = thePacker.ident;
                                 ingredient.save();
                             });
-                            needToAssemblyIngrs.push(ingredient);
-                            assemblyTarWeight += ingredient.targetWeight;
-
                         }
                     }
-                    if (ingredient.category === 1) {
-                        Storage.findOne({
-                            where: {
-                                category: 3
-                            }
-                        }).then(function (theStorage) {
-                            ingredient.StorageId = theStorage.id;
-                            ingredient.storageIdent = theStorage.ident;
-                            ingredient.save();
-                        });
-                    }
+
+                });
+                if (needToAssemblyIngrs.length > 0) {
+                    var assemblyTarWeight = 0.0;
+                    Assembly.findOrCreate({
+                        where: {
+                            jobIdent: me.ident
+                        }, defaults: {
+                            JobId: me.id,
+                            state: AssemblyState.Created
+                        }
+                    }).spread(function (theAssembly, created) {
+                        if (theAssembly) {
+                            needToAssemblyIngrs.forEach(function (theIngr) {
+                                assemblyTarWeight += theIngr.targetWeight;
+                                AssemblyItem.findOrCreate({
+                                    where: {
+                                        AssemblyId: theAssembly.id,
+                                        productIdent: theIngr.productIdent
+                                    }
+                                }).spread(function (theAssemblyItem, created) {
+
+                                })
+                            });
+                            Warehouse.findAll({where: {category: 2, lineIdent: me.lineIdent}}).then(function (dispensarys) {
+                                var theLength = dispensarys.length;
+                                var theDispensary;
+                                if (theLength == 0) {
+                                    var error = i18n.__('no dispensary found');
+                                } else if (theLength == 1) {
+                                    theDispensary = dispensarys[0];
+                                    if(theDispensary){
+                                        theAssembly.location = theDispensary.ident;
+                                        theAssembly.source = theDispensary.ident;
+                                        theAssembly.save();
+                                    }
+
+                                } else if (theLength == 2) {
+                                    Job.findAll({
+                                        where: {
+                                            dispensary: {
+                                                $in: [dispensarys[0].ident, dispensarys[1].ident]
+                                            }
+                                        }
+                                    }).then(function (jobs) {
+                                        var jobsInDis1 = [];
+                                        var jobsInDis2 = [];
+                                        jobs.forEach(function (job) {
+                                            if (job.dispensary === dispensarys[0].ident) {
+                                                jobsInDis1.push(job);
+                                            } else {
+                                                jobsInDis2.push(job);
+                                            }
+                                        });
+                                        if(jobsInDis1.length <=jobsInDis2.length){
+                                            theDispensary = dispensarys[0];
+                                        }else {
+                                            theDispensary = dispensarys[1];
+                                        }
+                                        if(theDispensary){
+                                            theAssembly.location = theDispensary.ident;
+                                            theAssembly.source = theDispensary.ident;
+                                            theAssembly.save();
+                                        }
+
+                                    });
+                                } else {
+
+                                }
+                            });
+                            Storage.findOne({
+                                where: {
+                                    category: 2,
+                                    mixerIdent: me.mixerIdent
+                                }
+                            }).then(function (theHandAdd) {
+                                if(theHandAdd){
+                                    theAssembly.target = theHandAdd.ident;
+                                    theAssembly.save();
+                                }else {
+                                    var error = i18n.__('no handAdd found');
+                                }
+                            });
+
+                        } else {
+                            log.error(i18n.__('theAssembly not found'));
+                        }
+                    });
+
                 }
 
+
             })
-            if (needToAssemblyIngrs.length > 0) {
-                var assemblyTarWeight = 0.0;
-                Assembly.findOrCreate({
-                    where: {
-                        jobIdent: me.ident
-                    }, defaults: {
-                        JobId: me.id
-                    }
-                }).spread(function (theAssembly, created) {
-                    if (theAssembly) {
-                        needToAssemblyIngrs.forEach(function (theIngr) {
-                            assemblyTarWeight += theIngr.targetWeight;
-                            AssemblyItem.findOrCreate({
-                                where: {
-                                    AssemblyId: theAssembly.id,
-                                    productIdent: theIngr.productIdent
-                                }
-                            }).spread(function (theAssemblyItem, created) {
-
-                            })
-                        })
-                    } else {
-                        reject({error: i18n.__('theAssembly not found')});
-                    }
-                });
-            }
-
-
         })
-    })
+    });
+
 };
 Job.Instance.prototype.setDisplayState = function () {
 
@@ -271,7 +339,7 @@ Job.Instance.prototype.getReceiver = function () {
                     me.save();
                     resolve(receivers[0]);
                 }
-                else{
+                else {
                     var error = global.i18n.__('Job: getReceiver: receiver is not found');
                     reject({error: error});
                 }

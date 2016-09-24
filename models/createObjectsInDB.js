@@ -5,7 +5,7 @@ var Filler = require('./eq/Filler');
 var Discharger = require('./eq/Discharger');
 var Storage = require('./eq/Storage');
 var Company = require('./eq/Company');
-
+var Warehouse = require('./eq/Warehouse');
 var Scale = require('./eq/Scale');
 var Mixer = require('./eq/Mixer');
 var Packer = require('./eq/Packer');
@@ -42,36 +42,11 @@ var type = '';
 var segments = [];
 var elements = [];
 
-Assembly.bulkCreate([
-    {
-        jobIdent: 'PO:000033',
-        name: 'PO:000033',
-        JobId: 46,
-        state: 10,
-        targetWeight: 65
-    }
 
-]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
-    return Assembly.findAll();
-}).then(function(assemblys) {
-    console.log(assemblys); // ... in order to get the array of user objects
-});
 
-// Mixer.bulkCreate([
-//     {
-//         ident: 'mixer001',
-//         name: 'mixer001',
-//         state: 10,
-//         weightMax: 1000,
-//         weightMin: 200,
-//         SectionId: 12
-//     }
-//
-// ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
-//     return Mixer.findAll();
-// }).then(function(mixers) {
-//     console.log(mixers); // ... in order to get the array of user objects
-// });
+
+
+
 // fs.readFile('PLC.csv', 'utf8', function (err, data) {
 //     if (err) {
 //         console.log( err);
@@ -463,4 +438,77 @@ Assembly.bulkCreate([
 //     return Section.findAll();
 // }).then(function(sections) {
 //     console.log(sections); // ... in order to get the array of user objects
+// });
+
+// Mixer.bulkCreate([
+//     {
+//         ident: 'mixer001',
+//         name: 'mixer001',
+//         state: 10,
+//         weightMax: 1000,
+//         weightMin: 200,
+//         SectionId: 12
+//     }
+//
+// ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+//     return Mixer.findAll();
+// }).then(function(mixers) {
+//     console.log(mixers); // ... in order to get the array of user objects
+// });
+
+Warehouse.bulkCreate([
+    {
+        ident: 'WH',
+        name: 'raw material',
+        category: 1
+    },
+    {
+        ident: 'Dis1',
+        name: 'Dispensary1' ,
+        category: 2,
+        lineIdent: 'MIX1'
+    },
+    {
+        ident: 'HT1',
+        name: 'hand add1' ,
+        category: 3,
+        lineIdent: 'MIX1'
+    },
+    {
+        ident: 'PK1',
+        name: 'packing1' ,
+        category: 4,
+        lineIdent: 'MIX1'
+    },
+    {
+        ident: 'PK2',
+        name: 'packing2' ,
+        category: 4,
+        lineIdent: 'MIX1'
+    },
+    {
+        ident: 'FP',
+        name: 'finished product' ,
+        category: 5
+    }
+]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+    return Warehouse.findAll();
+}).then(function(warehouses) {
+    console.log(warehouses); // ... in order to get the array of user objects
+});
+
+//temp
+// Assembly.bulkCreate([
+//     {
+//         jobIdent: 'PO:000033',
+//         name: 'PO:000033',
+//         JobId: 46,
+//         state: 10,
+//         targetWeight: 65
+//     }
+//
+// ]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+//     return Assembly.findAll();
+// }).then(function(assemblys) {
+//     console.log(assemblys); // ... in order to get the array of user objects
 // });

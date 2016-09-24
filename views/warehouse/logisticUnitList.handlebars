@@ -29,8 +29,8 @@
 
         </div>
         <div class="col-lg-6">
-            <table id="receiptsTable" class="table table-bordered table-hover">
-                <caption>{{{__ "Receipt Management"}}}</caption>
+            <table id="logisticUnitsTable" class="table table-bordered table-hover">
+                <caption>{{location}} {{{__ "Stock Management"}}}</caption>
                 <thead>
                 <tr>
                     <th>{{{__ "Ident"}}}</th>
@@ -40,11 +40,11 @@
                 </tr>
                 </thead>
                 <tbody>
-                {{#each receipts}}
+                {{#each logisticUnits}}
                     <tr id="{{id}}">
-                        <td><a href="/station/receipt/receiptDetail/:{{id}}">{{ident}}</a></td>
+                        <td><a href="/warehouse/logisticUnitDetail/:{{id}}">{{ident}}</a></td>
                         <td>{{productIdent}}</td>
-                        <td>{{actualUnitSize}}</td>
+                        <td>{{unitSize}}</td>
                         <td>{{packagingType}}</td>
                     </tr>
                 {{/each}}
@@ -52,15 +52,13 @@
             </table>
         </div>
         <div class="col-lg-3">
-
+            <button id="newLogisticUnit" class="btn btn-primary">{{{__ "New"}}}</button>
+            <button id='deleteLogisticUnit' class="btn btn-danger">{{{__ "Delete"}}}</button>
         </div>
     </div>
 </div>
 {{#section 'jquery'}}
-
-    <script src="/js/receipts.js"></script>
+    <script src="/vendor/jquery.dataTables.min.js"></script>
+    <script src="/js/processOrders.js"></script>
 
 {{/section}}
-
-
-

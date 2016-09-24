@@ -16,6 +16,7 @@ var Packer = require('./eq/Packer');
 var Section = require('./eq/Section');
 var Line = require('./eq/Line');
 var GcObject = require('./eq/GcObject');
+var Warehouse = require('./eq/Warehouse');
 
 var Product = require('./pr/Product');
 var IngredientComponent = require('./pr/IngredientComponent');
@@ -106,7 +107,7 @@ Promise.all(promises).then(function (res) {
     
 });
 
-
+Warehouse.sync();
 JobLog.sync();
 LotLog.sync();
 LayerLog.sync();

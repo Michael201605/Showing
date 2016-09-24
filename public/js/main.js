@@ -12,6 +12,7 @@ $(function () {
     // password = $( "#password" ),
     // allFields = $( [] ).add( name ).add( email ).add( password ),
     // tips = $( ".validateTips" );
+    $( ".secondMenu" ).menu();
     $('#errors').selectmenu();
     GcObjectDialog = $("#GCObject-form").dialog({
         title: 'GcObject',

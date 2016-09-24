@@ -63,16 +63,16 @@
                 <caption>{{{__ "Dispensary job Management"}}}</caption>
                 <thead>
                 <tr>
-                    <th>{{{__ "Ident"}}}</th>
-                    <th>{{{__ "ProductIdent"}}}</th>
+                    <th>{{{__ "JobIdent"}}}</th>
+                    <th>{{{__ "State"}}}</th>
                     <th>{{{__ "TargetWeight"}}}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {{#each dispensaryJobs}}
                     <tr id="{{id}}">
-                        <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{ident}}</a></td>
-                        <td>{{productIdent}}</td>
+                        <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{jobIdent}}</a></td>
+                        <td>{{state}}</td>
                         <td>{{targetWeight}}</td>
                     </tr>
                 {{/each}}

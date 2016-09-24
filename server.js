@@ -161,6 +161,7 @@ require('./routes/recipe')(app, i18n);
 require('./routes/mixer')(app, i18n);
 require('./routes/jobLog')(app, i18n);
 require('./routes/product')(app, i18n);
+require('./routes/warehouse')(app, i18n);
 require('./routes/dispensary')(app, i18n);
 var hasMonitored = false;
 new GcObjectAdapter(io).then(function (gcObjectAd) {

@@ -89,8 +89,12 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
                             sscc: sscc,
                             lot: me.lot,
                             ProductId: me.ProductId,
+                            productIdent: theProduct.ident,
+                            productName: theProduct.name,
                             supplierIdent: supplierIdent,
-                            supplierName:supplierName
+                            supplierName:supplierName,
+                            location: 'WH',
+                            state: 10
                         };
                         LogisticUnit.create(logisticUnitInfo).then(function (newLogistic) {
                             console.log('newLogistic: ' + JSON.stringify(newLogistic));

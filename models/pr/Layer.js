@@ -10,6 +10,7 @@ var properties = {
     bagNo: modelBase.Sequelize.INTEGER,
     state: modelBase.Sequelize.INTEGER,
     size: modelBase.Sequelize.DECIMAL,
+    isUsed: modelBase.Sequelize.BOOLEAN,
     actualWeight: modelBase.Sequelize.DECIMAL
 };
 

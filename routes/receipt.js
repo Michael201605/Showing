@@ -17,9 +17,8 @@ module.exports = function (app, i18n) {
             where: {State: state}
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
-            var receiptsStr = JSON.stringify(receipts);
             res.render('order/receipt/receiptList', {
-                receipts: receiptsStr,
+                receipts: receipts,
                 state: state
             });
         });
@@ -30,12 +29,12 @@ module.exports = function (app, i18n) {
             ident: 'newReceipt',
             name: 'Raw',
             visible: true,
-            state: 10,
+            state: 10
         };
         console.log('try to create new receipt.... ');
         Receipt.create(info).then(function (newReceipt) {
             console.log('newReceipt: ' + newReceipt);
-            res.json(newReceipt);
+            res.json({receipt:newReceipt});
         });
     });
     app.post('/order/receipt/receiptList/deleteReceipt', function (req, res) {
@@ -113,9 +112,9 @@ module.exports = function (app, i18n) {
             where: {State: 10}
         }).then(function (receipts) {
             console.log('receipts: ' + receipts);
-            var receiptsStr = JSON.stringify(receipts);
+
             res.render('station/receipt/receiptList', {
-                receipts: receiptsStr,
+                receipts: receipts,
                 state: 10
             });
         });

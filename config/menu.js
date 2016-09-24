@@ -8,15 +8,15 @@ var ConfigureMenus = [
         SubMenus: [
             {
                 name: 'Raw',
-                url: '/warehouse/rawwarehouse'
+                url: '/warehouse/logisticUnitList/:WH'
             },
             {
                 name: 'Dis1',
-                url: '/warehouse/dispensary/:dis1'
+                url: '/warehouse/logisticUnitList/:dis1'
             },
             {
                 name: 'FP',
-                url: '/warehouse/finishedProduct'
+                url: '/warehouse/logisticUnitList/:FP'
             },
             {
                 name: 'Lots',

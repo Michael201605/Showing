@@ -12,27 +12,28 @@ var utils = require('../lib/utils');
 var log = require('../lib/log');
 
 module.exports = function (app, i18n) {
-    app.get('/station/dispensary/dispensaryJobList/:lineIdent', function (req, res) {
-        var lineIdent = req.params.lineIdent.substring(1);
-        console.log('lineIdent: ' + lineIdent);
-        Job.findAll({
+    app.get('/station/dispensary/dispensaryJobList/:disIdent', function (req, res) {
+        var disIdent = req.params.disIdent.substring(1);
+        console.log('dispensary ident: ' + disIdent);
+        Assembly.findAll({
             where: {
-                lineIdent: lineIdent
+                location: disIdent,
+                state: {$in: [1, 2]}
             }
-        }).then(function (dispensaryJobs) {
-            console.log('dispensary Jobs: ' + dispensaryJobs);
+        }).then(function (assemblys) {
+            console.log('dispensary Jobs: ' + assemblys);
             res.render('station/dispensary/dispensaryJobList', {
-                dispensaryJobs: dispensaryJobs
+                dispensaryJobs: assemblys
             });
         });
 
     });
-    app.get('/station/dispensary/dispensaryJobDetail/:jobId', function (req, res) {
-        var jobId = req.params.jobId.substring(1);
-        console.log('jobId: ' + jobId);
+    app.get('/station/dispensary/dispensaryJobDetail/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        console.log('assembly id: ' + id);
         Assembly.findOne({
             where: {
-                JobId: jobId
+                id: id
             }
         }).then(function (theAssembly) {
             theAssembly.getAssemblyItems().then(function (assemblyItems) {
@@ -46,7 +47,7 @@ module.exports = function (app, i18n) {
                         toAssemblyItems.push(item);
                     }
                 });
-                LogisticUnit.findAll({where:{location:theAssembly.location}}).then(function (stocks) {
+                LogisticUnit.findAll({where: {location: theAssembly.location}}).then(function (stocks) {
                     res.render('station/dispensary/dispensaryJobDetail', {
                         assembly: theAssembly,
                         toAssemblyItems: toAssemblyItems,
