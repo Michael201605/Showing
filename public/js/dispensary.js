@@ -2,10 +2,12 @@
  * Created by pi on 8/30/16.
  */
 var progressbarValue, barcodeText, progressbar, conn, cmd;
-var selected;
+var selected, selectedProduct,selectedTargetWeight, tareWeight = 0;
+var toAssemblyDataTable, haveAssemblyedDataTable, stockDataTable;
 $(function () {
     var pressed = false;
     var chars = [];
+    selected = [];
     progressbar = $("#progressbar");
     progressbar.progressbar({
         value: 20
@@ -32,8 +34,6 @@ $(function () {
     });
 
 
-
-
     if (window["WebSocket"]) {
         conn = new WebSocket("ws://localhost:8989/ws");
 
@@ -57,35 +57,116 @@ $(function () {
     } else {
         ('#errors').append('<li>Your browser does not support WebSockets.</li>');
     }
-    var toAssemblyDataTable = $('#toAssemblyTable').DataTable();
-    var haveAssemblyedDataTable = $('#haveAssemblyedTable').DataTable();
-    var stockDataTable = $('#stockTable').DataTable();
-    $('#tare').click(function () {
-        var actualWeight = $('#actualWeight').val();
-        if($.isNumeric(actualWeight)){
-            tareWeight += actualWeight;
-            $('#actualWeight').val(0);
-            progressbar.progressbar({value: 0});
+    toAssemblyDataTable = $('#toAssemblyTable').DataTable();
+    haveAssemblyedDataTable = $('#haveAssemblyedTable').DataTable();
+    stockDataTable = $('#stockTable').DataTable();
+    $('#toAssemblyTable tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            selected.pop();
+            selectedProduct ='';
+            selectedTargetWeight= 0;
+            $('#targetWeight').val(selectedTargetWeight);
         }
-    })
+        else {
+            toAssemblyDataTable.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+            console.log('id: ' + this.id);
+            selected.pop();
+            selected.push(this.id);
+            selectedProduct = $(this).find('input[type="text"]').val();
+            selectedTargetWeight = $(this).find('input[type="number"]').val();
+            $('#targetWeight').val(selectedTargetWeight);
+            console.log('selected');
+            console.dir(selected);
+            // console.dir(this);
+            // console.dir($(this).find('input[type="number"]'));
+
+        }
+    });
+
+    $('#tare').click(_tare);
     $('#scaleWeight').click(function () {
+
+    });
+    $('#acceptWeight').click(function () {
+        var itemInfo = {
+            id: selected[0],
+            actualWeight: parseFloat($('#actualWeight').val()),
+            isFinished: true
+        };
+        $.post('/station/dispensary/acceptWeight/:id',itemInfo, function (data) {
+            if(data.info){
+                $('#infos').append('<li>' + data.info + '</li>');
+                _tare();
+                $('#navBar').$('li.active').removeClass('active').
+                $('a[href=#general]').parent().addClass('active');
+                toAssemblyDataTable.row('.selected').remove().draw(false);
+            }
+            if(data.error){
+                $('#errors').append('<li>' + data.error + '</li>');
+            }
+        });
+    });
+    $('#interrupt').click(function () {
+        var actualWeight = parseFloat($('#actualWeight').val());
+
+        var targetWeight = parseFloat(selectedTargetWeight) - actualWeight;
+        if(targetWeight<0){
+            targetWeight =0;
+        }
+        var itemInfo = {
+            id: selected[0],
+            actualWeight: actualWeight,
+            targetWeight: targetWeight,
+            isFinished: false
+        };
+        $.post('/station/dispensary/acceptWeight/:id',itemInfo, function (data) {
+            if(data.info){
+                $('#infos').append('<li>' + data.info + '</li>');
+                _tare();
+                $('#navBar').$('li.active').removeClass('active').
+                $('a[href=#general]').parent().addClass('active');
+                if(targetWeight>0){
+                    toAssemblyDataTable.$('tr.selected').find('input[type="number"]').val(targetWeight);
+                }else{
+                    toAssemblyDataTable.row('.selected').remove().draw(false);
+                }
+            }
+            if(data.error){
+                $('#errors').append('<li>' + data.error + '</li>');
+            }
+        });
+    });
+    $('#test').click(function () {
         progressbar.progressbar({max: 20});
         simulateScale(10);
     });
-});
 
-var tareWeight =0;
-var simulatedValue=0;
+});
+function _tare() {
+    var actualWeight = $('#actualWeight').val();
+    if ($.isNumeric(actualWeight)) {
+        tareWeight += actualWeight;
+        $('#actualWeight').val(0);
+        progressbar.progressbar({value: 0});
+    }
+}
+function checkAssemblyIsFinished() {
+    var remainRows = toAssemblyDataTable.data().count();
+
+}
+var simulatedValue = 0;
 function simulateScale(targetValue) {
     simulatedValue += 0.1;
-    if(targetValue>simulatedValue){
-        cmd = 'send COM1 ' + simulatedValue +'\n';
-        if(conn){
+    if (targetValue > simulatedValue) {
+        cmd = 'send COM1 ' + simulatedValue + '\n';
+        if (conn) {
             conn.send(cmd);
         }
         setTimeout(function () {
             simulateScale(targetValue);
-        },300);
+        }, 300);
     }
 
 }
@@ -95,13 +176,26 @@ $("#barcode").keypress(function (e) {
         console.log("Barcode input: " + barcodeText);
     }
 });
-function assemblyToJob(barcode) {
-
-}
 
 function barcodeScanned(barcode) {
-    if(barcode){
-
+    if (barcode) {
+        var segments = barcode.split('_');
+        if(segments[0] === selectedProduct){
+            $.get('/station/dispensary/scanBarcode/:location/:barcode', function (data) {
+                if(data.info){
+                    $('#infos').append('<li>' + data.info + '</li>');
+                }
+                if(data.error){
+                    $('#errors').append('<li>' + data.error + '</li>');
+                }
+                if(data.isScale === true){
+                    $('#navBar').$('li.active').removeClass('active').
+                    $('a[href=#scale]').attr('data-toggle','pill').parent().addClass('active');
+                }
+            });
+        }else {
+            ('#errors').append('<li>Product ident is not correct, please take right product</li>');
+        }
     }
 }
 
@@ -111,36 +205,30 @@ function showWeight(dataStr) {
     var value;
     var length;
     try {
-        data= $.parseJSON(dataStr);
-        if(typeof data == 'object'){
+        data = $.parseJSON(dataStr);
+        if (typeof data == 'object') {
             if (data.D) {
-                if(Array.isArray(data.D)){
+                if (Array.isArray(data.D)) {
                     valueStr = data.D[0];
-                    length= valueStr.length;
-                    data = valueStr.substring(0,length-1);
-                    value= parseFloat(data);
+                    length = valueStr.length;
+                    data = valueStr.substring(0, length - 1);
+                    value = parseFloat(data);
                     console.log('value: ' + value);
-                    value = value -tareWeight;
+                    value = value - tareWeight;
                     if (progressbar) {
                         progressbar.progressbar({value: value})
                     }
                     $('#actualWeight').val(value);
-                }else{
+                } else {
                     return;
                 }
 
 
-
-
-
-
             }
         }
-    }catch (ex)
-    {
+    } catch (ex) {
 
     }
-
 
 
 }

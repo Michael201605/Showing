@@ -219,5 +219,8 @@
 	"LogisticUnit List": "LogisticUnit List",
 	"Unit Size": "Unit Size",
 	"Nb Of Units": "Nb Of Units",
-	"OK": "OK"
+	"OK": "OK",
+	"JobIdent": "JobIdent",
+	"Test": "Test",
+	"Interrupt": "Interrupt"
 }

@@ -6,9 +6,11 @@ var Company = require('../eq/Company');
 var Product = require('./Product');
 var LogisticUnit = require('./LogisticUnit');
 var Layer = require('./Layer');
+var LotLog = require('./LotLog');
 var utils = require('../../lib/utils');
 var BusinessBase = require('../BusinessBase');
 var WarehousePackingType = require('../../lib/stateAndCategory/warehousePackingType');
+var LotState = require('../../lib/stateAndCategory/lotState');
 var Promise = require('promise');
 var properties = {
     ident: {type: modelBase.Sequelize.STRING},
@@ -32,7 +34,7 @@ var properties = {
 var Receipt = modelBase.define('Receipt', properties);
 
 
-Receipt.belongsTo(Company,{as: 'Supplier'});
+Receipt.belongsTo(Company, {as: 'Supplier'});
 Receipt.belongsTo(Product);
 
 utils.inherits(Receipt.Instance.prototype, BusinessBase.prototype);
@@ -70,7 +72,7 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
     return new Promise(function (resolve, reject) {
         if (errors.length == 0) {
             me.getProduct().then(function (theProduct) {
-                if(theProduct){
+                if (theProduct) {
                     sscc = theProduct.ident + '_' + me.lot;
                 }
                 me.getSupplier().then(function (theSupplier) {
@@ -80,7 +82,7 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
                     }
                     me.getMaxId('LogisticUnits').then(function (maxId) {
                         var logisticUnitInfo = {
-                            ident: 'WH:'+ maxId,
+                            ident: 'WH:' + maxId,
                             name: 'WH',
                             unitSize: me.actualUnitSize,
                             nbOfUnits: me.actualNbOfUnits,
@@ -92,25 +94,50 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
                             productIdent: theProduct.ident,
                             productName: theProduct.name,
                             supplierIdent: supplierIdent,
-                            supplierName:supplierName,
+                            supplierName: supplierName,
                             location: 'WH',
                             state: 10
                         };
                         LogisticUnit.create(logisticUnitInfo).then(function (newLogistic) {
                             console.log('newLogistic: ' + JSON.stringify(newLogistic));
                             if (newLogistic.packagingType == WarehousePackingType.Bag) {
-                                for (var i = 1; i <= newLogistic.nbOfUnits; i++) {
-                                    var layInfo = {
-                                        sscc: sscc + '_' + utils.pad(i,4),
-                                        bagNo: i,
-                                        size: newLogistic.unitSize,
-                                        actualWeight: newLogistic.unitSize,
-                                        LogisticUnitId: newLogistic.id
-                                    };
-                                    Layer.create(layInfo).then(function (newLayer) {
-                                        console.log('newLayer: ' + JSON.stringify(newLayer));
-                                    });
-                                }
+                                LotLog.findOne({where: {ident: newLogistic.lot}}).then(function (theLot) {
+                                    var offSet = 0;
+                                    if (theLot) {
+                                        offSet = theLot.nbOfUnits;
+                                        theLot.nbOfUnits += newLogistic.nbOfUnits;
+                                        theLot.save();
+                                    }
+                                    else {
+                                        var expireDate = new Date();
+                                        var remainingDays = 180;
+                                        expireDate.setDate(expireDate.getDate() + remainingDays);
+                                        LotLog.create({
+                                            ident: newLogistic.lot,
+                                            productIdent: newLogistic.productIdent,
+                                            productName: newLogistic.productName,
+                                            state: LotState.OK,
+                                            expireDate: expireDate,
+                                            size: newLogistic.unitSize,
+                                            nbOfUnits: newLogistic.nbOfUnits
+                                        });
+                                    }
+                                    for (var i = 1; i <= newLogistic.nbOfUnits; i++) {
+                                        var layInfo = {
+                                            sscc: sscc + '_' + utils.pad(i + offSet, 4),
+                                            bagNo: i + offSet,
+                                            size: newLogistic.unitSize,
+                                            actualWeight: newLogistic.unitSize,
+                                            LogisticUnitId: newLogistic.id
+                                        };
+                                        Layer.create(layInfo).then(function (newLayer) {
+                                            console.log('newLayer: ' + JSON.stringify(newLayer));
+                                        });
+                                    }
+
+
+                                })
+
 
                             }
                             me.update({
@@ -126,7 +153,7 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
             });
         }
         else {
-            reject({errors:errors});
+            reject({errors: errors});
         }
     });
 

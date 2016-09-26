@@ -10,7 +10,7 @@ var properties = {
     state: modelBase.Sequelize.INTEGER,
     expireDate: modelBase.Sequelize.DATE,
     size: modelBase.Sequelize.DECIMAL,
-    actualWeight: modelBase.Sequelize.DECIMAL
+    nbOfUnits: modelBase.Sequelize.INTEGER
 };
 
 var LotLog = modelBase.define('LotLog', properties);

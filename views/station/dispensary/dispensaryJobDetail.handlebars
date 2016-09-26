@@ -85,9 +85,9 @@
         </div>
         <div class="col-lg-6 details">
             <div class="">
-                <ul class="nav nav-pills">
+                <ul id="navBar" class="nav nav-pills">
                     <li class="active"><a data-toggle="pill" href="#general">{{{__ "General"}}}</a></li>
-                    <li><a data-toggle="pill" href="#scale">{{{__ "Scale"}}}</a></li>
+                    <li class="disabled"><a href="#scale">{{{__ "Scale"}}}</a></li>
                     <li><a data-toggle="pill" href="#stock">{{{__ "Stock"}}}</a></li>
                 </ul>
 
@@ -107,8 +107,8 @@
                                     <tbody>
                                     {{#each toAssemblyItems}}
                                         <tr id="{{id}}">
-                                            <td>{{productIdent}}</td>
-                                            <td>{{targetWeight}}</td>
+                                            <td><input type="text" value="{{productIdent}}" disabled></td>
+                                            <td><input type="number" value="{{targetWeight}}" disabled></td>
                                         </tr>
                                     {{/each}}
                                     </tbody>
@@ -144,6 +144,12 @@
                                 <button id="confirmBarcode" class="btn btn-primary">{{{__ "Confirm"}}}</button>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <button id="printAssembly" class="btn btn-primary">{{{__ "Print"}}}</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="scale" class="tab-pane fade">
                         <div class="row weight">
@@ -162,7 +168,7 @@
                                     background-color: #009926;
                                 }
 
-                                #actualWeight, #targetWeight, #tare, #scaleWeight, #acceptWeight {
+                                .weightCtr {
                                     height: 100px;
                                 }
 
@@ -174,16 +180,20 @@
                         <div class="row weight">
                             <div class="col-lg-12">
                                 <label class="col-lg-2 col-sm-6">{{{__ "Target weight"}}}</label>
-                                <input id="targetWeight" class="col-lg-4" disabled>
+                                <input id="targetWeight" class="col-lg-4 weightCtr" disabled>
                                 <label class="col-lg-2 col-sm-6">{{{__ "Actual weight"}}}</label>
-                                <input id="actualWeight" class="col-lg-4" disabled>
+                                <input id="actualWeight" class="col-lg-4 weightCtr" disabled>
                             </div>
                         </div>
                         <div class="row weight">
                             <div class="col-lg-12">
-                                <button id="tare" class="col-lg-3">{{{__ "Tare"}}}</button>
-                                <button id="scaleWeight" class="col-lg-3">{{{__ "Scale"}}}</button>
-                                <button id="acceptWeight" class="col-lg-3">{{{__ "Accept"}}}</button>
+                                <button id="tare" class="col-lg-3 weightCtr btn btn-info">{{{__ "Tare"}}}</button>
+                                <!--<button id="scaleWeight" class="col-lg-3">{{{__ "Scale"}}}</button>-->
+                                <button id="acceptWeight" class="col-lg-3 weightCtr btn">{{{__ "Accept"}}}</button>
+                            </div>
+                            <div class="col-lg-12 weight">
+                                <button id="interrupt" class="col-lg-3 weightCtr">{{{__ "Interrupt"}}}</button>
+                                <button id="test" class="col-lg-3 weightCtr">{{{__ "Test"}}}</button>
                             </div>
                         </div>
                     </div>
