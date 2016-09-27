@@ -38,7 +38,6 @@
 
 
 <div class="container main">
-    <label id="15"></label>
     <!--<input id="receipt" type="text" class="hidden" value="{{receipt}}"/>-->
     <!--<input id="packingCategory" type="text" class="hidden" value="{{packingCategory}}"/>-->
     <input id="products" type="text" class="hidden" value="{{products}}"/>
@@ -199,24 +198,25 @@
                         </form>
                     </div>
                     <div id="bom" class="tab-pane fade">
-                        <div class="row">
 
-                            <div class="col-lg-3 col-md-3">
-
-                                <select class="col-lg-8" id="rawProducts">
-                                    <option></option>
-                                </select>
-                            </div>
-
-                            <div class="col-lg-9 col-md-9">
-                                <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
-                                <button id="removeItem"
-                                        class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
-                            </div>
-                        </div>
                         <div class="row">
                             <table id="bomTable" class="table table-bordered table-hover">
                                 <caption>{{{__ "BOM list"}}}</caption>
+                                <div class="row">
+
+                                    <div class="col-lg-3 col-md-3">
+
+                                        <select class="col-lg-8" id="rawProducts">
+                                            <option></option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-9 col-md-9">
+                                        <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
+                                        <button id="removeItem"
+                                                class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
+                                    </div>
+                                </div>
                                 <thead>
                                 <tr>
                                     <th>{{{__ "ProductIdent"}}}</th>
@@ -233,6 +233,7 @@
                                     </tr>
                                 {{/each}}
                                 </tbody>
+                                <tr></tr>
                             </table>
                         </div>
 

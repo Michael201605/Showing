@@ -8,7 +8,7 @@
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail">{{{__ "Dispensary Job List"}}}</h2>
+            <h2 class="title-Detail">{{{__ "Product List"}}}</h2>
         </div>
         <div class="col-lg-3">
 
@@ -40,34 +40,52 @@
 
         </div>
         <div class="col-lg-6 details">
-            <input id="receipts" type="text" class="hidden" value="{{receipts}}"/>
-            <input id="state" type="text" class="hidden" value="{{state}}"/>
-            <table id="disJobsTable" class="table table-bordered table-hover">
-                <caption>{{{__ "Dispensary job Management"}}}</caption>
+            <table id="productsTable" class="table table-bordered table-hover">
+                <caption>{{{__ "Product Management"}}}</caption>
                 <thead>
                 <tr>
-                    <th>{{{__ "JobIdent"}}}</th>
+                    <th>{{{__ "Ident"}}}</th>
+                    <th>{{{__ "Category"}}}</th>
                     <th>{{{__ "State"}}}</th>
-                    <th>{{{__ "TargetWeight"}}}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {{#each dispensaryJobs}}
+                {{#each products}}
                     <tr id="{{id}}">
-                        <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{jobIdent}}</a></td>
-                        <td>{{state}}</td>
-                        <td>{{targetWeight}}</td>
+                        <td><a href="/product/productDetail/:{{id}}">{{ident}}</a></td>
+                        <td>{{category}}</td>
+                        <td>{{displayState}}</td>
                     </tr>
                 {{/each}}
                 </tbody>
             </table>
         </div>
         <div class="col-lg-3">
-
+            <button id="newProduct" class="btn btn-primary">{{{__ "New"}}}</button>
+            <button id='deleteProduct' class="btn btn-danger">{{{__ "Delete"}}}</button>
         </div>
     </div>
 </div>
+<div id="createNewProductDialog" title="{{{__ "Create new product"}}}">
+    <p class="validateTips">{{{__ "All form fields are required."}}}</p>
+    <form>
+        <fieldset>
+            <label for="ident">{{{__ "Ident"}}}</label>
+            <input type="text" name="ident" id="ident" class="text ui-widget-content ui-corner-all">
+            <br>
+            <label for="category">{{{__ "Category"}}}</label>
+            <select name="category" id="category">
+                <option value="-1"></option>
+                <option value="0">{{{__ "Raw material"}}}</option>
+                <option value="1">{{{__ "Finished Product"}}}</option>
+            </select>
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+    </form>
+</div>
 {{#section 'jquery'}}
     <script src="/vendor/jquery.dataTables.min.js"></script>
-    <script src="/js/dispensarys.js"></script>
+    <script src="/js/products.js"></script>
+
 {{/section}}

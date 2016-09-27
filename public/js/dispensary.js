@@ -14,7 +14,7 @@ $(function () {
     });
     progressbarValue = progressbar.find(".ui-progressbar-value");
     $(window).keypress(function (e) {
-        if ((e.which >= 48 && e.which <= 57) || (e.which >= 65 && e.which <= 90) || (e.which >= 97 && e.which <= 122) || e.which == 95) {
+        if ((e.which >= 48 && e.which <= 57) || (e.which >= 65 && e.which <= 90) || (e.which >= 97 && e.which <= 122) || e.which == 95||e.which == 47) {
             chars.push(String.fromCharCode(e.which));
         }
         console.log(e.which + ":" + chars.join("|"));
@@ -25,6 +25,7 @@ $(function () {
                     console.log("Barcode Scanned: " + barcodeText);
                     // assign value to some input (or do whatever you want)
                     $("#barcode").val(barcodeText);
+                    barcodeScanned(barcodeText);
                 }
                 chars = [];
                 pressed = false;
@@ -142,6 +143,29 @@ $(function () {
         progressbar.progressbar({max: 20});
         simulateScale(10);
     });
+    var changed = false;
+    $('#testTab').click(function () {
+        if(!changed){
+            // console.log('li.active');
+            // console.dir($('#navBar').find('li.active'));
+            var activeTab = $('#navBar').find('li.active');
+            // $(activeTab).removeClass('active');
+            var scaleLink = $('#navBar').find('a[href=#scale]');
+            var scaleTab =$(scaleLink).attr('data-toggle','pill').parent();
+            $(scaleTab).removeClass('disabled');
+            // var e = new $.Event('click');
+            $(scaleLink).click();
+            // $('#navBar').find('li.active').removeClass('active').
+            // $('a[href=#scale]').attr('data-toggle','pill').parent().addClass('active');
+            // changed =true;
+        }else {
+            $('#navBar').find('li.active').removeClass('active').
+            $('a[href=#general]').parent().addClass('active');
+            changed = false;
+        }
+
+    });
+
 
 });
 function _tare() {
@@ -178,25 +202,30 @@ $("#barcode").keypress(function (e) {
 });
 
 function barcodeScanned(barcode) {
-    if (barcode) {
-        var segments = barcode.split('_');
-        if(segments[0] === selectedProduct){
-            $.get('/station/dispensary/scanBarcode/:location/:barcode', function (data) {
-                if(data.info){
-                    $('#infos').append('<li>' + data.info + '</li>');
-                }
-                if(data.error){
-                    $('#errors').append('<li>' + data.error + '</li>');
-                }
-                if(data.isScale === true){
-                    $('#navBar').$('li.active').removeClass('active').
-                    $('a[href=#scale]').attr('data-toggle','pill').parent().addClass('active');
-                }
-            });
-        }else {
-            ('#errors').append('<li>Product ident is not correct, please take right product</li>');
+    if(selectedProduct){
+        if (barcode) {
+            var segments = barcode.split('_');
+            if(segments[0] === selectedProduct){
+                $.get('/station/dispensary/scanBarcode/:location/:barcode', function (data) {
+                    if(data.info){
+                        $('#infos').append('<li>' + data.info + '</li>');
+                    }
+                    if(data.error){
+                        $('#errors').append('<li>' + data.error + '</li>');
+                    }
+                    if(data.isScale === true){
+                        $('#navBar').$('li.active').removeClass('active').
+                        $('a[href=#scale]').attr('data-toggle','pill').parent().addClass('active');
+                    }
+                });
+            }else {
+                $('#errors').append('<li>Product ident is not correct, please take right product</li>');
+            }
         }
+    }else {
+        $('#errors').append('<li>No product selected.</li>');
     }
+
 }
 
 function showWeight(dataStr) {
@@ -259,4 +288,3 @@ function setBKColor(state) {
     }
     $('#displayState').css({'background-color': color});
 }
-

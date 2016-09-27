@@ -116,29 +116,3 @@ svg {
     padding-left: 0;
     padding-right: 0;
 }
-.title-Detail {
-    padding-left: 25%;
-    color: snow;
-}
-
-header {
-    background-color: lightsteelblue;
-}
-
-.right-button {
-    padding-top: 50%;
-}
-
-.details {
-    padding-top: 1%;
-    background-color: skyblue;
-    padding-bottom: 15%;
-}
-
-.info {
-    color: green;
-}
-
-.error {
-    color: red;
-}

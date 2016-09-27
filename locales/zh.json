@@ -222,5 +222,18 @@
 	"OK": "OK",
 	"JobIdent": "JobIdent",
 	"Test": "Test",
-	"Interrupt": "Interrupt"
+	"Interrupt": "Interrupt",
+	"Print": "Print",
+	"Test tab": "Test tab",
+	"Product Management": "Product Management",
+	"input new Ident": "input new Ident",
+	"All form fields are required.": "All form fields are required.",
+	"Raw material": "Raw material",
+	"Finished Product": "Finished Product",
+	"Create new product": "Create new product",
+	"Product List": "Product List",
+	"the ident already existed.": "the ident already existed.",
+	"have deleted  %d product": "have deleted  %d product",
+	"Product Detail": "Product Detail",
+	"cross contaimination": "cross contaimination"
 }

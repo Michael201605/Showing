@@ -52,6 +52,7 @@ module.exports = function (app, i18n) {
                 LogisticUnit.findAll({where: {location: theAssembly.location}}).then(function (stocks) {
                     res.render('station/dispensary/dispensaryJobDetail', {
                         assembly: theAssembly,
+                        location: theAssembly.location,
                         toAssemblyItems: toAssemblyItems,
                         assemblyedItems: assemblyedItems,
                         stocks: stocks
@@ -89,6 +90,7 @@ module.exports = function (app, i18n) {
             }else {
                 res.json({error:i18n.__('Invalide barcode.')});
             }
+
         });
     });
     app.post('/station/dispensary/acceptWeight/:id', function (req, res) {
