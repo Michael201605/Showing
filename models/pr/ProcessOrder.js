@@ -25,6 +25,7 @@ var ProcessOrder = modelBase.define('ProcessOrder', {
     targetWeight: modelBase.Sequelize.DECIMAL,
     packSize: modelBase.Sequelize.DECIMAL,
     productIdent: modelBase.Sequelize.STRING,
+    productName: modelBase.Sequelize.STRING,
     mixerIdent: modelBase.Sequelize.STRING,
     lineIdent: modelBase.Sequelize.STRING,
     mixingTime: modelBase.Sequelize.INTEGER,
@@ -287,7 +288,9 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 actualWeight: 0.0,
                                 state: JobState.Released,
                                 LineId: me.LineId,
-                                processOrderIdent: me.ident
+                                processOrderIdent: me.ident,
+                                productIdent: me.productIdent,
+                                productName: me.productName
                             }));
 
                         }
@@ -305,7 +308,9 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                 actualWeight: 0.0,
                                 state: JobState.Released,
                                 LineId: me.LineId,
-                                processOrderIdent: me.ident
+                                processOrderIdent: me.ident,
+                                productIdent: me.productIdent,
+                                productName: me.productName
                             }));
                         }
                     } else {
@@ -325,7 +330,9 @@ ProcessOrder.Instance.prototype.releaseOrder = function (i18n) {
                                     actualWeight: 0.0,
                                     state: JobState.Released,
                                     LineId: me.LineId,
-                                    processOrderIdent: me.ident
+                                    processOrderIdent: me.ident,
+                                    productIdent: me.productIdent,
+                                    productName: me.productName
                                 }).then(function (res) {
                                     log.debug('ProcessOrder: releaseOrder: res: ' + res);
                                     resolve1();

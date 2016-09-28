@@ -5,7 +5,6 @@
  * Created by pi on 7/21/16.
  */
 var modelBase = require('../ModelBase');
-var Assembly = require('./Assembly');
 var BusinessBase = require('../BusinessBase');
 var utils = require('../../lib/utils');
 

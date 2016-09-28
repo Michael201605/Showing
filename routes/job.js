@@ -419,14 +419,25 @@ module.exports = function (app, controllerManager, i18n, io) {
             if (theJob) {
                 theJob.state = JobState.Scheduled;
                 theJob.save();
-                theJob.updateIngredients();
-                res.json({
-                    update: {
-                        state: JobState.Scheduled,
-                        displayState: i18n.__(getDisplayState(JobState, JobState.Scheduled))
-                    },
-                    info: i18n.__('job has been scheduled.')
+                theJob.updateIngredients().then(function (pRes) {
+                    console.dir(pRes);
+                    var resData ={
+                        update: {
+                            state: JobState.Scheduled,
+                            displayState: i18n.__(getDisplayState(JobState, JobState.Scheduled))
+                        },
+                        info: i18n.__('job has been scheduled.')
+                    };
+                    if(pRes){
+                        resData.update.receiver = pRes.receiver;
+
+                    }
+                    res.json(resData);
+                }, function (pErr) {
+                    console.dir(pErr);
+                    res.json(pErr);
                 });
+
             }
             else {
                 res.json({error: i18n.__('Job: %s is empty.', id)});
@@ -445,7 +456,6 @@ module.exports = function (app, controllerManager, i18n, io) {
             if (theJob) {
                 theJob.state = JobState.Released;
                 theJob.save();
-                theJob.updateIngredients();
                 res.json({
                     update: {
                         state: JobState.Released,

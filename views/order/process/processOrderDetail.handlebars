@@ -198,25 +198,25 @@
                         </form>
                     </div>
                     <div id="bom" class="tab-pane fade">
+                        <div class="row">
 
+                            <div class="col-lg-3 col-md-3">
+
+                                <select class="col-lg-8" id="rawProducts">
+                                    <option></option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-9 col-md-9">
+                                <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
+                                <button id="removeItem"
+                                        class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
+                            </div>
+                        </div>
                         <div class="row">
                             <table id="bomTable" class="table table-bordered table-hover">
                                 <caption>{{{__ "BOM list"}}}</caption>
-                                <div class="row">
 
-                                    <div class="col-lg-3 col-md-3">
-
-                                        <select class="col-lg-8" id="rawProducts">
-                                            <option></option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-lg-9 col-md-9">
-                                        <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
-                                        <button id="removeItem"
-                                                class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
-                                    </div>
-                                </div>
                                 <thead>
                                 <tr>
                                     <th>{{{__ "ProductIdent"}}}</th>
@@ -224,19 +224,38 @@
                                     <th>{{{__ "TargetPercentage"}}}</th>
                                 </tr>
                                 </thead>
+                                <tfoot>
+                                <tr>
+                                    <th>{{{__ "ProductIdent"}}}</th>
+                                    <th>{{{__ "TargetWeight"}}}</th>
+                                    <th>{{{__ "TargetPercentage"}}}</th>
+                                </tr>
+                                </tfoot>
                                 <tbody>
                                 {{#each processOrder.orderItems}}
                                     <tr id="{{id}}">
                                         <td><label>{{productIdent}}</label></td>
-                                        <td><input type="text" value="{{targetWeight}}" disabled></td>
-                                        <td><input type="number" step="any" value="{{targetPercentage}}" disabled></td>
+                                        <td><input type="text" value="{{targetWeight}}" disabled>kg</td>
+                                        <td><input type="number" step="any" value="{{targetPercentage}}" disabled>%</td>
                                     </tr>
                                 {{/each}}
                                 </tbody>
-                                <tr></tr>
+
                             </table>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
 
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+
+                            </div>
+                            <div class="col-lg-5 col-md-5">
+                                <label>{{{__ "total pectentage"}}}</label>
+                                <input id="total" disabled>%
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

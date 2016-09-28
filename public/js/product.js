@@ -21,7 +21,11 @@ $(function () {
         var productId = $('#productId').val();
 
         var productInfo = {
-            name: $('#name').val()
+            name: $('#name').val(),
+            unitSize:  parseFloat($('#unitSize').val()),
+            shelfLife:  parseInt($('#shelfLife').val()),
+            positiveDeviation:  parseFloat($('#positiveDeviation').val()),
+            negativeDeviation:  parseFloat($('#negativeDeviation').val())
         };
         console.log('productInfo: ');
         console.dir(productInfo);

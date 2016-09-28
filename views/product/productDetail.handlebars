@@ -83,7 +83,38 @@
                                            value="{{product.state}}"/>
                                 </div>
                             </div>
-
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">{{{__ "Unit size"}}}</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="unitSize" name="unitSize"
+                                           value="{{product.unitSize}}"/>
+                                </div>
+                                <label class="unit">kg</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">{{{__ "Shelf life"}}}</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="shelfLife" name="shelfLife"
+                                           value="{{product.shelfLife}}"/>
+                                </div>
+                                <label class="unit">{{{__ "day"}}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">{{{__ "Positive Deviation"}}}</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="positiveDeviation" name="positiveDeviation"
+                                           value="{{product.positiveDeviation}}"/>
+                                </div>
+                                <label class="unit">%</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">{{{__ "Negative deviation"}}}</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="negativeDeviation" name="negativeDeviation"
+                                           value="{{product.negativeDeviation}}"/>
+                                </div>
+                                <label class="unit">%</label>
+                            </div>
                             <div class="form-group">
                                 <label class="col-md-2 control-label">{{{__ "Creation Time"}}}</label>
                                 <div class="col-md-4">

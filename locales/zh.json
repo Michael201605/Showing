@@ -235,5 +235,13 @@
 	"the ident already existed.": "the ident already existed.",
 	"have deleted  %d product": "have deleted  %d product",
 	"Product Detail": "Product Detail",
-	"cross contaimination": "cross contaimination"
+	"cross contaimination": "cross contaimination",
+	"Total": "Total",
+	"total pectentage": "total pectentage",
+	"no handAdd found": "no handAdd found",
+	"Unit size": "Unit size",
+	"Shelf life": "Shelf life",
+	"Positive Deviation": "Positive Deviation",
+	"Negative deviation": "Negative deviation",
+	"day": "day"
 }

@@ -9,6 +9,7 @@ $(function () {
 
 
     var products = JSON.parse($('#products').val());
+    var productsForName =[];
     var mixers = JSON.parse($('#mixers').val());
     var productIdent = '';
     var productName = '';
@@ -21,6 +22,7 @@ $(function () {
     options = [];
     products.forEach(function (product) {
         options.push("<option value='" + product.id + "'>" + product.ident + "</option>");
+        productsForName[product.ident] = product.name;
     });
     $('#productsSelect')
         .append(options.join(""))
@@ -191,6 +193,7 @@ $(function () {
         if (productId && productId > 0) {
             processOrderInfo.ProductId = productId;
             processOrderInfo.productIdent = productIdent;
+            processOrderInfo.productName = productsForName[productIdent];
         }
         if (lineId > 0) {
             processOrderInfo.LineId = lineId;
@@ -242,6 +245,7 @@ $(function () {
 
                     }
                 });
+                calculateTotalPer();
             }
 
         }
@@ -285,8 +289,19 @@ $(function () {
             }
         });
     });
+    calculateTotalPer();
 });
 
+function calculateTotalPer() {
+    var totalPer = 0;
+    var pers = $('#bomTable tbody').find('tr td input[type=number]');
+    var length = pers.length;
+    for(var i =0; i<length;i++){
+        var targetPercentage = pers[i];
+        totalPer += parseFloat($(targetPercentage).val());
+    }
+    $('#total').val(totalPer);
+}
 function setBKColor(state) {
     var color;
     switch (state) {

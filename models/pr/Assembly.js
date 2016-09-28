@@ -14,7 +14,8 @@ var properties = {
     targetWeight: modelBase.Sequelize.DECIMAL,
     location:modelBase.Sequelize.STRING,
     source:modelBase.Sequelize.STRING,
-    target:modelBase.Sequelize.STRING
+    target:modelBase.Sequelize.STRING,
+    category: modelBase.Sequelize.INTEGER
 };
 
 var Assembly = modelBase.define('Assembly', properties);

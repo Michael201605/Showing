@@ -526,13 +526,15 @@ function jobDetail(jobId) {
 }
 function jobQueue(lineIdent) {
     var activeJobsDataTable;
+    var scheduleJobsSortable, pendingJobsSortable;
     var clickMethod = '';
     var $li, $ident, $state, $receiver;
     var selected = [];
     jobQueueDialog.dialog('option', 'title', 'JobQueue: ' + lineIdent);
     jobQueueDialog.dialog('open');
-    $("#scheduleJobs").sortable({
+    scheduleJobsSortable = $("#scheduleJobs").sortable({
         connectWith: ".connectedSortable",
+        dropOnEmpty: true,
         receive: function (event, ui) {
             console.log('receive');
             console.log("scheduleJobs: " + ui.item.jobId + " New position: " + ui.item.index());
@@ -556,8 +558,9 @@ function jobQueue(lineIdent) {
 
         }
     }).disableSelection();
-    $("#pendingJobs").sortable({
+    pendingJobsSortable = $("#pendingJobs").sortable({
         connectWith: ".connectedSortable",
+        dropOnEmpty: true,
         receive: function (event, ui) {
             console.log('receive');
             console.log("pendingJobs New position: " + ui.item.index());
@@ -573,6 +576,7 @@ function jobQueue(lineIdent) {
                 }
                 if (data.update) {
                     $(ui.item).find('label.state').html(data.update.displayState);
+                    $(ui.item).find('label.receiver').html(data.update.receiver);
                 }
             });
         },
@@ -590,20 +594,22 @@ function jobQueue(lineIdent) {
         }
     }).disableSelection();
 
-
+    scheduleJobsSortable.empty();
+    pendingJobsSortable.empty();
     if (lineIdent) {
         var url = '/job/getJobList/:' + lineIdent;
         $.get('/job/getJobList/:' + lineIdent, function (data) {
             console.log('jobListStr: ' + data.jobs);
             var jobList = JSON.parse(data.jobs);
             activeJobsDataTable = $('#activeJobs').DataTable();
+            activeJobsDataTable.clear();
             jobList.forEach(function (theJob) {
                 clickMethod = 'jobDetail(' + theJob.id + ')';
                 if (theJob.state === 121 || theJob.state === 120) {
                     $li = $("<li class='ui-state-default'/>");
                     $ident = $("<label>" + theJob.ident + "</label>");
                     $state = $("<label class='state'>" + theJob.displayState + "</label>");
-                    $receiver = $("<label>" + theJob.receiver + "</label>");
+                    $receiver = $("<label class='receiver'>" + theJob.receiver + "</label>");
                     $li.append($ident)
                         .append($state)
                         .append($receiver)
