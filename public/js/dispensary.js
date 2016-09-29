@@ -60,7 +60,7 @@ $(function () {
     }
     toAssemblyDataTable = $('#toAssemblyTable').DataTable();
     haveAssemblyedDataTable = $('#haveAssemblyedTable').DataTable();
-    stockDataTable = $('#stockTable').DataTable();
+
     $('#toAssemblyTable tbody').on('click', 'tr', function () {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected');
@@ -165,7 +165,17 @@ $(function () {
         }
 
     });
-
+    $("#barcode").keypress(function (e) {
+        if (e.which === 13) {
+            barcodeText = $(this).val();
+            barcodeScanned(barcodeText);
+            console.log("Barcode input: " + barcodeText);
+        }
+    });
+    $('#confirmBarcode').click(function () {
+        barcodeText = $('#barcode').val();
+        barcodeScanned(barcodeText);
+    });
 
 });
 function _tare() {
@@ -194,33 +204,38 @@ function simulateScale(targetValue) {
     }
 
 }
-$("#barcode").keypress(function (e) {
-    if (e.which === 13) {
-        barcodeText = $(this).val();
-        console.log("Barcode input: " + barcodeText);
-    }
-});
 
 function barcodeScanned(barcode) {
     if(selectedProduct){
         if (barcode) {
-            var segments = barcode.split('_');
-            if(segments[0] === selectedProduct){
-                $.get('/station/dispensary/scanBarcode/:location/:barcode', function (data) {
-                    if(data.info){
-                        $('#infos').append('<li>' + data.info + '</li>');
-                    }
-                    if(data.error){
-                        $('#errors').append('<li>' + data.error + '</li>');
-                    }
-                    if(data.isScale === true){
-                        $('#navBar').$('li.active').removeClass('active').
-                        $('a[href=#scale]').attr('data-toggle','pill').parent().addClass('active');
-                    }
-                });
-            }else {
-                $('#errors').append('<li>Product ident is not correct, please take right product</li>');
+            var segments;
+            segments= barcode.split('_');
+            if(segments.length==0){
+                segments= barcode.split('/');
             }
+            if(segments.length>0){
+                if(segments[0] === selectedProduct){
+                    $.get('/station/dispensary/scanBarcode/:location/:barcode', function (data) {
+                        if(data.info){
+                            $('#infos').append('<li>' + data.info + '</li>');
+                        }
+                        if(data.error){
+                            $('#errors').append('<li>' + data.error + '</li>');
+                        }
+                        if(data.isScale === true){
+                            var scaleLink = $('#navBar').find('a[href=#scale]');
+                            var scaleTab =$(scaleLink).attr('data-toggle','pill').parent();
+                            $(scaleTab).removeClass('disabled');
+                            $(scaleLink).click();
+                        }
+                    });
+                }else {
+                    $('#errors').append('<li>Product ident is not correct, please take right product</li>');
+                }
+            }else {
+                $('#errors').append('<li>No barcode found</li>');
+            }
+
         }
     }else {
         $('#errors').append('<li>No product selected.</li>');

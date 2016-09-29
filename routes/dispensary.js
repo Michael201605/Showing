@@ -38,35 +38,68 @@ module.exports = function (app, i18n) {
                 id: id
             }
         }).then(function (theAssembly) {
-            theAssembly.getAssemblyItems().then(function (assemblyItems) {
-                var toAssemblyItems = [];
-                var assemblyedItems = [];
-                assemblyItems.forEach(function (item) {
-                    if (item.isFinished) {
-                        assemblyedItems.push(item);
-                    }
-                    else {
-                        toAssemblyItems.push(item);
-                    }
-                });
-                LogisticUnit.findAll({where: {location: theAssembly.location}}).then(function (stocks) {
-                    res.render('station/dispensary/dispensaryJobDetail', {
-                        assembly: theAssembly,
-                        location: theAssembly.location,
-                        toAssemblyItems: toAssemblyItems,
-                        assemblyedItems: assemblyedItems,
-                        stocks: stocks
+            if(theAssembly){
+                theAssembly.getAssemblyItems().then(function (assemblyItems) {
+                    var toAssemblyItems = [];
+                    var assemblyedItems = [];
+                    assemblyItems.forEach(function (item) {
+                        if (item.isFinished) {
+                            assemblyedItems.push(item);
+                        }
+                        else {
+                            toAssemblyItems.push(item);
+                        }
                     });
-                })
+                    LogisticUnit.findAll({where: {location: theAssembly.location}}).then(function (stocks) {
+                        res.render('station/dispensary/dispensaryJobDetail', {
+                            assembly: theAssembly,
+                            location: theAssembly.location,
+                            toAssemblyItems: toAssemblyItems,
+                            assemblyedItems: assemblyedItems,
+                            stocks: stocks
+                        });
+                    })
 
 
-            });
+                });
+            }
+            else{
+                res.json({error:i18n.__('not found assembly: %d',id)});
+            }
 
 
         });
 
     });
     app.get('/station/dispensary/scanBarcode/:location/:barcode', function (req, res) {
+        var location = req.params.location.substring(1);
+        var barcode = req.params.barcode.substring(1);
+        var jobJson = {};
+        var segments = barcode.split('_');
+        var productIdent = '';
+        var lotIdent = '';
+        Layer.findOne({where:{sscc: barcode}}).then(function (theLayer) {
+            if(theLayer){
+                LogisticUnit.findOne({where:{id: theLayer.LogisticUnitId}}).then(function (theLogisticUnit) {
+                    if(theLogisticUnit){
+                        if(theLogisticUnit.location ==location){
+                            res.json({info:i18n.__('barcode confirmed,please scale the weight.'),
+                                isScale: true
+                            });
+                        }else if(theLogisticUnit.location === "WH"){
+                            res.json({info:i18n.__('material is at raw warehouse,please transfer firstly.'),
+                                isScale: false})
+                        }
+                    }
+                });
+            }else {
+                res.json({error:i18n.__('Invalide barcode.')});
+            }
+
+        });
+    });
+    app.get('/station/dispensary/transferToDis/:location/:barcode', function (req, res) {
+        //TODO: tranfer to dispensary
         var location = req.params.location.substring(1);
         var barcode = req.params.barcode.substring(1);
         var jobJson = {};

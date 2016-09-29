@@ -1,5 +1,5 @@
 {{#section 'head'}}
-
+    <link href="/stylesheets/formStyle.css" rel="stylesheet">
 {{/section}}
 <div class="container main">
 
@@ -12,7 +12,7 @@
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail">{{{__ "Receipt Detail"}}}</h2>
+            <h2 class="title-Detail">{{location}} {{{__ "Logistic Detail"}}}</h2>
             <a href="/warehouse/logisticUnitList/:{{logisticUnit.location}}">{{logisticUnit.location}} {{{__ "LogisticUnit List"}}}</a>
         </div>
         <div class="col-lg-3">

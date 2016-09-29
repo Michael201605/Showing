@@ -4,7 +4,7 @@
 var Receipt = require('../models/pr/Receipt');
 var Product = require('../models/pr/Product');
 var Company = require('../models/eq/Company');
-
+var utils = require('../lib/utils');
 var WarehousePackingType = require('../lib/stateAndCategory/warehousePackingType');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 var labelPrintManager = require('../lib/labelPrintManager');
@@ -28,13 +28,18 @@ module.exports = function (app, i18n) {
         var info = {
             ident: 'newReceipt',
             name: 'Raw',
+            productIdent:'',
             visible: true,
-            state: 10
+            state: 10,
+            packagingType: WarehousePackingType.Undefined,
+            actualUnitSize: 0.0
         };
         console.log('try to create new receipt.... ');
         Receipt.create(info).then(function (newReceipt) {
             console.log('newReceipt: ' + newReceipt);
-            res.json({receipt:newReceipt});
+            var receiptJson = newReceipt.getJsonObject();
+            receiptJson.packagingTypeName = utils.getDisplayState(WarehousePackingType, receiptJson.packagingType);
+            res.json({receipt:receiptJson});
         });
     });
     app.post('/order/receipt/receiptList/deleteReceipt', function (req, res) {
@@ -47,8 +52,8 @@ module.exports = function (app, i18n) {
                     $in: toDeleteReceiptIds
                 }
             }
-        }).then(function (message) {
-            res.json(message);
+        }).then(function (num) {
+            res.json({info: global.i18n.__('have deleted %d receipt', num)});
         });
     });
     app.get('/order/receipt/receiptDetail/:id', function (req, res) {
@@ -67,8 +72,10 @@ module.exports = function (app, i18n) {
                 Company.findAll().then(function (companys) {
                     var companysStr = JSON.stringify(companys);
                     console.log('companysStr: ' + companysStr);
+                    var receiptJson = receipt.getJsonObject();
+                    receiptJson.packagingTypeName = utils.getDisplayState(WarehousePackingType, receiptJson.packagingType);
                     res.render('order/receipt/receiptDetail', {
-                        receipt: receipt.getJsonObject(),
+                        receipt: receiptJson,
                         packingCategory: packingCategoryStr,
                         products: productsStr,
                         companys: companysStr

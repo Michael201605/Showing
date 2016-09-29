@@ -10,14 +10,14 @@ $(function () {
             console.log('data: ' + data);
             if (!data.error) {
                 newReceipt = data.receipt;
-                console.log('newProcessOrder: ' + newReceipt);
-                console.log('newProcessOrder id: ' + newReceipt.id);
-                console.log('newProcessOrder State: ' + newReceipt.displayState);
+                console.log('newReceipt: ' + newReceipt);
+                console.log('newReceipt id: ' + newReceipt.id);
+                console.log('newReceipt State: ' + newReceipt.packagingTypeName);
                 var rowNode = receiptsDataTable.row.add([
                     '<a href="/order/receipt/receiptDetail/:' + newReceipt.id + '">' + newReceipt.ident + '</a>',
                     newReceipt.productIdent,
                     newReceipt.actualUnitSize,
-                    newReceipt.packagingType
+                    newReceipt.packagingTypeName
                 ]).draw(false).node();
                 $(rowNode).attr('id', newReceipt.id);
 
@@ -27,18 +27,20 @@ $(function () {
 
         });
     });
-    $('#processOrdersTable tbody').on('click', 'tr', function () {
-        var id = this.id;
-        var index = $.inArray(id, selected);
-
-        if (index === -1) {
-            selected.push(id);
-        } else {
-            selected.splice(index, 1);
+    $('#receiptsTable tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            selected.pop();
         }
-        console.log('id: ');
-        console.log(selected);
-        $(this).toggleClass('selected');
+        else {
+            receiptsDataTable.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+            console.log('id: ' + this.id);
+            selected.pop();
+            selected.push(this.id);
+            console.log('selected');
+            console.dir(selected);
+        }
     });
     $('#deleteReceipt').click(function () {
         $('#errors').empty();

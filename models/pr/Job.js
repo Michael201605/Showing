@@ -272,56 +272,60 @@ Job.Instance.prototype.updateIngredients = function () {
                                         // theAssembly.target = theHandAdd.ident;
                                         // theAssembly.save();
                                         var promises2 = [];
-                                        var countOfIngr = needToAssemblyIngrs.length;
+                                        var length = needToAssemblyIngrs.length;
                                         var index =0;
 
 
-
-                                        needToAssemblyIngrs.forEach(function (theIngr) {
-                                            promises2.push(new Promise(function (resolve2, reject2) {
-                                                LogisticUnit.findOne({
-                                                    where: {
-                                                        ProductId: theIngr.ProductId,
-                                                        unitSize: {$lte: theIngr.targetWeight},
-                                                        location: 'WH'
-                                                    }
-                                                }).then(function (theLogisticUnit) {
-                                                    if (theLogisticUnit) {
-                                                        log.debug('find logisticUnit for the weight: ' + theIngr.targetWeight);
-                                                        _updateAssembly(Assembly, me, theHandAdd, theIngr, theLogisticUnit).then(function (res) {
-                                                            resolve2(res);
-                                                        }, function (err) {
-                                                            reject2(err);
-                                                        });
-                                                    } else {
-                                                        //only dispensary assembly
-                                                        Product.findOne({
-                                                            where: {id: theIngr.ProductId}
-                                                        }).then(function (theProduct) {
-                                                            if (theProduct) {
-                                                                log.debug('find theProduct for the weight: ' + theProduct.ident);
-                                                                _updateAssembly(Assembly, me, theHandAdd, theIngr, theProduct).then(function (res) {
-                                                                    resolve2(res);
-                                                                }, function (err) {
-                                                                    reject2(err);
-                                                                });
-                                                            } else {
-                                                                reject2({error: global.i18n.__('Job: updateIngredients: product not found.')});
-                                                            }
-                                                        });
-                                                    }
-
-                                                });
-                                            }));
-                                        });
-                                        Promise.all(promises2).then(function (res) {
-                                            log.debug('Job: updateIngredients: promise: resolve!!!');
-                                            resolve1(res);
-
+                                        updateAssembly(Assembly, me, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                                            resolve1();
                                         }, function (err) {
-                                            log.debug('Job: updateIngredients: promise: reject: ' + err);
-                                            reject1(err);
+                                            reject1();
                                         });
+                                        // needToAssemblyIngrs.forEach(function (theIngr) {
+                                        //     promises2.push(new Promise(function (resolve2, reject2) {
+                                        //         LogisticUnit.findOne({
+                                        //             where: {
+                                        //                 ProductId: theIngr.ProductId,
+                                        //                 unitSize: {$lte: theIngr.targetWeight},
+                                        //                 location: 'WH'
+                                        //             }
+                                        //         }).then(function (theLogisticUnit) {
+                                        //             if (theLogisticUnit) {
+                                        //                 log.debug('find logisticUnit for the weight: ' + theIngr.targetWeight);
+                                        //                 _updateAssembly(Assembly, me, theHandAdd, theIngr, theLogisticUnit).then(function (res) {
+                                        //                     resolve2(res);
+                                        //                 }, function (err) {
+                                        //                     reject2(err);
+                                        //                 });
+                                        //             } else {
+                                        //                 //only dispensary assembly
+                                        //                 Product.findOne({
+                                        //                     where: {id: theIngr.ProductId}
+                                        //                 }).then(function (theProduct) {
+                                        //                     if (theProduct) {
+                                        //                         log.debug('find theProduct for the weight: ' + theProduct.ident);
+                                        //                         _updateAssembly(Assembly, me, theHandAdd, theIngr, theProduct).then(function (res) {
+                                        //                             resolve2(res);
+                                        //                         }, function (err) {
+                                        //                             reject2(err);
+                                        //                         });
+                                        //                     } else {
+                                        //                         reject2({error: global.i18n.__('Job: updateIngredients: product not found.')});
+                                        //                     }
+                                        //                 });
+                                        //             }
+                                        //
+                                        //         });
+                                        //     }));
+                                        // });
+                                        // Promise.all(promises2).then(function (res) {
+                                        //     log.debug('Job: updateIngredients: promise: resolve!!!');
+                                        //     resolve1(res);
+                                        //
+                                        // }, function (err) {
+                                        //     log.debug('Job: updateIngredients: promise: reject: ' + err);
+                                        //     reject1(err);
+                                        // });
 
                                     } else {
                                         var error = global.i18n.__('no handAdd found');
@@ -422,9 +426,18 @@ function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length
                 log.debug('find logisticUnit for the weight: ' + theIngr.targetWeight);
                 _updateAssembly(Assembly, theJob, theHandAdd, theIngr, theLogisticUnit).then(function (res) {
                     index++;
+                    if(index<length){
+                        updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                            resolve(res);
+                        }, function (err) {
+                            reject(err);
+                        })
+                    }else {
+                        resolve(res);
+                    }
 
                 }, function (err) {
-                    reject2(err);
+                    reject(err);
                 });
             } else {
                 //only dispensary assembly
@@ -434,12 +447,21 @@ function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length
                     if (theProduct) {
                         log.debug('find theProduct for the weight: ' + theProduct.ident);
                         _updateAssembly(Assembly, theJob, theHandAdd, theIngr, theProduct).then(function (res) {
-                            resolve2(res);
+                            index++;
+                            if(index<length){
+                                updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                                    resolve(res);
+                                }, function (err) {
+                                    reject(err);
+                                })
+                            }else {
+                                resolve(res);
+                            }
                         }, function (err) {
-                            reject2(err);
+
                         });
                     } else {
-                        reject2({error: global.i18n.__('Job: updateIngredients: product not found.')});
+                        reject({error: global.i18n.__('Job: updateIngredients: product not found.')});
                     }
                 });
             }
@@ -535,7 +557,7 @@ function _updateAssembly(Assembly, theJob, theHandAdd, theIngr, unit) {
                             sscc: theJob.ident + '_M_01_' + Math.ceil(Math.random() * 100),
                             target: theHandAdd.ident,
                             jobIdent: theJob.ident,
-                            targetWeight: targetWeight
+                            targetWeight: remainWeight
                         }).then(function (newAssembly) {
                             _updateIngredients(newAssembly, remainWeight, theIngr, unit).then(function (res) {
                                 _setDispensary(theJob, newAssembly).then(function (res2) {

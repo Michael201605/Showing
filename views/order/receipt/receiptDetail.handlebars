@@ -40,7 +40,7 @@
         </div>
         <div class="col-lg-6">
             <h2 class="title-Detail">{{{__ "Receipt Detail"}}}</h2>
-            <a href="/warehouse/receiptList/:10">{{{__ "Receipt List"}}}</a>
+            <a href="/order/receipt/receiptList/:10">{{{__ "Receipt List"}}}</a>
         </div>
         <div class="col-lg-3">
 
@@ -107,7 +107,7 @@
                         <select class="col-md-6" id="packagingTypes">
                             <option></option>
                         </select>
-                        <input type="text" class="col-md-6 form-control" id="packagingTypeName" disabled
+                        <input type="text" class="col-md-6 form-control" id="packagingTypeName" value = "{{receipt.packagingTypeName}}" disabled
                         />
                         <input type="text" class="col-md-6 form-control hidden" id="packagingType" value = "{{receipt.packagingType}}"
                         />

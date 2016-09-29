@@ -243,5 +243,9 @@
 	"Shelf life": "Shelf life",
 	"Positive Deviation": "Positive Deviation",
 	"Negative deviation": "Negative deviation",
-	"day": "day"
+	"day": "day",
+	"have deleted %d receipt": "have deleted %d receipt",
+	"not found assembly: %d": "not found assembly: %d",
+	"Logistic Detail": "Logistic Detail",
+	"Please scan barcode to transfer": "Please scan barcode to transfer"
 }
