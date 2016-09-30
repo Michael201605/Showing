@@ -2,6 +2,7 @@
  * Created by pi on 7/21/16.
  */
 var LogisticUnit = require('../models/pr/LogisticUnit');
+var Layer = require('../models/pr/Layer');
 var Product = require('../models/pr/Product');
 var Company = require('../models/eq/Company');
 var utils = require('../lib/utils');
@@ -33,14 +34,27 @@ module.exports = function (app, i18n) {
             logisticUnitJson = theLogisticUnit.getJsonObject();
             logisticUnitJson.displayState = i18n.__(utils.getDisplayState(LotState, theLogisticUnit.state));
             logisticUnitJson.packagingTypeName = i18n.__(utils.getDisplayState(WarehousePackingType, theLogisticUnit.packagingType));
-            res.render('warehouse/logisticUnitDetail', {
-                logisticUnit: logisticUnitJson,
-                location: theLogisticUnit.location
+            Layer.findAll({where:{LogisticUnitId: id}}).then(function (layers) {
+                res.render('warehouse/logisticUnitDetail', {
+                    logisticUnit: logisticUnitJson,
+                    location: theLogisticUnit.location,
+                    layers: layers
+                });
             });
+
         });
 
     });
+    app.get('/warehouse/layers/:logisticUnitId', function (req, res) {
+        var logisticUnitId = req.params.logisticUnitId.substring(1);
 
+
+        Layer.findAll({where:{LogisticUnitId: logisticUnitId}}).then(function (layers) {
+            res.json({layers: layers});
+        });
+
+
+    });
 };
 
 function isLoggedIn(req, res, next) {

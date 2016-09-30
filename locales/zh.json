@@ -247,5 +247,18 @@
 	"have deleted %d receipt": "have deleted %d receipt",
 	"not found assembly: %d": "not found assembly: %d",
 	"Logistic Detail": "Logistic Detail",
-	"Please scan barcode to transfer": "Please scan barcode to transfer"
+	"Please scan barcode to transfer": "Please scan barcode to transfer",
+	"Dispensary jobs ": "Dispensary jobs ",
+	"NbOfUnits": "NbOfUnits",
+	"logisticUnit detail": "logisticUnit detail",
+	"sscc": "sscc",
+	"bagNo": "bagNo",
+	"actuallWeight": "actuallWeight",
+	" Stock Management": " Stock Management",
+	"LogisticUnits": "LogisticUnits",
+	"Layers": "Layers",
+	"has transfered to dispensary.": "has transfered to dispensary.",
+	"Invalide barcode.": "Invalide barcode.",
+	"barcode confirmed,please scale the weight.": "barcode confirmed,please scale the weight.",
+	"update successfully": "update successfully"
 }

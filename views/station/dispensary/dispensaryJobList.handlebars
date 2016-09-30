@@ -1,5 +1,5 @@
 {{#section 'head'}}
-    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet" xmlns="http://www.w3.org/1999/html">
     <link href="/stylesheets/formStyle.css" rel="stylesheet">
 {{/section}}
 <div class="container main">
@@ -75,19 +75,38 @@
                                     <caption>{{{__ "Stock"}}}</caption>
                                     <thead>
                                     <tr>
+                                        <th>{{{__ "Ident"}}}</th>
                                         <th>{{{__ "ProductIdent"}}}</th>
                                         <th>{{{__ "UnitSize"}}}</th>
-                                        <th>{{{__ "ActualWeight"}}}</th>
+                                        <th>{{{__ "NbOfUnits"}}}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {{#each assembly.items}}
+                                    {{#each stocks}}
                                         <tr id="{{id}}">
+                                            <td>{{ident}}</td>
                                             <td>{{productIdent}}</td>
                                             <td>{{unitSize}}</td>
-                                            <td>{{actualWeight}}</td>
+                                            <td>{{nbOfUnits}}</td>
                                         </tr>
                                     {{/each}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table id="layersTable" class="table table-bordered table-hover">
+                                    <caption>{{{__ "logisticUnit detail"}}}</caption>
+                                    <thead>
+                                    <tr>
+                                        <th>{{{__ "sscc"}}}</th>
+                                        <th>{{{__ "bagNo"}}}</th>
+                                        <th>{{{__ "actuallWeight"}}}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -101,11 +120,7 @@
                         </div>
                     </div>
                 </div>
-
-
-            <input id="receipts" type="text" class="hidden" value="{{receipts}}"/>
-            <input id="state" type="text" class="hidden" value="{{state}}"/>
-
+            </div>
         </div>
         <div class="col-lg-3">
 

@@ -1,51 +1,14 @@
 {{#section 'head'}}
-    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet">
-    <style>
-        .title-Detail {
-            padding-left: 25%;
-            color: snow;
-        }
-
-        header {
-            background-color: lightsteelblue;
-        }
-
-        .right-button {
-            padding-top: 50%;
-        }
-
-        .details {
-            padding-top: 1%;
-            background-color: skyblue;
-            padding-bottom: 15%;
-        }
-
-        .info {
-            color: green;
-        }
-
-        .error {
-            color: red;
-        }
-
-
-    </style>
+    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet" xmlns="http://www.w3.org/1999/html">
+    <link href="/stylesheets/formStyle.css" rel="stylesheet">
 {{/section}}
-
-
-
-
-
-
-
-
 <div class="container main">
     <header class="row">
         <div class="col-lg-3">
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail">{{{__ "Dispensary Detail"}}}</h2>
+            <h2 class="title-Detail"><span id="disLocation">{{location}}</span>: {{{__ "Dispensary Detail"}}}</h2>
             <a href="/station/dispensary/dispensaryJobList/:{{location}}">{{{__ "Dispensary Job List"}}}</a>
         </div>
         <div class="col-lg-3">
@@ -82,7 +45,6 @@
                 <ul id="navBar" class="nav nav-pills">
                     <li class="active"><a data-toggle="pill" href="#general">{{{__ "General"}}}</a></li>
                     <li class="disabled"><a href="#scale">{{{__ "Scale"}}}</a></li>
-                    <li><a data-toggle="pill" href="#stock">{{{__ "Stock"}}}</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -141,7 +103,7 @@
                         <div class="row">
                             <div class="col-lg-12">
 
-                                <button id="printAssembly" class="btn btn-primary">{{{__ "Print"}}}</button>
+                                <button id="printAssembly" class="btn btn-primary" disabled>{{{__ "Print"}}}</button>
                                 <button id="testTab" class="btn btn-primary">{{{__ "Test tab"}}}</button>
                             </div>
                         </div>
@@ -184,43 +146,11 @@
                             <div class="col-lg-12">
                                 <button id="tare" class="col-lg-3 weightCtr btn btn-info">{{{__ "Tare"}}}</button>
                                 <!--<button id="scaleWeight" class="col-lg-3">{{{__ "Scale"}}}</button>-->
-                                <button id="acceptWeight" class="col-lg-3 weightCtr btn">{{{__ "Accept"}}}</button>
+                                <button id="acceptWeight" class="col-lg-3 weightCtr btn" disabled>{{{__ "Accept"}}}</button>
                             </div>
                             <div class="col-lg-12 weight">
                                 <button id="interrupt" class="col-lg-3 weightCtr">{{{__ "Interrupt"}}}</button>
                                 <button id="test" class="col-lg-3 weightCtr">{{{__ "Test"}}}</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="stock" class="tab-pane fade">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <table id="stockTable" class="table table-bordered table-hover">
-                                    <caption>{{{__ "Stock"}}}</caption>
-                                    <thead>
-                                    <tr>
-                                        <th>{{{__ "ProductIdent"}}}</th>
-                                        <th>{{{__ "UnitSize"}}}</th>
-                                        <th>{{{__ "ActualWeight"}}}</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {{#each assembly.items}}
-                                        <tr id="{{id}}">
-                                            <td>{{productIdent}}</td>
-                                            <td>{{unitSize}}</td>
-                                            <td>{{actualWeight}}</td>
-                                        </tr>
-                                    {{/each}}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <label class="col-lg-3">{{{__ "Please scan barcode to transfer"}}}</label>
-                                <input id="transferBarcode" class="col-lg-6">
-                                <button id="confirmTransfer" class="btn btn-primary">{{{__ "Confirm"}}}</button>
                             </div>
                         </div>
                     </div>

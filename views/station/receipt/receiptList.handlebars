@@ -1,8 +1,19 @@
 {{#section 'head'}}
-
+    <link href="/vendor/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="/stylesheets/formStyle.css" rel="stylesheet">
 {{/section}}
 <div class="container main">
+    <header class="row">
+        <div class="col-lg-3">
+            <label id="error"></label>
+        </div>
+        <div class="col-lg-6">
+            <h2 class="title-Detail">{{{__ "Receipt List"}}}</h2>
+        </div>
+        <div class="col-lg-3">
 
+        </div>
+    </header>
     <div class="row">
         <div class="col-lg-3">
             <div class="row">
@@ -28,7 +39,7 @@
             </div>
 
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6 details">
             <table id="receiptsTable" class="table table-bordered table-hover">
                 <caption>{{{__ "Receipt Management"}}}</caption>
                 <thead>
@@ -57,7 +68,7 @@
     </div>
 </div>
 {{#section 'jquery'}}
-
+    <script src="/vendor/jquery.dataTables.min.js"></script>
     <script src="/js/receipts.js"></script>
 
 {{/section}}

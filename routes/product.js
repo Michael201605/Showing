@@ -123,6 +123,33 @@ module.exports = function (app, i18n) {
 
         });
     });
+    app.get('/product/getProductByIdent/:ident', function (req, res) {
+        var ident = req.params.ident.substring(1);
+        var storageStr = '';
+        var error = '';
+        console.log('product ident: ' + ident);
+        Product.findOne({
+            where: {ident: ident}
+        }).then(function (theProduct) {
+            console.log('product: ');
+            console.dir(theProduct);
+            if (theProduct) {
+                res.json(
+                    {
+                        product: theProduct.getJsonObject()
+
+                    });
+
+            } else {
+                res.json(
+                    {
+                        error: i18n.__('Product: %s is not found', ident)
+
+                    });
+            }
+
+        });
+    });
     app.post('/product/productDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
         // for(var p in req){

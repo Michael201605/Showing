@@ -8,6 +8,7 @@ var LogisticUnit = require('./LogisticUnit');
 var Layer = require('./Layer');
 var LotLog = require('./LotLog');
 var utils = require('../../lib/utils');
+var log = require('../../lib/log');
 var BusinessBase = require('../BusinessBase');
 var WarehousePackingType = require('../../lib/stateAndCategory/warehousePackingType');
 var LotState = require('../../lib/stateAndCategory/lotState');
@@ -100,28 +101,35 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
                         };
                         LogisticUnit.create(logisticUnitInfo).then(function (newLogistic) {
                             console.log('newLogistic: ' + JSON.stringify(newLogistic));
-                            if (newLogistic.packagingType == WarehousePackingType.Bag) {
-                                LotLog.findOne({where: {ident: newLogistic.lot}}).then(function (theLot) {
-                                    var offSet = 0;
-                                    if (theLot) {
-                                        offSet = theLot.nbOfUnits;
-                                        theLot.nbOfUnits += newLogistic.nbOfUnits;
-                                        theLot.save();
-                                    }
-                                    else {
-                                        var expireDate = new Date();
-                                        var remainingDays = 180;
-                                        expireDate.setDate(expireDate.getDate() + remainingDays);
-                                        LotLog.create({
-                                            ident: newLogistic.lot,
-                                            productIdent: newLogistic.productIdent,
-                                            productName: newLogistic.productName,
-                                            state: LotState.OK,
-                                            expireDate: expireDate,
-                                            size: newLogistic.unitSize,
-                                            nbOfUnits: newLogistic.nbOfUnits
-                                        });
-                                    }
+                            LotLog.findOne({where: {
+                                ident: newLogistic.lot,
+                                productIdent: newLogistic.productIdent
+                            }}).then(function (theLot) {
+                                var offSet = 0;
+                                if (theLot) {
+                                    offSet = theLot.nbOfUnits;
+                                    theLot.nbOfUnits += newLogistic.nbOfUnits;
+                                    theLot.save();
+                                }
+                                else {
+                                    var expireDate = new Date();
+                                    var remainingDays = 180;
+                                    expireDate.setDate(expireDate.getDate() + remainingDays);
+                                    LotLog.create({
+                                        ident: newLogistic.lot,
+                                        productIdent: newLogistic.productIdent,
+                                        productName: newLogistic.productName,
+                                        state: LotState.OK,
+                                        expireDate: expireDate,
+                                        size: newLogistic.unitSize,
+                                        nbOfUnits: newLogistic.nbOfUnits
+                                    }).then(function (newLot) {
+                                        log.debug('newLot: ');
+                                        log.debug(newLot);
+                                    });
+                                }
+                                if (newLogistic.packagingType == WarehousePackingType.Bag) {
+
                                     for (var i = 1; i <= newLogistic.nbOfUnits; i++) {
                                         var layInfo = {
                                             sscc: sscc + '_' + utils.pad(i + offSet, 4),
@@ -131,21 +139,24 @@ Receipt.Instance.prototype.confirmReceipt = function (i18n) {
                                             LogisticUnitId: newLogistic.id
                                         };
                                         Layer.create(layInfo).then(function (newLayer) {
-                                            console.log('newLayer: ' + JSON.stringify(newLayer));
+                                            log.debug('newLayer: ');
+                                            log.debug(newLayer);
                                         });
                                     }
 
+                                }
+                                me.update({
+                                    state: 80
+                                }).then(function (theReceipt) {
+                                    log.debug('the receipt: ' + theReceipt.id + 'has done');
+                                });
 
-                                })
+                                resolve({info: i18n.__('confirm successfully')});
 
-
-                            }
-                            me.update({
-                                state: 80
-                            }).then(function (theReceipt) {
 
                             });
-                            resolve({info: i18n.__('confirm successfully')});
+
+
                         });
                     });
 
