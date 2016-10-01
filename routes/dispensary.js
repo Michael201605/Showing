@@ -12,6 +12,8 @@ var Layer = require('../models/pr/Layer');
 var LogisticUnit = require('../models/pr/LogisticUnit');
 var utils = require('../lib/utils');
 var log = require('../lib/log');
+var AssemblyState = require('../lib/stateAndCategory/assemblyState');
+var labelPrintManager = require('../lib/labelPrintManager');
 
 module.exports = function (app, i18n) {
     app.get('/station/dispensary/dispensaryJobList/:disIdent', function (req, res) {
@@ -92,10 +94,10 @@ module.exports = function (app, i18n) {
                                 info: i18n.__('material is at raw warehouse,please transfer firstly.'),
                                 isScale: false
                             })
-                        }else{
+                        } else {
                             res.json({error: i18n.__('logisticUnit location missing.')});
                         }
-                    }else{
+                    } else {
                         res.json({error: i18n.__('logisticUnit lost.')});
                     }
                 });
@@ -187,20 +189,94 @@ module.exports = function (app, i18n) {
         }
 
     });
-    app.post('/station/dispensary/acceptWeight/:id', function (req, res) {
+    app.post('/station/dispensary/acceptWeight/:id/:barcode', function (req, res) {
 
         var id = req.params.id.substring(1);
+        var barcode = req.params.barcode.substring(1);
         var itemInfo = req.body.itemInfo;
+        Layer.findOne({where: {sscc: barcode}}).then(function (theLayer) {
+            if (theLayer) {
+                theLayer.actualWeight -= itemInfo.actualWeight;
+                if (theLayer.actualWeight <= 0) {
+                    theLayer.destroy();
+                } else {
+                    theLayer.save();
+                }
+                AssemblyItem.findOne({where: {id: id}}).then(function (theItem) {
+                    if (theItem) {
+                        theItem.update(itemInfo).then(function (updatedItem) {
 
-        AssemblyItem.findOne({where: {id: id}}).then(function (theItem) {
-            if (theItem) {
-                theItem.update(itemInfo).then(function (updatedItem) {
-                    res.json({info: i18n.__('update successfully')});
+                            Assembly.findOne({where: {id: theItem.AssemblyId}}).then(function (theAssembly) {
+                                if (theAssembly) {
+                                    if(!theAssembly.actualWeight){
+                                        theAssembly.actualWeight = itemInfo.actualWeight;
+                                    }else {
+                                        theAssembly.actualWeight += itemInfo.actualWeight;
+                                    }
+                                    theAssembly.save();
+                                    theAssembly.getAssemblyItems().then(function (items) {
+                                        var isReady = true;
+                                        items.forEach(function (item) {
+                                            if (item.isFinished === false) {
+                                                isReady = false;
+                                            }
+                                        });
+                                        if (isReady === true) {
+                                            theAssembly.state = AssemblyState.Ready;
+                                            theAssembly.save();
+                                        } else if (theAssembly.state === AssemblyState.Created) {
+                                            theAssembly.state = AssemblyState.Working;
+                                            theAssembly.save();
+                                        }
+                                        res.json({
+                                            info: i18n.__('update successfully'),
+                                            isReady: isReady
+                                        });
+
+                                    })
+                                } else {
+                                    res.json({error: i18n.__('Assembly not found.')});
+                                }
+                            })
+
+                        });
+                    } else {
+                        res.json({error: i18n.__('no item found.')});
+                    }
                 });
             } else {
-                res.json({error: i18n.__('Invalide barcode.')});
+                res.json({error: i18n.__('no layer found.')});
             }
+        })
+
+    });
+
+    app.get('/dispensary/printAssembly/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+
+        Assembly.findOne({
+            where: {id: id}
+        }).then(function (theAssembly) {
+
+            labelPrintManager(theAssembly.location, {
+                count: 1,
+                parameter: {
+                    jobIdent: theAssembly.jobIdent,
+                    sscc: theAssembly.sscc,
+                    targetWeight: theAssembly.targetWeight,
+                    actualWeight: theAssembly.actualWeight,
+                    state: i18n.__(utils.getDisplayState(AssemblyState, theAssembly.state)),
+                    source: theAssembly.source,
+                    target: theAssembly.target
+                }
+            });
+            res.json({
+                update: {state:80},
+                info: i18n.__('confirm successfully.')
+            });
+
         });
+
     });
 };
 

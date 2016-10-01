@@ -6,12 +6,13 @@ $(function () {
     var pressed = false;
     var chars = [];
     var progressbarValue, barcodeText, progressbar, conn, cmd;
-    var selected, selectedProductIdent, selectedTargetWeight, tareWeight = 0;
+    var selected, selectedProductIdent, selectedTargetWeight, selectedActualWeight, tareWeight = 0;
     var toAssemblyDataTable, haveAssemblyedDataTable;
     var disLocation = $('#disLocation').html();
     var selectedProduct;
     var positiveDev = 0;
     var negativeDev = 0;
+    var assemblyId = $('#assemblyId').val();
     console.log('disLocation: ' + disLocation);
     selected = [];
     progressbar = $("#progressbar");
@@ -83,7 +84,13 @@ $(function () {
             selected.push(this.id);
             selectedProductIdent = $(this).find('input[type="text"]').val();
             selectedTargetWeight = $(this).find('input[type="number"]').val();
+            selectedActualWeight = $(this).find('input.actualWeight').val();
             selectedTargetWeight = parseFloat(selectedTargetWeight);
+            if(!$.isNumeric(selectedActualWeight)){
+                selectedActualWeight = 0;
+            }
+            selectedActualWeight = parseFloat(selectedActualWeight);
+            selectedTargetWeight = selectedTargetWeight -selectedActualWeight;
             $('#targetWeight').val(selectedTargetWeight);
             progressbar.progressbar({max: selectedTargetWeight * 2});
             if (selectedProductIdent) {
@@ -112,15 +119,13 @@ $(function () {
     });
     $('#acceptWeight').click(function () {
         var itemInfo = {
-            targetWeight: 0,
             actualWeight: parseFloat($('#actualWeight').val()),
             isFinished: true
         };
-        $.post('/station/dispensary/acceptWeight/:' + selected[0], {itemInfo:itemInfo}, function (data) {
+        $.post('/station/dispensary/acceptWeight/:' + selected[0] + '/:' + barcodeText, {itemInfo:itemInfo}, function (data) {
             if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
                 _tare();
-                $('#navBar').$('li.active').removeClass('active').$('a[href=#general]').parent().addClass('active');
                 toAssemblyDataTable.row('.selected').remove().draw(false);
                 $('#acceptWeight').prop('disabled', true);
                 $('#actualWeight').val(0);
@@ -130,6 +135,9 @@ $(function () {
                 var scaleTab = $(scaleLink).removeAttr('data-toggle').parent();
                 $(scaleTab).addClass('disabled');
 
+            }
+            if(data.isReady === true){
+                $('#printAssembly').prop('disabled', false);
             }
             if (data.error) {
                 $('#errors').append('<li>' + data.error + '</li>');
@@ -146,7 +154,6 @@ $(function () {
         var itemInfo = {
             id: selected[0],
             actualWeight: actualWeight,
-            targetWeight: targetWeight,
             isFinished: false
         };
         $.post('/station/dispensary/acceptWeight/:id', itemInfo, function (data) {
@@ -200,6 +207,21 @@ $(function () {
         barcodeText = $('#barcode').val();
         barcodeScanned(barcodeText);
     });
+
+    $('#printAssembly').click(function () {
+        get('/dispensary/printAssembly/:' + assemblyId,function (data) {
+            if (data.info) {
+                $('#infos').append('<li>' + data.info + '</li>');
+            }
+            if (data.error) {
+                $('#errors').append('<li>' + data.error + '</li>');
+            }else{
+                setTimeout(function () {
+                    window.location.replace('/station/dispensary/dispensaryJobList/:' +disLocation);
+                },500);
+            }
+        });
+    });
     function _tare() {
         var actualWeight = $('#actualWeight').val();
         actualWeight = parseFloat(actualWeight);
@@ -242,6 +264,7 @@ $(function () {
                 if (segments.length == 0) {
                     segments = barcode.split('/');
                 }
+                barcode = segments[0] +'_' + segments[1] +'_' + segments[2];
                 if (segments.length > 0) {
                     if (segments[0] === selectedProductIdent) {
                         $.get('/station/dispensary/scanBarcode/:' + disLocation + '/:' + barcode, function (data) {

@@ -37,6 +37,7 @@ $(function () {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected');
             logisticUnitSelected.pop();
+            layersDataTable.clear().draw();
         }
         else {
             stockDataTable.$('tr.selected').removeClass('selected');
