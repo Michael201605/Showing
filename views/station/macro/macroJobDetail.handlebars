@@ -8,8 +8,8 @@
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail"><span id="disLocation">{{location}}</span>: {{{__ "Dispensary Detail"}}}</h2>
-            <a href="/station/dispensary/dispensaryJobList/:{{location}}">{{{__ "Dispensary Job List"}}}</a>
+            <h2 class="title-Detail"><span id="disLocation">{{location}}</span>: {{{__ "Macro Detail"}}}</h2>
+            <a href="/station/macro/macroJobList">{{{__ "Macro Job List"}}}</a>
         </div>
         <div class="col-lg-3">
 
@@ -45,7 +45,7 @@
             <div class="">
                 <ul id="navBar" class="nav nav-pills">
                     <li class="active"><a data-toggle="pill" href="#general">{{{__ "General"}}}</a></li>
-                    <li class="disabled"><a href="#scale">{{{__ "Scale"}}}</a></li>
+                    <li class="hidden"><a href="#scale">{{{__ "Scale"}}}</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -168,5 +168,5 @@
 </div>
 {{#section 'jquery'}}
     <script src="/vendor/jquery.dataTables.min.js"></script>
-    <script src="/js/dispensary.js"></script>
+    <script src="/js/macro.js"></script>
 {{/section}}

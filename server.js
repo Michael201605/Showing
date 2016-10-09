@@ -163,6 +163,7 @@ require('./routes/jobLog')(app, i18n);
 require('./routes/product')(app, i18n);
 require('./routes/warehouse')(app, i18n);
 require('./routes/dispensary')(app, i18n);
+require('./routes/macro')(app, i18n);
 var hasMonitored = false;
 new GcObjectAdapter(io).then(function (gcObjectAd) {
     log.debug('gcobjectAdapter created success!');

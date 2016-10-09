@@ -222,7 +222,7 @@ $(function () {
     });
 
     $('#printAssembly').click(function () {
-        get('/dispensary/printAssembly/:' + assemblyId,function (data) {
+        $.get('/macro/printAssembly/:' + assemblyId,function (data) {
             if (data.info) {
                 $('#infos').append('<li>' + data.info + '</li>');
             }
@@ -271,6 +271,7 @@ $(function () {
         $('#errors').empty();
         if (selectedProductIdent) {
             barcode = barcode.trim();
+            var id = selected[0];
             if (barcode) {
                 var segments;
                 segments = barcode.split('_');
@@ -280,18 +281,32 @@ $(function () {
                 barcode = segments[0] +'_' + segments[1] +'_' + segments[2];
                 if (segments.length > 0) {
                     if (segments[0] === selectedProductIdent) {
-                        $.get('/station/dispensary/scanBarcode/:' + disLocation + '/:' + barcode, function (data) {
+                        $.get('/station/macro/scanBarcode/:' + id + '/:' + barcode, function (data) {
                             if (data.info) {
+                                var actualWeight = 0;
                                 $('#infos').append('<li>' + data.info + '</li>');
+                                toAssemblyDataTable.row('.selected').remove().draw(false);
+                                $('#acceptWeight').prop('disabled', true);
+                                $('#actualWeight').val(0);
+
+                                $('#navBar').find('a[href=#general]').click();
+                                var scaleLink = $('#navBar').find('a[href=#scale]');
+                                var scaleTab = $(scaleLink).removeAttr('data-toggle').parent();
+                                $(scaleTab).addClass('disabled');
+                                if(data.update){
+                                    actualWeight = data.update.actualWeight;
+                                }
+                                var rowNode = haveAssemblyedDataTable.row.add([
+                                    selectedProductIdent,
+                                    actualWeight
+                                ]).draw(false).node();
+
+                            }
+                            if(data.isReady === true){
+                                $('#printAssembly').prop('disabled', false);
                             }
                             if (data.error) {
                                 $('#errors').append('<li>' + data.error + '</li>');
-                            }
-                            if (data.isScale === true) {
-                                var scaleLink = $('#navBar').find('a[href=#scale]');
-                                var scaleTab = $(scaleLink).attr('data-toggle', 'pill').parent();
-                                $(scaleTab).removeClass('disabled');
-                                $(scaleLink).click();
                             }
                         });
                     } else {

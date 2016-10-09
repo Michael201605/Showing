@@ -5,14 +5,18 @@
   },
   "Dis1": {
     "printer": "HP-LaserJet-5200-2",
-    "label": "dis1"
+    "label": "dispensary.html"
   },
   "dis2": {
     "printer": "HP-LaserJet-5200-2",
-    "label": "dis2"
+    "label": "dispensary.html"
   },
   "dispatch": {
     "printer": "HP-LaserJet-5200-2",
     "label": "dispatch"
+  },
+  "WH": {
+    "printer": "HP-LaserJet-5200-2",
+    "label": "macro.html"
   }
 }
