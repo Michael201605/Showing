@@ -421,14 +421,14 @@ module.exports = function (app, controllerManager, i18n, io) {
                 theJob.save();
                 theJob.updateIngredients().then(function (pRes) {
                     console.dir(pRes);
-                    var resData ={
+                    var resData = {
                         update: {
                             state: JobState.Scheduled,
                             displayState: i18n.__(getDisplayState(JobState, JobState.Scheduled))
                         },
                         info: i18n.__('job has been scheduled.')
                     };
-                    if(pRes){
+                    if (pRes) {
                         resData.update.receiver = pRes.receiver;
 
                     }
@@ -472,7 +472,7 @@ module.exports = function (app, controllerManager, i18n, io) {
 
     });
     //station
-    app.get('/job/station/jobList/:lineIdent', function (req, res) {
+    app.get('/station/job/jobList/:lineIdent', function (req, res) {
         var lineIdent = req.params.lineIdent.substring(1);
         console.log('lineIdent: ' + lineIdent);
 
@@ -487,7 +487,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         }).then(function (jobs) {
 
             console.log('jobs: ' + jobs);
-            res.render('job/station/jobList',
+            res.render('station/job/jobList',
                 {
                     jobs: JSON.stringify(Job.getTranslatedJobs(jobs, i18n)),
                     lineIdent: lineIdent
@@ -495,7 +495,7 @@ module.exports = function (app, controllerManager, i18n, io) {
         });
 
     });
-    app.get('/job/station/jobDetail/:id', function (req, res) {
+    app.get('/station/job/jobDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
         var jobJson = {};
 
@@ -517,7 +517,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                                     jobJson.recipe.receivers.push(ingredient.getJsonObject());
                                 }
                             });
-                            res.render('job/station/jobDetail',
+                            res.render('station/job/jobDetail',
                                 {
                                     job: jobJson,
                                     recipe: JSON.stringify(jobJson.recipe)
@@ -525,7 +525,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                                 });
                         })
                     } else {
-                        res.render('job/station/jobDetail', {error: i18n.__('Job: %s recipe is empty.', id)});
+                        res.render('station/job/jobDetail', {error: i18n.__('Job: %s recipe is empty.', id)});
                     }
 
                 });

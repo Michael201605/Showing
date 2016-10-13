@@ -267,5 +267,18 @@
 	"Macro Detail": "Macro Detail",
 	"layer has been added": "layer has been added",
 	"no item found.": "no item found.",
-	"Ready": "Ready"
+	"Ready": "Ready",
+	"JobParameter": "JobParameter",
+	"Recipes List": "Recipes List",
+	"Create new recipe": "Create new recipe",
+	"sender Management": "sender Management",
+	"jobParameter Management": "jobParameter Management",
+	"Parameter": "Parameter",
+	"Job parameter": "Job parameter",
+	"receiver Management": "receiver Management",
+	"IsProduced": "IsProduced",
+	"recipe save successfully": "recipe save successfully",
+	"NodeId": "NodeId",
+	"NodeValue": "NodeValue",
+	"Type": "Type"
 }

@@ -4,6 +4,7 @@
 var Job = require('../models/pr/Job');
 var Line = require('../models/eq/Line');
 var Recipe = require('../models/pr/Recipe');
+var JobParameter = require('../models/pr/JobParameter');
 var IngredientComponent = require('../models/pr/IngredientComponent');
 module.exports = function (app, i18n) {
     app.get('/admin/recipe/recipeList', function (req, res) {
@@ -36,7 +37,7 @@ module.exports = function (app, i18n) {
 
             var recipesStr = JSON.stringify(recipes);
             res.render('admin/recipe/recipeList', {
-                    recipes: recipesStr
+                    recipes: recipes
                 }
             );
         });
@@ -52,19 +53,19 @@ module.exports = function (app, i18n) {
         };
         var recipeJson = {};
         Line.findOne({
-            where:{id:lineId}
+            where: {id: lineId}
         }).then(function (theLine) {
-            if(theLine){
+            if (theLine) {
                 recipeInfo.LineId = theLine.id;
-                recipeInfo.lineIdent= theLine.ident;
+                recipeInfo.lineIdent = theLine.ident;
                 Recipe.create(recipeInfo).then(function (newRecipe) {
-                    if(newRecipe){
+                    if (newRecipe) {
                         console.log('newRecipe: ' + JSON.stringify(newRecipe));
                         // console.log('newRecipe.save: ' +newRecipe.save);
                         recipeJson = newRecipe.getJsonObject();
                         res.json({recipe: recipeJson});
 
-                    }else {
+                    } else {
                         res.json({error: i18n.__('recipe is not found.')});
                     }
 
@@ -72,6 +73,25 @@ module.exports = function (app, i18n) {
 
             }
         })
+
+    });
+    app.post('/admin/recipe/recipeList/createRecipe/:lineId', function (req, res) {
+        var lineId = req.params.lineId.substring(1);
+        var recipeJson;
+        var recipeInfo = req.body.recipeInfo;
+        // console.log(lineIdent)
+        Recipe.create(recipeInfo).then(function (newRecipe) {
+            if (newRecipe) {
+                console.log('newRecipe: ' + JSON.stringify(newRecipe));
+                // console.log('newRecipe.save: ' +newRecipe.save);
+                recipeJson = newRecipe.getJsonObject();
+                res.json({newRecipe: recipeJson});
+
+            } else {
+                res.json({error: i18n.__('recipe create failed.')});
+            }
+
+        });
 
     });
     app.get('/admin/recipe/recipeList/deleteRecipe/:toDeleteIds', function (req, res) {
@@ -88,7 +108,20 @@ module.exports = function (app, i18n) {
         });
 
     });
-
+    app.post('/admin/recipe/recipeList/deleteRecipe', function (req, res) {
+        var toDeleteRecipeIdsStr = req.body.toDeleteRecipeIdsStr;
+        console.log('toDeleteRecipeIdsStr:  ' + toDeleteRecipeIdsStr);
+        var toDeleteRecipeIds = JSON.parse(toDeleteRecipeIdsStr);
+        Recipe.destroy({
+            where: {
+                id: {
+                    $in: toDeleteRecipeIds
+                }
+            }
+        }).then(function (num) {
+            res.json({info: i18n.__('have deleted  %d recipe', num)});
+        });
+    });
     //--------------------------------------------------------------------
     app.get('/admin/recipe/recipeDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
@@ -99,38 +132,46 @@ module.exports = function (app, i18n) {
             where: {id: id}
         }).then(function (theRecipe) {
             var recipeJson = theRecipe.getJsonObject();
-            theRecipe.getSenders({where:{category:0}}).then(function (senders) {
+            theRecipe.getSenders({where: {category: 0}}).then(function (senders) {
                 senders.forEach(function (sender) {
                     sendersJson.push(sender.getJsonObject());
                 });
-                theRecipe.getReceivers({where:{category:1}}).then(function (receivers) {
+                theRecipe.getReceivers({where: {category: 1}}).then(function (receivers) {
                     receivers.forEach(function (receiver) {
                         receiversJson.push(receiver.getJsonObject());
                     });
                     recipeJson.receivers = receiversJson;
                     recipeJson.senders = sendersJson;
-                    res.render('admin/recipe/recipeDetail',
-                        {
-                            recipe: JSON.stringify(recipeJson)
+                    JobParameter.findAll({where: {RecipeId: id}}).then(function (parameters) {
+                        recipeJson.jobParameters = parameters;
+                        res.render('admin/recipe/recipeDetail',
+                            {
+                                recipe: recipeJson
 
-                        });
+                            });
+                    });
+
                 });
             });
 
         });
     });
-    app.get('/admin/recipe/recipeDetail/updateRecipe/:recipeJsonStr', function (req, res) {
-        var recipeJsonStr = req.params.recipeJsonStr.substring(1);
-
-        var recipeFromClient = JSON.parse(recipeJsonStr);
-        console.log('recipeFromClient: ' + recipeFromClient);
+    app.post('/admin/recipe/recipeDetail/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        var recipeInfo = req.body.recipeInfo;
+        console.log('recipeFromClient: ' + recipeInfo);
         Recipe.findOne({
-            where: {id: recipeFromClient.id}
+            where: {id: id}
         }).then(function (theRecipe) {
-            theRecipe.update(recipeFromClient).then(function () {
-                console.log("save successfully");
-                res.json("save successfully");
-            });
+            if (theRecipe) {
+                theRecipe.update(recipeInfo).then(function () {
+                    console.log("save successfully");
+                    res.json({info: i18n.__('recipe save successfully')});
+                });
+            } else {
+                res.json({error: i18n.__('recipe not found')});
+            }
+
         });
 
     });
@@ -143,22 +184,23 @@ module.exports = function (app, i18n) {
         console.log('Recipe id: ' + recipeId);
         console.log('type of ingredient to create: ' + category);
         IngredientComponent.create({
-            category:category,
-            RecipeId:recipeId,
+            category: category,
+            RecipeId: recipeId,
             targetPercentage: 0,
-            targetWeight:0
+            targetWeight: 0
         }).then(function (newIngredient) {
             console.log('newIngredient');
             console.log(newIngredient);
-            if(newIngredient){
+            if (newIngredient) {
                 console.log('response to send new ingredient:');
                 res.json({newIngredient: newIngredient.getJsonObject()});
-            }else {
+            } else {
                 res.json({error: i18n.__('new ingredient is empty.')});
             }
 
         });
     });
+
     app.post('/admin/recipe/updateIngredient', function (req, res) {
         var ingredientStr = req.body.ingredientStr;
         //console.log('ingredientStr: ' + ingredientStr);
@@ -168,13 +210,13 @@ module.exports = function (app, i18n) {
         IngredientComponent.findOne({
             where: {id: ingredientFromClient.id}
         }).then(function (theIngredient) {
-            if(theIngredient){
+            if (theIngredient) {
 
                 theIngredient.update(ingredientFromClient).then(function () {
                     console.log("save successfully");
-                    res.json({info:i18n.__("save successfully")});
+                    res.json({info: i18n.__("save successfully")});
                 });
-            }else {
+            } else {
                 console.log("ingredient not found");
             }
 
@@ -187,7 +229,7 @@ module.exports = function (app, i18n) {
         console.log('toDeleteIngredientIdsStr:  ' + toDeleteIngredientIdsStr);
         var toDeleteIngredientIds = JSON.parse(toDeleteIngredientIdsStr);
         IngredientComponent.destroy({
-            where:{
+            where: {
                 id: {
                     $in: toDeleteIngredientIds
                 }
@@ -198,5 +240,55 @@ module.exports = function (app, i18n) {
         });
 
     });
+    //------------------------------------------------------------
+    //JobParameter
+    app.get('/admin/recipe/createJobParameter/:recipeId', function (req, res) {
+        var recipeId = req.params.recipeId.substring(1);
+        var receiversJson = [];
+        var sendersJson = [];
+        console.log('Recipe id: ' + recipeId);
+        JobParameter.getMaxId().then(function (max) {
+            JobParameter.create({
+                ident: 'para' + max,
+                RecipeId: recipeId,
+                name: ''
+            }).then(function (newParameter) {
+                console.log('newParameter');
+                console.log(newParameter);
+                if (newParameter) {
+                    console.log('response to send new ingredient:');
+                    res.json({newParameter: newParameter.getJsonObject()});
+                } else {
+                    res.json({error: i18n.__('new ingredient is empty.')});
+                }
+
+            });
+        })
+
+    });
+    app.get('/admin/recipe/jobParameterDetail/:id', function (req, res) {
+        var id = req.params.id.substring(1);
+        console.log('jobParameter id: ' + id);
+        JobParameter.findOne({where:{id:id}}).then(function (theJobParameter) {
+            res.json({theJobParameter: theJobParameter.getJsonObject()});
+        })
+
+    });
+    app.post('/admin/recipe/deleteJobParameter', function (req, res) {
+        var toDeleteParameterIdsStr = req.body.toDeleteParameterIdsStr;
+        console.log('toDeleteParameterIdsStr:  ' + toDeleteParameterIdsStr);
+        var toDeleteParameterIds = JSON.parse(toDeleteParameterIdsStr);
+        JobParameter.destroy({
+            where: {
+                id: {
+                    $in: toDeleteParameterIds
+                }
+            }
+        }).then(function (num) {
+            res.json({info: i18n.__('have deleted  %d jobParameter', num)});
+        });
+    });
+
+
 
 };

@@ -13,7 +13,8 @@ var Recipe = modelBase.define('Recipe', {
     category: modelBase.Sequelize.INTEGER,
     isTemplate: modelBase.Sequelize.BOOLEAN,
     lineIdent: modelBase.Sequelize.STRING,
-    jobIdent: modelBase.Sequelize.STRING
+    jobIdent: modelBase.Sequelize.STRING,
+    isProduced: modelBase.Sequelize.BOOLEAN
 }, {
     classMethods: {
         copyFromTemplate: function (lineIdent, newJob) {

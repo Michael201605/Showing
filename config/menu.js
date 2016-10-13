@@ -175,7 +175,7 @@ var ConfigureMenus = [
 
                     },
                     {
-                        name: 'Filler',
+                        name: 'JobParameter',
                         url: '/filler/fillerList'
 
                     }

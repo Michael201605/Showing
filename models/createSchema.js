@@ -20,6 +20,7 @@ var Warehouse = require('./eq/Warehouse');
 
 var Product = require('./pr/Product');
 var IngredientComponent = require('./pr/IngredientComponent');
+var JobParameter = require('./pr/JobParameter');
 var Recipe = require('./pr/Recipe');
 var Job = require('./pr/Job');
 var JobLog = require('./pr/JobLog');
@@ -78,6 +79,7 @@ Line.sync().then(function () {
     Job.sync().then(function () {
         Recipe.sync().then(function () {
             IngredientComponent.sync();
+            JobParameter.sync();
         });
         ProcessOrder.sync().then(function () {
             OrderItem.sync();
