@@ -6,6 +6,8 @@ var Product = require('./Product');
 var Line = require('../eq/Line');
 var Mixer = require('../eq/Mixer');
 var Job = require('./Job');
+var JobParameter = require('./JobParameter');
+
 var OrderState = require('../../lib/stateAndCategory/orderState');
 var JobState = require('../../lib/stateAndCategory/jobState');
 var OrderItem = require('./OrderItem');
@@ -231,6 +233,35 @@ ProcessOrder.Instance.prototype.createOrUpdateJob = function (jobInfo) {
 
                                 });
                             });
+
+                            JobParameter.findAll({where:{RecipeId: RecipeTemplate.id}}).then(function (parameters) {
+                                parameters.forEach(function (curPara) {
+                                    var paraInfo = {
+                                        ident: curPara.ident,
+                                        name: curPara.name,
+                                        jobIdent: newJob.ident,
+                                        JobId:newJob.id,
+                                        nodeId: curPara.nodeId,
+                                        nodeValue: curPara.nodeValue,
+                                        type: curPara.type,
+                                        RecipeId: curPara.RecipeId
+                                    };
+                                    if(curPara.ident === 'mainMixingTime'){
+                                        paraInfo.nodeValue = me.mixingTime;
+                                    }
+                                    if(curPara.ident === 'packSize'){
+                                        paraInfo.nodeValue = me.packSize;
+                                    }
+                                    if(curPara.ident === 'mixerIdent'){
+                                        paraInfo.nodeValue = me.mixerIdent;
+                                    }
+                                    JobParameter.create(paraInfo).then(function (newPara) {
+
+                                    })
+
+                                })
+                            });
+
                             promises.push(promise2);
                             Promise.all(promises).then(function (res) {
                                 resolve(res);
