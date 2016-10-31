@@ -7,7 +7,7 @@ var Line = require('../eq/Line');
 var Mixer = require('../eq/Mixer');
 var Job = require('./Job');
 var JobParameter = require('./JobParameter');
-
+var JobProcessOrderData = require('./JobProcessOrderData');
 var OrderState = require('../../lib/stateAndCategory/orderState');
 var JobState = require('../../lib/stateAndCategory/jobState');
 var OrderItem = require('./OrderItem');
@@ -233,7 +233,16 @@ ProcessOrder.Instance.prototype.createOrUpdateJob = function (jobInfo) {
 
                                 });
                             });
-
+                            JobProcessOrderData.create({
+                                processOrderIdent: me.ident,
+                                processOrderId:me.id,
+                                jobIdent: newJob.ident,
+                                JobId: newJob.id,
+                                mixerIdent: me.mixerIdent,
+                                packSize: me.packSize,
+                                mixingTime: me.mixingTime,
+                                isMedicatedOrder: me.isMedicatedOrder
+                            });
                             JobParameter.findAll({where:{RecipeId: RecipeTemplate.id}}).then(function (parameters) {
                                 parameters.forEach(function (curPara) {
                                     var paraInfo = {

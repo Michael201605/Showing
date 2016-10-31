@@ -49,8 +49,7 @@
             <label id="error"></label>
         </div>
         <div class="col-lg-6">
-            <h2 class="title-Detail">{{{__ "ProcessOrder Detail"}}}</h2>
-            <a href="/order/process/ProcessOrderList">{{{__ "ProcessOrder List"}}}</a>
+            <h2 class="title-Detail">{{{__ "Handadd job Detail"}}}</h2>
         </div>
         <div class="col-lg-3">
 
@@ -85,27 +84,27 @@
             <div class="">
                 <ul class="nav nav-pills">
                     <li class="active"><a data-toggle="pill" href="#general">{{{__ "General"}}}</a></li>
-                    <li><a data-toggle="pill" href="#bom">{{{__ "BOM"}}}</a></li>
+                    <li><a data-toggle="pill" href="#bags">{{{__ "Bags"}}}</a></li>
                 </ul>
 
                 <div class="tab-content">
                     <div id="general" class="tab-pane fade in active">
 
                         <div class="row">
-                            <table id="handJobTable" class="table table-bordered table-hover">
-                                <caption>{{{__ "HandAdd job Management"}}}</caption>
+                            <table id="assembliesTable" class="table table-bordered table-hover">
+                                <caption>{{{__ "Handadd job Management"}}}</caption>
                                 <thead>
                                 <tr>
-                                    <th>{{{__ "Ident"}}}</th>
-                                    <th>{{{__ "ProductIdent"}}}</th>
+                                    <th>{{{__ "JobIdent"}}}</th>
+                                    <th>{{{__ "State"}}}</th>
                                     <th>{{{__ "TargetWeight"}}}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {{#each handAddJobs}}
+                                {{#each assemblies}}
                                     <tr id="{{id}}">
-                                        <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{ident}}</a></td>
-                                        <td>{{productIdent}}</td>
+                                        <td><a href="/station/dispensary/dispensaryJobDetail/:{{id}}">{{jobIdent}}</a></td>
+                                        <td>{{state}}</td>
                                         <td>{{targetWeight}}</td>
                                     </tr>
                                 {{/each}}
@@ -119,25 +118,10 @@
                             </div>
                         </div>
                     </div>
-                    <div id="bom" class="tab-pane fade">
+                    <div id="bags" class="tab-pane fade">
                         <div class="row">
-
-                            <div class="col-lg-3 col-md-3">
-
-                                <select class="col-lg-8" id="rawProducts">
-                                    <option></option>
-                                </select>
-                            </div>
-
-                            <div class="col-lg-9 col-md-9">
-                                <button id="newItem" class="glyphicon glyphicon-plus pull-right">{{{__ "New"}}}</button>
-                                <button id="removeItem"
-                                        class="glyphicon glyphicon-minus pull-right">{{{__ "Remove"}}}</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <table id="bomTable" class="table table-bordered table-hover">
-                                <caption>{{{__ "BOM list"}}}</caption>
+                            <table id="bagsTable" class="table table-bordered table-hover">
+                                <caption>{{{__ "Bags list"}}}</caption>
                                 <thead>
                                 <tr>
                                     <th>{{{__ "ProductIdent"}}}</th>
@@ -146,13 +130,6 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {{#each processOrder.orderItems}}
-                                    <tr id="{{id}}">
-                                        <td><label>{{productIdent}}</label></td>
-                                        <td><input type="text" value="{{targetWeight}}" disabled></td>
-                                        <td><input type="number" step="any" value="{{targetPercentage}}" disabled></td>
-                                    </tr>
-                                {{/each}}
                                 </tbody>
                             </table>
                         </div>

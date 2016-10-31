@@ -164,6 +164,7 @@ require('./routes/product')(app, i18n);
 require('./routes/warehouse')(app, i18n);
 require('./routes/dispensary')(app, i18n);
 require('./routes/macro')(app, i18n);
+require('./routes/handAdd')(app, i18n);
 var hasMonitored = false;
 new GcObjectAdapter(io).then(function (gcObjectAd) {
     log.debug('gcobjectAdapter created success!');
@@ -187,6 +188,7 @@ new GcObjectAdapter(io).then(function (gcObjectAd) {
         require('./routes/job')(app, controllerManager, i18n, io);
     });
     require('./routes/line')(app, gcObjectAd, i18n, io);
+    require('./routes/section')(app, gcObjectAd, i18n, io);
     require('./routes/storage')(app, gcObjectAd, i18n, io);
     require('./routes/gcObject')(app, gcObjectAd, i18n, io);
 

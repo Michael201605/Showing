@@ -288,6 +288,7 @@ function jobList(lineIdent) {
     }
 
 }
+
 function jobDetail(jobId) {
     var jobDetailDataTable;
     var selected = [];
@@ -524,12 +525,19 @@ function jobDetail(jobId) {
 
     }
 }
+
+/**
+ * @summary It's for job queue dialog, generally it's for production line
+ * @author Allen
+ * @augments {lineIdent}
+ * **/
 function jobQueue(lineIdent) {
-    var activeJobsDataTable;
+    var activeJobsDataTable = $('#activeJobs').DataTable();
     var scheduleJobsSortable, pendingJobsSortable;
     var clickMethod = '';
     var $li, $ident, $state, $receiver;
     var selected = [];
+    activeJobsDataTable.clear();
     jobQueueDialog.dialog('option', 'title', 'JobQueue: ' + lineIdent);
     jobQueueDialog.dialog('open');
     scheduleJobsSortable = $("#scheduleJobs").sortable({
@@ -601,8 +609,6 @@ function jobQueue(lineIdent) {
         $.get('/job/getJobList/:' + lineIdent, function (data) {
             console.log('jobListStr: ' + data.jobs);
             var jobList = JSON.parse(data.jobs);
-            activeJobsDataTable = $('#activeJobs').DataTable();
-            activeJobsDataTable.clear();
             jobList.forEach(function (theJob) {
                 clickMethod = 'jobDetail(' + theJob.id + ')';
                 if (theJob.state === 121 || theJob.state === 120) {
@@ -650,37 +656,53 @@ function jobQueue(lineIdent) {
     } else {
         alert('line Ident is empty');
     }
-    $('jobQueueCheckJob').click(function () {
-        var jobId= selected[0];
-        $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
-            if (data.errors) {
-                data.errors.forEach(function (error) {
-                    $('#jobErrors').append('<li>' + error + '</li>');
-                });
-            }
-            if (data.info) {
-                $('#jobInfos').append('<li>' + data.info + '</li>');
-            }
-        });
-    });
-    $('jobQueueStartJob').click(function () {
-        var jobId= selected[0];
-        $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
-            if (data.error) {
-                $('#jobErrors').append('<li>' + data.error + '</li>');
-            } else if (data.update) {
-                $('#displayJobState').val(data.update.displayState);
-                $('#jobState').val(data.update.state);
-                setJobBKColor(data.update.state);
-            }
+    $('#jobQueueCheckJob').click(function () {
+        $('#jobQueueErrors').empty();
+        $('#jobQueueInfos').empty();
+        if(selected.length>0){
+            var jobId= selected[0];
+            $.get('/job/jobDetail/checkJob/:' + jobId, function (data) {
+                console.log(data);
+                if (data.errors) {
+                    data.errors.forEach(function (error) {
+                        $('#jobQueueErrors').append('<li>' + error + '</li>');
+                    });
+                }
+                if(data.error){
+                    $('#jobQueueErrors').append('<li>' + data.error + '</li>');
+                }
+                if (data.info) {
+                    $('#jobQueueInfos').append('<li>' + data.info + '</li>');
+                }
+            });
+        }else {
+            $('#jobQueueErrors').append('<li>Please select job firstly</li>');
+        }
 
-        });
     });
-    $('jobQueueDoneJob').click(function () {
+    $('#jobQueueStartJob').click(function () {
+        $('#jobQueueErrors').empty();
+        $('#jobQueueInfos').empty();
+        if(selected.length>0){
+            var jobId= selected[0];
+            $.get('/job/jobDetail/startJob/:' + jobId, function (data) {
+                console.log('Data: ');
+                console.log(data);
+                if (data.error) {
+                    $('#jobQueueErrors').append('<li>' + data.error + '</li>');
+                }
+
+            });
+        }else {
+            $('#jobQueueErrors').append('<li>Please select job firstly</li>');
+        }
+
+    });
+    $('#jobQueueDoneJob').click(function () {
         var jobId= selected[0];
         $.get('/job/jobDetail/doneJob/:' + jobId, function (data) {
             if (data.error) {
-                $('#error').val(data.error);
+                $('#jobQueueErrors').val(data.error);
             }
             if (data.update) {
                 $('#displayJobState').val(data.update.displayState);
@@ -688,7 +710,7 @@ function jobQueue(lineIdent) {
                 setJobBKColor(data.update.state);
             }
             if (data.info) {
-                $('#jobInfos').append('<li>' + data.info + '</li>');
+                $('#jobQueueInfos').append('<li>' + data.info + '</li>');
             }
 
         });
@@ -717,6 +739,20 @@ function jobQueue(lineIdent) {
             }
         }
     });
+    $('#jobQueueDialog tbody').on('click', 'tr', function () {
+        var id = this.id;
+        var index = $.inArray(id, selected);
+
+        if (index === -1) {
+            selected.push(id);
+        } else {
+            selected.splice(index, 1);
+        }
+        console.log('id: ');
+        console.log(selected);
+        $(this).toggleClass('selected');
+    });
+
     function setSelected() {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected')

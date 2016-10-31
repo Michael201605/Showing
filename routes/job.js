@@ -231,11 +231,11 @@ module.exports = function (app, controllerManager, i18n, io) {
                 console.log('theJob:' + theJob);
                 theJob.getLine().then(function (theLine) {
                     console.log('TheLine:');
-                    console.dir(theLine);
+                    //console.dir(theLine);
                     if (theLine) {
                         console.log('TheLine controller name: ' + theLine.controllerName);
                         controller = controllerManager.getController(theLine.controllerName);
-
+                        //log(controller._checkJob);
                         controller.checkJob(theJob).then(function (data) {
                             console.log('check job is OK:');
                             console.log(data);
@@ -252,9 +252,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                         }, function (errors) {
                             console.log('check job failed');
                             console.log(errors);
-                            res.json({
-                                errors: errors
-                            });
+                            res.json(errors);
                         });
                     }
                 });
@@ -300,9 +298,7 @@ module.exports = function (app, controllerManager, i18n, io) {
                                 });
                             });
                         }, function (Perr) {
-                            res.json({
-                                error: Perr
-                            });
+                            res.json(Perr);
                         });
                     } else {
                         error = i18n.__('routes: startJob: the line: %s is not found', theJob.LineId);

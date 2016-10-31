@@ -6,276 +6,128 @@ var Product = require('../models/pr/Product');
 var Company = require('../models/eq/Company');
 var Mixer = require('../models/eq/Mixer');
 var OrderItem = require('../models/pr/OrderItem');
-var OrderState = require('../lib/stateAndCategory/orderState');
+var JobState = require('../lib/stateAndCategory/jobState');
 var getTranslateOptions = require('../lib/tools/getTranslateOptions');
 var Job = require('../models/pr/Job');
+var Assembly = require('../models/pr/Assembly');
 var utils = require('../lib/utils');
 var log = require('../lib/log');
+var JobProcessOrderData = require('../models/pr/JobProcessOrderData');
 
 module.exports = function (app, i18n) {
-    app.get('/order/process/ProcessOrderList', function (req, res) {
-        var state;
-        var filter;
-        if (req.params.state) {
-            state = req.params.state.substring(1);
-            filter = {state: state};
-        }
-
-
-        ProcessOrder.findAll({
-            where: {State: {$notIn: [OrderState.Done]}}
-        }).then(function (processOrders) {
-            console.log('processOrders: ' + processOrders);
-            var processOrdersStr = JSON.stringify(processOrders);
-            res.render('order/process/processOrderList', {
-                processOrders: processOrders
-            });
-        });
-
-    });
-    app.get('/order/process/ProcessOrderList/:state', function (req, res) {
-        var state = req.params.state.substring(1);
-        ProcessOrder.findAll({
-            where: {State: state}
-        }).then(function (processOrders) {
-            console.log('processOrders: ' + processOrders);
-            var processOrdersStr = JSON.stringify(processOrders);
-            res.render('order/process/processOrderList', {
-                processOrders: processOrders
-            });
-        });
-
-    });
-    app.get('/order/process/createProcessOrder', function (req, res) {
-        ProcessOrder.getMaxId().then(function (maxId) {
-            var info = {
-                ident: 'PO:' + maxId,
-                erpIdent: '',
-                name: 'processOrder',
-                isTemplate: false,
-                state: 10,
-                targetWeight: 0,
-                packSize: 0,
-                productIdent: '',
-                mixerIdent: '',
-                lineIdent: '',
-                mixingTime: 0,
-                isMedicatedOrder: false
-            };
-            console.log('try to create new ProcessOrder.... ');
-            ProcessOrder.create(info).then(function (newProcessOrder) {
-                console.log('newProcessOrder: ' + newProcessOrder);
-                res.json({processOrder: newProcessOrder});
-            });
-        }, function (err) {
-            res.json({error: i18n.__('get maxID failed')});
-        })
-
-    });
-    app.post('/order/process/processOrderList/deleteProcessOrder', function (req, res) {
-        var toDeleteProcessOrderIdsStr = req.body.toDeleteProcessOrderIdsStr;
-        console.log('toDeleteProcessOrderIdsStr:  ' + toDeleteProcessOrderIdsStr);
-        var toDeleteProcessOrderIds = JSON.parse(toDeleteProcessOrderIdsStr);
-        ProcessOrder.destroy({
+    app.get('/station/handAdd/handAddJobDetail/:mixerIdent', function (req, res) {
+        var mixerIdent = req.params.mixerIdent.substring(1);
+        console.log('mixerIdent: ' + mixerIdent);
+        Job.findOne({
             where: {
-                id: {
-                    $in: toDeleteProcessOrderIds
-                }
+                mixerIdent: mixerIdent,
+                state: JobState.HandAdd
             }
-        }).then(function (deleteNo) {
-            if (deleteNo > 0) {
-                res.json({
-                    deleteNo: deleteNo,
-                    info: i18n.__('delete successfully.')
-                });
-            } else {
-                res.json({
-                    error: i18n.__('delete not successfyully.')
-                });
+        }).then(function (theJob) {
+            console.log(theJob);
+            if(theJob){
+                Assembly.findAll({
+                    where: {
+                        jobIdent: theJob.ident,
+                        state: {$in: [3, 5]}
+                    }
+                }).then(function (assemblies) {
+                    res.render('station/handAdd/handAddJobDetail', {assemblies: assemblies});
+                }) ;
+            }else{
+                res.render('station/handAdd/handAddJobDetail');
             }
-
+            // findAsseblies(theJob, length, 0).then(function (pRes) {
+            //     res.render('station/handAdd/handAddJobDetail', pRes);
+            // }, function (err) {
+            //     log(err);
+            //     res.render('station/handAdd/handAddJobDetail', err);
+            // });
         });
-    });
-    app.get('/order/process/processOrderDetail/:id', function (req, res) {
-        var id = req.params.id.substring(1);
-        console.log('id: ' + id);
-
-        ProcessOrder.findOne({
-            where: {id: id}
-        }).then(function (theProcessOrder) {
-            if (theProcessOrder) {
-                var processOrderJson = theProcessOrder.getTranslatedObject(OrderState);
-                theProcessOrder.getOrderItems().then(function (orderItems) {
-                    processOrderJson.orderItems = orderItems;
-                    Product.findAll({where: {category: 1}}).then(function (products) {
-                        var productsStr = JSON.stringify(products);
-                        console.log('productsStr: ' + productsStr);
-                        Mixer.findAll().then(function (mixers) {
-                            var mixersStr = JSON.stringify(mixers);
-                            res.render('order/process/processOrderDetail', {
-                                processOrder: processOrderJson,
-                                products: productsStr,
-                                mixers: mixersStr
-                            });
-                        });
-
-                    });
-                })
-            }
-
-
-        });
+        // JobProcessOrderData.findAll({where: {mixerIdent: mixerIdent}}).then(function (jobProcessOrderDatas) {
+        //     var length = jobProcessOrderDatas.length;
+        //     for (var i = 0; i < length; i++) {
+        //         var curJobProcessOrderData = jobProcessOrderDatas[i];
+        //         if (curJobProcessOrderData) {
+        //             Job.findOne({where: {id: curJobProcessOrderData.JobId}}).then(function (theJob) {
+        //                 if (theJob && theJob.state === JobState.HandAdd) {
+        //                     Assembly.findAll({jobIdent: theJob.ident}).then(function (assemblies) {
+        //                         console.log('assemblies: ' + assemblies);
+        //                         res.render('station/handAdd/handAddJobDetail', {
+        //                             assemblies: assemblies
+        //                         });
+        //                     });
+        //                 } else {
+        //                     res.json({errors: i18n.__('job is not found or job state is not handAdd')});
+        //                 }
+        //             })
+        //         }
+        //     }
+        // });
 
     });
-    app.get('/order/process/createNewItem/:processId', function (req, res) {
-        var processId = req.params.processId.substring(1);
-
-
-        OrderItem.create({
-            targetPercentage: 0,
-            targetWeight: 0,
-            productIdent: '',
-            ProcessOrderId: processId
-        }).then(function (newOrderItem) {
-            if (newOrderItem) {
-                res.json({newOrderItem: newOrderItem});
-            } else {
-                res.json({error: i18n.__('create not successfully.')});
-            }
-        })
-
-    });
-    app.post('/order/process/deleteOrderItem', function (req, res) {
-        var toDeleteOrderItemIdsStr = req.body.toDeleteOrderItemIdsStr;
-        console.log('toDeleteOrderItemIdsStr:  ' + toDeleteOrderItemIdsStr);
-        var toDeleteOrderItemIds = JSON.parse(toDeleteOrderItemIdsStr);
-        OrderItem.destroy({
+    app.get('/station/handAdd/getAssemblies/:mixerIdent', function (req, res) {
+        var mixerIdent = req.params.mixerIdent.substring(1);
+        Job.findOne({
             where: {
-                id: {
-                    $in: toDeleteOrderItemIds
-                }
+                mixerIdent: mixerIdent,
+                state: JobState.HandAdd
             }
-        }).then(function (deleteNo) {
-            if (deleteNo > 0) {
-                res.json({
-                    deleteNo: deleteNo,
-                    info: i18n.__('delete successfully.')
-                });
-            } else {
-                res.json({
-                    error: i18n.__('delete not successfyully.')
-                });
+        }).then(function (theJob) {
+            var length = theJob.length;
+            console.log(theJob);
+            if(theJob){
+                Assembly.findAll({
+                    where: {
+                        jobIdent: theJob.ident,
+                        state: {$in: [3, 5]}
+                    }
+                }).then(function (assemblies) {
+                    res.json({assemblies: assemblies});
+                }) ;
+            }else{
+                res.json({error:i18n.__('no job found')});
             }
-
-        });
-    });
-    app.post('/order/process/processOrderDetail/:id', function (req, res) {
-        // for(var p in req){
-        //     console.log('property of req: '+ p);
-        // }
-        var id = req.params.id.substring(1);
-
-        var processOrderInfo = req.body.processOrderInfo;
-        console.log('processOrder: ');
-        console.dir(processOrderInfo);
-        try {
-            ProcessOrder.findOne({
-                where: {id: id}
-            }).then(function (theProcessOrder) {
-                theProcessOrder.update(processOrderInfo).then(function () {
-                    console.log("save successfully");
-                    res.json({info: i18n.__("save successfully")});
-                });
-            });
-        }
-        catch (err) {
-            res.json({error: i18n.__(err)});
-        }
-
-
-    });
-    app.post('/order/process/orderItem/:id', function (req, res) {
-        // for(var p in req){
-        //     console.log('property of req: '+ p);
-        // }
-        var id = req.params.id.substring(1);
-
-        var orderItemInfo = req.body.orderItemInfo;
-        console.log('orderItemInfo: ');
-        console.dir(orderItemInfo);
-        try {
-            OrderItem.findOne({
-                where: {id: id}
-            }).then(function (theOrderItem) {
-                theOrderItem.update(orderItemInfo).then(function () {
-                    console.log("save successfully");
-                    res.json({info: i18n.__("save successfully")});
-                });
-            });
-        }
-        catch (err) {
-            res.json({error: i18n.__(err)});
-        }
-
-
-    });
-    app.get('/order/process/checkProcessOrder/:id', function (req, res) {
-        var id = req.params.id.substring(1);
-
-        ProcessOrder.findOne({
-            where: {id: id}
-        }).then(function (theProcessOrder) {
-            theProcessOrder.checkOrder(i18n).then(function (info) {
-                res.json({
-                    info: i18n.__('check OK.')
-                });
-            }, function (errors) {
-                res.json({
-                    errors: errors
-                });
-            });
-        });
-
-    });
-    app.get('/order/process/releaseProcessOrder/:id', function (req, res) {
-        var id = req.params.id.substring(1);
-
-        ProcessOrder.findOne({
-            where: {id: id}
-        }).then(function (theProcessOrder) {
-            theProcessOrder.releaseOrder(i18n).then(function (info) {
-                theProcessOrder.state = OrderState.Released;
-                theProcessOrder.save();
-                Job.findAll({where: {processOrderIdent: theProcessOrder.ident}}).then(function (jobs) {
-                    jobs.forEach(function (theJob) {
-                        theJob.updateIngredients();
-                    });
-                });
-                res.json({
-                    update: {
-                        state: OrderState.Released,
-                        displayState: i18n.__(utils.getDisplayState(OrderState, OrderState.Released))
-                    },
-                    info: i18n.__('release successfully.')
-                });
-            }, function (errInfo) {
-                log.error(errInfo);
-                if (Array.isArray(errInfo)) {
-                    res.json({
-                        errors: errInfo
-                    });
-                } else {
-                    res.json({
-                        error: errInfo
-                    });
-                }
-
-            });
         });
 
     });
 
 };
+function findAsseblies(jobs, length, index) {
+    var curJob = jobs[index];
+    return new Promise(function (resolve, reject) {
+        if (length <= 0) {
+            reject({error: i18n.__('no data found')});
+        } else {
+            Assembly.findAll({
+                where: {
+                    jobIdent: theJob.ident,
+                    state: {$in: [3, 5]}
+                }
+            }).then(function (assemblies) {
+                resolve({assemblies: assemblies});
+            })
+            Job.findOne({where: {id: curJob.id}}).then(function (theJob) {
+                if (theJob && theJob.state === JobState.HandAdd) {
+
+                } else {
+                    if (index < length) {
+                        index++;
+                        findAsseblies(jobs, length, index).then(function (res) {
+                            resolve(res);
+                        }, function (err) {
+                            reject(err);
+                        })
+                    } else {
+                        reject({error: i18n.__('no matched job found')});
+                    }
+                }
+            })
+        }
+
+    })
+
+}
 
 function isLoggedIn(req, res, next) {
 

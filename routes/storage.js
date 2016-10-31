@@ -8,7 +8,7 @@ module.exports = function (app, gcObjectAd, i18n,io) {
     app.get('/storage/storageList', function (req, res) {
         Storage.findAll().then(function (storages) {
             console.log('storages: ' + storages);
-            res.render('storage/StorageList',
+            res.render('storage/storageList',
                 {
                     storages: JSON.stringify(storages)
                 });

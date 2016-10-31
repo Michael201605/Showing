@@ -38,7 +38,7 @@ var ProcessOrder = require('./pr/ProcessOrder');
 var OrderItem = require('./pr/OrderItem');
 var Assembly = require('./pr/Assembly');
 var AssemblyItem = require('./pr/AssemblyItem');
-
+var JobProcessOrderData = require('./pr/JobProcessOrderData');
 
 UserGroup.sync().then(function () {
 
@@ -80,6 +80,7 @@ Line.sync().then(function () {
         Recipe.sync().then(function () {
             IngredientComponent.sync();
             JobParameter.sync();
+            JobProcessOrderData.sync();
         });
         ProcessOrder.sync().then(function () {
             OrderItem.sync();

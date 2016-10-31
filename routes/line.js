@@ -56,7 +56,7 @@ module.exports = function (app, i18n) {
         });
     });
 
-    app.get('/line/lineDetail/:id',isLoggedIn, function (req, res) {
+    app.get('/line/lineDetail/:id', function (req, res) {
         var id = req.params.id.substring(1);
         console.log('Line id: ' + id);
         Line.findOne({

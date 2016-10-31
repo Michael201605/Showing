@@ -229,6 +229,7 @@ Job.Instance.prototype.updateIngredients = function () {
                                     reject1({error: error});
                                 }
                             }
+                            //receiver,is normally packer
                             if (ingredient.category === 1) {
                                 Storage.findOne({
                                     where: {
@@ -273,10 +274,10 @@ Job.Instance.prototype.updateIngredients = function () {
                                         // theAssembly.save();
                                         var promises2 = [];
                                         var length = needToAssemblyIngrs.length;
-                                        var index =0;
+                                        var index = 0;
 
 
-                                        updateAssembly(Assembly, me, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                                        updateAssembly(Assembly, me, theHandAdd, needToAssemblyIngrs, length, index).then(function (res) {
                                             resolve1();
                                         }, function (err) {
                                             reject1();
@@ -412,9 +413,9 @@ Job.Instance.prototype.getRecipe = function () {
         });
     });
 };
-function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length, index) {
+function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs, length, index) {
     var theIngr = needToAssemblyIngrs[index];
-    return new Promise(function (resolve,reject) {
+    return new Promise(function (resolve, reject) {
         LogisticUnit.findOne({
             where: {
                 ProductId: theIngr.ProductId,
@@ -426,13 +427,13 @@ function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length
                 log.debug('find logisticUnit for the weight: ' + theIngr.targetWeight);
                 _updateAssembly(Assembly, theJob, theHandAdd, theIngr, theLogisticUnit).then(function (res) {
                     index++;
-                    if(index<length){
-                        updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                    if (index < length) {
+                        updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs, length, index).then(function (res) {
                             resolve(res);
                         }, function (err) {
                             reject(err);
                         })
-                    }else {
+                    } else {
                         resolve(res);
                     }
 
@@ -448,13 +449,13 @@ function updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length
                         log.debug('find theProduct for the weight: ' + theProduct.ident);
                         _updateAssembly(Assembly, theJob, theHandAdd, theIngr, theProduct).then(function (res) {
                             index++;
-                            if(index<length){
-                                updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs,length, index).then(function (res) {
+                            if (index < length) {
+                                updateAssembly(Assembly, theJob, theHandAdd, needToAssemblyIngrs, length, index).then(function (res) {
                                     resolve(res);
                                 }, function (err) {
                                     reject(err);
                                 })
-                            }else {
+                            } else {
                                 resolve(res);
                             }
                         }, function (err) {
@@ -476,9 +477,9 @@ function _updateAssembly(Assembly, theJob, theHandAdd, theIngr, unit) {
     noOfBag = Math.floor(theIngr.targetWeight / unit.unitSize);
     var targetWeight = noOfBag * unit.unitSize;
     var remainWeight = theIngr.targetWeight - targetWeight;
-    log.debug('noOfBag: '+ noOfBag);
-    log.debug('targetWeight: '+ targetWeight);
-    log.debug('remainWeight: '+ remainWeight);
+    log.debug('noOfBag: ' + noOfBag);
+    log.debug('targetWeight: ' + targetWeight);
+    log.debug('remainWeight: ' + remainWeight);
     return new Promise(function (resolve, reject) {
         var promises = [];
         if (targetWeight > 0) {
